@@ -1,0 +1,50 @@
+{
+  "theme": {
+    "page_background": "#f5f6f3",
+    "sidebar_background": "#17191a",
+    "brand_accent": "#00d4a1",
+    "brand_accent_light": "rgba(0, 212, 161, 0.12)",
+    "notification_bell_dot": "#ff3048",
+    "card_dark_bg": "#121415",
+    "card_light_bg": "#ffffff",
+    "card_border_light": "rgba(0, 0, 0, 0.06)",
+    "card_border_dark": "rgba(255, 255, 255, 0.08)",
+    "text_primary_dark": "#ffffff",
+    "text_secondary_dark": "#8e9396",
+    "text_primary_light": "#121415",
+    "text_secondary_light": "#686e73",
+    "chip_bg_light": "#eef1ed",
+    "chip_text_light": "#2d3235"
+  },
+  "typography": {
+    "font_family": "DM Sans, sans-serif",
+    "hero_eyebrow": { "size": "11px", "weight": 700, "letter_spacing": "0.12em", "transform": "uppercase", "color": "#686e73" },
+    "hero_title": { "size": "26px", "weight": 700, "color": "#121415" },
+    "stat_card_headline": { "size": "32px", "weight": 700, "letter_spacing": "-0.02em" },
+    "stat_card_label": { "size": "13px", "weight": 600, "color_light": "#686e73", "color_dark": "#8e9396" },
+    "stat_card_submetric_value": { "size": "15px", "weight": 700 },
+    "stat_card_submetric_label": { "size": "11px", "weight": 500, "color_light": "#686e73", "color_dark": "#8e9396" },
+    "quick_action_title": { "size": "15px", "weight": 700, "color": "#121415" },
+    "quick_action_subtitle": { "size": "12px", "weight": 400, "color": "#686e73" }
+  },
+  "component_refinement_spec": {
+    "hero_header": { "instruction": "Keep greeting Good evening, Ryan., eyebrow THE GOORIN BROS. B2B PORTAL, date pill on right. Ensure notification bell red dot (#ff3048) is preserved." },
+    "stat_card_1_ytd_spend": { "bg": "#121415", "text_color": "#ffffff", "headline": "$4,563.00", "label": "YTD Spend", "toggle": ["Year to Date", "Last 12 months"], "chart": { "bars": 12, "active_color": "#00d4a1", "inactive_color": "rgba(255, 255, 255, 0.15)", "height": "42px", "clean_tooltip": true }, "footer": { "left": { "label": "Year progress", "value": "69%" }, "right": { "label": "Open amount", "value": "$51 (3 orders)" } } },
+    "stat_card_2_outstanding_balance": { "bg": "#ffffff", "border": "1px solid rgba(0, 0, 0, 0.06)", "headline": "$51.00", "label": "Outstanding balance", "chip": { "text": "No past-due balance", "bg": "#eef8f4", "color": "#008a65" }, "footer": { "left": { "label": "Past due", "value": "$0.00" }, "right": { "label": "Current balance", "value": "$51.00" } } },
+    "stat_card_3_payment_terms": { "bg": "#ffffff", "border": "1px solid rgba(0, 0, 0, 0.06)", "headline": "50% Prepay, 50% Net 60", "headline_size": "20px", "label": "Payment terms", "chip": { "text": "Invoiced account", "bg": "#eef1ed", "color": "#2d3235" }, "footer": { "left": { "label": "Active orders", "value": "3 open" }, "right": { "label": "Last order placed", "value": "Sep 2 (7d ago)" } } },
+    "quick_actions": { "layout": "4 equal columns (grid-cols-1 sm:grid-cols-2 lg:grid-cols-4)", "gap": "16px", "items": [
+      { "title": "Browse Catalog", "subtitle": "Shop current in-stock items", "cta": "Shop now", "icon": "ShoppingBag" },
+      { "title": "Pre-Book Orders", "subtitle": "Plan upcoming seasonal releases", "cta": "View pre-books", "icon": "Calendar" },
+      { "title": "Track Orders", "subtitle": "3 open orders in fulfillment", "cta": "3 open orders", "icon": "Truck" },
+      { "title": "Brand Assets", "subtitle": "Download line sheets & media", "cta": "Resources", "icon": "FolderDown" }
+    ] }
+  },
+  "css_snippet": "/* Modern Clean Refined B2B Stat Cards & Quick Actions */\n.stat-card-modern-dark { background-color: #121415; color: #ffffff; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; shadow: 0 4px 20px rgba(0,0,0,0.15); }\n.stat-card-modern-light { background-color: #ffffff; color: #121415; border: 1px solid rgba(0,0,0,0.06); border-radius: 16px; padding: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; shadow: 0 2px 12px rgba(0,0,0,0.03); }\n.quick-action-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 20px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }\n.quick-action-card:hover { border-color: rgba(0, 212, 161, 0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 212, 161, 0.08); }\n.quick-action-icon-box { width: 42px; height: 42px; border-radius: 10px; background: rgba(0, 212, 161, 0.08); color: #00b88c; display: flex; align-items: center; justify-content: center; }",
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Include data-testid on all interactive buttons, cards, toggles, tabs, and links.",
+    "Do not add new features like announcements or live data sync.",
+    "Notification bell red dot must stay #ff3048.",
+    "Maintain exact brand accent green #00d4a1, sidebar dark #17191a, page background #f5f6f3.",
+    "Do not use transparent background on dropdowns or overlays."
+  ]
+}
