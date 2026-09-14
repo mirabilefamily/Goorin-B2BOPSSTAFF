@@ -205,9 +205,9 @@ export default function PreBookPage({ onNavigate }: Props) {
         <aside className="pb-side">
           <div className="pb-side-head"><span>{tab === 'setup' ? 'Pre-book Collections' : 'Seasons'}</span>{tab === 'review' && <button className="pb-side-add" aria-label="Add season" onClick={() => toast('New season')}><Plus size={15} /></button>}</div>
           {tab === 'review' ? (
-            <div className="pb-season">
-              <div className="pb-season-head"><ChevronDown size={15} /><strong>SS27</strong><em className="pb-badge closing">Closing</em></div>
-              <div className="pb-drops">
+            <div className="pbx-season">
+              <div className="pbx-season-head"><ChevronDown size={15} /><strong>SS27</strong><em className="pb-badge closing">Closing</em></div>
+              <div className="pbx-drops">
                 {seasonDrops.map((d) => (
                   <button key={d.id} className={`pb-drop-item ${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
                     <FolderClosed size={15} />
@@ -236,12 +236,12 @@ export default function PreBookPage({ onNavigate }: Props) {
           {tab === 'review' ? (
             <>
               {/* drop header */}
-              <div className="pb-drop-head">
-                <div className="pb-drop-title">
+              <div className="pbx-drop-head">
+                <div className="pbx-drop-title">
                   <span className="pb-live" />
                   <div className="pb-drop-idblock">
                     <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
-                    <span className="pb-deadline"><Calendar size={14} /> Deadline 9/21/2026</span>
+                    <span className="pbx-deadline"><Calendar size={14} /> Deadline 9/21/2026</span>
                   </div>
                 </div>
                 <div className="pb-drop-actions">
@@ -319,7 +319,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                       <div className="pb-metric"><small>Wholesale</small><strong className="green">{c.wholesale}</strong></div>
                       <div className="pb-metric"><small>MOQ rate</small><strong className={c.moqTone}>{c.moq}</strong></div>
                     </div>
-                    <div className="pb-moq"><span>MOQ hit</span><div className="pb-moq-bar"><i style={{ width: `${c.pct}%`, background: c.bar }} /></div><em>{c.hit}</em></div>
+                    <div className="pbx-moq"><span>MOQ hit</span><div className="pbx-moq-bar"><i style={{ width: `${c.pct}%`, background: c.bar }} /></div><em>{c.hit}</em></div>
                   </div>
                 ))}
               </div>
@@ -352,7 +352,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                 </div>
 
                 {subTab === 'demand' ? (
-                  <div className="pb-table pb-table--demand">
+                  <div className="pbx-table pbx-table--demand">
                     <div className="pb-tr pb-th">
                       <span>SKU</span><span>Name</span><span className="r">USW</span><span className="r">DIST</span><span className="r">EXT</span><span className="r">Total</span><span className="r">MOQ</span><span>Fill</span><span>Status</span><span />
                     </div>
@@ -391,7 +391,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                     <div className="pb-foot"><b>{skus.length} SKUs</b><span>{totalUnits.toLocaleString()} total units</span><span className="pb-foot-sep">|</span><span>{atOrAbove} at or above MOQ</span></div>
                   </div>
                 ) : (
-                  <div className="pb-table pb-table--orders">
+                  <div className="pbx-table pbx-table--orders">
                     <div className="pb-tr pb-oth">
                       <span className="pb-check"><input type="checkbox" aria-label="Select all" checked={selCount > 0 && selCount === orderRows.length} onChange={toggleAll} data-testid="pb-order-selectall" /></span>
                       <span>Order</span><span>Customer</span><span>Channel</span><span className="r">Units</span><span className="r">Wholesale</span><span>SO#</span><span>Status</span><span />

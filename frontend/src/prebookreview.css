@@ -14,14 +14,14 @@
 .pb-side-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 12px; }
 .pb-side-head span { font-size: 11px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #9aa39c; }
 .pb-side-add { border: none; background: #f2f5f3; color: #55605a; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; }
-.pb-season { border: 1px solid #eef1ef; border-radius: 14px; padding: 8px; margin: 2px; }
-.pb-season-head { display: flex; align-items: center; gap: 8px; padding: 8px 8px 10px; color: #4a544e; }
-.pb-season-head strong { font-size: 14px; color: #16241d; font-weight: 700; }
+.pbx-season { border: 1px solid #eef1ef; border-radius: 14px; padding: 8px; margin: 2px; }
+.pbx-season-head { display: flex; align-items: center; gap: 8px; padding: 8px 8px 10px; color: #4a544e; }
+.pbx-season-head strong { font-size: 14px; color: #16241d; font-weight: 700; }
 .pb-badge { font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; padding: 3px 7px; border-radius: 5px; margin-left: auto; }
 .pb-badge.closing { color: #d9930b; background: #fbf1dc; }
 .pb-badge.closed { color: #8a938d; background: #eef1ef; }
 .pb-badge.left { color: #d9930b; background: #fbf1dc; }
-.pb-drops { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
+.pbx-drops { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
 .pb-drop-item { display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: #4a544e; font-size: 13.5px; font-weight: 500; padding: 10px 11px; border-radius: 10px; cursor: pointer; text-align: left; white-space: nowrap; transition: background .14s; }
 .pb-drop-item svg { color: #a7b0a9; flex-shrink: 0; }
 .pb-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -40,14 +40,14 @@
 /* main */
 .pb-main { background: #fff; border: 1px solid #edf0ee; border-radius: 18px; padding: 22px 26px 26px; box-shadow: 0 14px 44px -34px rgba(16,35,27,.5); min-height: 520px; }
 
-.pb-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid #f0f2f0; }
-.pb-drop-title { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; text-align: left; }
+.pbx-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid #f0f2f0; }
+.pbx-drop-title { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; text-align: left; }
 .pb-live { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.16); flex-shrink: 0; }
 .pb-drop-idblock { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 .pb-drop-idtop { display: flex; align-items: center; gap: 12px; }
-.pb-drop-title strong { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #0f1a14; white-space: nowrap; }
-.pb-drop-title strong span { color: #6b756e; font-weight: 700; }
-.pb-deadline { display: inline-flex; align-items: center; gap: 7px; color: #8a938d; font-size: 13px; }
+.pbx-drop-title strong { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #0f1a14; white-space: nowrap; }
+.pbx-drop-title strong span { color: #6b756e; font-weight: 700; }
+.pbx-deadline { display: inline-flex; align-items: center; gap: 7px; color: #8a938d; font-size: 13px; }
 .pb-open-pill { font-size: 10px; font-weight: 800; letter-spacing: 0.07em; color: #12a150; border: 1px solid #bce7cd; background: #edfaf1; padding: 4px 11px; border-radius: 999px; }
 .pb-drop-actions { display: flex; align-items: center; gap: 10px; }
 .pb-more { width: 40px; height: 40px; border-radius: 11px; border: 1px solid #e6e9e7; background: #fff; color: #7a847d; display: grid; place-items: center; cursor: pointer; }
@@ -96,11 +96,11 @@
 .pb-metric strong.green { color: #4fe0b2; }
 .pb-metric strong.amber { color: #f2b544; }
 .pb-metric strong.red { color: #ff6b7d; }
-.pb-moq { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
-.pb-moq > span { font-size: 11px; color: #7a847c; white-space: nowrap; }
-.pb-moq-bar { flex: 1; height: 6px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
-.pb-moq-bar i { display: block; height: 100%; border-radius: 4px; }
-.pb-moq em { font-size: 12px; color: #b9c2bb; font-weight: 600; }
+.pbx-moq { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+.pbx-moq > span { font-size: 11px; color: #7a847c; white-space: nowrap; }
+.pbx-moq-bar { flex: 1; height: 6px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
+.pbx-moq-bar i { display: block; height: 100%; border-radius: 4px; }
+.pbx-moq em { font-size: 12px; color: #b9c2bb; font-weight: 600; }
 
 /* panel */
 .pb-panel { margin-top: 22px; }
@@ -121,10 +121,10 @@
 .pb-search input { border: none; background: transparent; outline: none; font-size: 13px; color: #24312b; width: 150px; }
 
 /* tables */
-.pb-table { border-top: 1px solid #edf0ee; }
+.pbx-table { border-top: 1px solid #edf0ee; }
 .pb-tr { display: grid; align-items: center; gap: 10px; }
-.pb-table--demand .pb-tr { grid-template-columns: minmax(150px,1.5fr) 1.6fr .6fr .6fr .6fr .7fr .7fr 1.3fr 1fr 20px; }
-.pb-table--orders .pb-tr { grid-template-columns: 34px .7fr 2fr .9fr .7fr 1fr .6fr 1.1fr 40px; }
+.pbx-table--demand .pb-tr { grid-template-columns: minmax(150px,1.5fr) 1.6fr .6fr .6fr .6fr .7fr .7fr 1.3fr 1fr 20px; }
+.pbx-table--orders .pb-tr { grid-template-columns: 34px .7fr 2fr .9fr .7fr 1fr .6fr 1.1fr 40px; }
 .pb-th, .pb-oth { padding: 13px 4px; }
 .pb-th span, .pb-oth span { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #9aa39c; }
 .pb-th span.r, .pb-oth span.r { text-align: right; }
@@ -271,8 +271,8 @@
   .pb-body { grid-template-columns: 1fr; }
   .pb-side { min-height: 0; }
   .pb-stats { grid-template-columns: 1fr; }
-  .pb-table { overflow-x: auto; }
-  .pb-table--demand .pb-tr, .pb-table--orders .pb-tr { min-width: 760px; }
+  .pbx-table { overflow-x: auto; }
+  .pbx-table--demand .pb-tr, .pbx-table--orders .pb-tr { min-width: 760px; }
   .pb-drow { grid-template-columns: 1fr 1fr; row-gap: 12px; }
   .pb-drow-actions { opacity: 1; }
   .pb-drow-edit { grid-template-columns: 1fr; }
