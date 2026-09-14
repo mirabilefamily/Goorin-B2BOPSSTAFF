@@ -265,10 +265,10 @@ export default function DashboardPage({ onNavigate }: Props) {
                   <linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1e40af" stopOpacity={0.12} /><stop offset="100%" stopColor="#1e40af" stopOpacity={0} /></linearGradient>
                 </defs>
                 <CartesianGrid vertical={false} stroke="#e6eae8" />
-                <XAxis dataKey="m" tickLine={false} axisLine={{ stroke: '#e4eae6' }} tick={{ fill: '#85938d', fontSize: 12, fontFamily: 'JetBrains Mono' }} dy={8} />
-                <YAxis tickFormatter={(v) => compact(v)} tickLine={false} axisLine={false} tick={{ fill: '#a0aca6', fontSize: 11, fontFamily: 'JetBrains Mono' }} width={56} domain={[0, chartMax]} />
+                <XAxis dataKey="m" tickLine={false} axisLine={{ stroke: '#e4eae6' }} tick={{ fill: '#85938d', fontSize: 12 }} dy={8} />
+                <YAxis tickFormatter={(v) => compact(v)} tickLine={false} axisLine={false} tick={{ fill: '#a0aca6', fontSize: 11 }} width={52} domain={[0, chartMax]} />
                 <Tooltip cursor={{ stroke: '#b8c0bb', strokeWidth: 1 }} content={<RevTooltip />} />
-                {months.some((m) => m.m === 'Sep') && <ReferenceLine x="Sep" stroke="#c9ced2" strokeDasharray="4 4" label={{ value: 'TODAY', position: 'insideTopRight', fill: '#a0aca6', fontSize: 10, fontFamily: 'Outfit', fontWeight: 800 }} />}
+                {months.some((m) => m.m === 'Sep') && <ReferenceLine x="Sep" stroke="#c9ced2" strokeDasharray="4 4" label={{ value: 'TODAY', position: 'insideTopRight', fill: '#a0aca6', fontSize: 10, fontWeight: 700 }} />}
                 <Area type="monotone" dataKey="total" stroke="none" fill="url(#gTotal)" isAnimationActive={false} activeDot={false} />
                 <Bar dataKey="invoiced" stackId="rev" fill="url(#gInv)" maxBarSize={30} isAnimationActive={false} />
                 <Bar dataKey="open" stackId="rev" fill="url(#gOpen)" radius={[6, 6, 0, 0]} maxBarSize={30} isAnimationActive={false} />
