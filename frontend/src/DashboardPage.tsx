@@ -231,7 +231,7 @@ export default function DashboardPage({ onNavigate }: Props) {
             <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span></div>
             <div><strong className="rv-kpi-v">{compact(t.v)}</strong><small className="rv-kpi-cap">{t.cap}</small></div>
             <div className="rv-kpi-foot">
-              <div className="rv-kpi-meter"><span><b>{Math.min(t.pct, 100)}%</b> {t.barLabel}</span><div className={`rv-kpi-bar ${t.chip}`}><i style={{ width: `${Math.min(t.pct, 100)}%` }} /></div></div>
+              <div className="rv-kpi-meter"><span><b>{t.pct}%</b> {t.barLabel}</span><div className={`rv-kpi-bar ${t.chip}`}><i style={{ width: `${Math.min(t.pct, 100)}%` }} /></div></div>
             </div>
           </section>
         ))}
@@ -250,7 +250,7 @@ export default function DashboardPage({ onNavigate }: Props) {
             <div className="rv-head-right">
               <div className="rv-legend">
                 <span><i className="dot" style={{ background: '#0f8a66' }} />Invoiced</span>
-                <span><i className="dot" style={{ background: '#3ecfb0' }} />Open Orders</span>
+                <span><i className="dot" style={{ background: '#3ecfb0' }} />Open orders</span>
                 <span><i className="line" style={{ background: '#1e3a8a' }} />Total</span>
                 <span><i className="dash" />Forecast</span>
               </div>
@@ -332,7 +332,7 @@ export default function DashboardPage({ onNavigate }: Props) {
                     <span className="rv-ava">{initials(a.name)}</span>
                     <span className="rv-acct-nametext"><b>{a.name}{a.strategic && <em className="rv-strategic">Strategic</em>}</b><small>{a.segment}</small></span>
                   </span>
-                  <span className="rv-acct-inv"><b>{compact(a.invoiced)}</b><i className={a.vsGoal >= 0 ? 'ok' : 'warn'} style={{ width: `${Math.max(12, barPct)}%` }} /></span>
+                  <span className="rv-acct-inv"><b>{compact(a.invoiced)}</b><span className="rv-acct-track"><i className={a.vsGoal >= 0 ? 'ok' : 'warn'} style={{ width: `${Math.max(6, barPct)}%` }} /></span></span>
                   <span className="rv-num rv-muted">{compact(a.open)}</span>
                   <span className="rv-num rv-strong">{compact(a.total)}</span>
                   <span className="rv-num rv-muted">{compact(a.goal)}</span>

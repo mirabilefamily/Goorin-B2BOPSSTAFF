@@ -88,3 +88,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Redesign retry: dropped Barlow Condensed + JetBrains Mono (too harsh) → Outfit headings, DM Sans tabular numerals, glass KPI tiles in hero (screenshot-verified)
 - 2026-06 Dashboard redesign v4 (bento): mint hero card w/ area chart + segment pills, goal ring card, KPI icon-chip cards, chart+segments(rings)+top accounts, account table. Airy green/navy/amber palette, Outfit+DM Sans. iteration_23.
 - Refinement: hero stats strip (Prior YTD/Avg/Best month), segment pts-vs-pace, zebra rows; removed decorative KPI spark bars → labeled meter bars (0f pipeline / 0f goal). iteration_24/25.
+- Refinement 2: true % on KPI meters, fixed-width invoiced progress track in table, rank chips, lowercase labels. iteration_26.
