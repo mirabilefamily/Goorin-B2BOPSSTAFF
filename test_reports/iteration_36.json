@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only verification of Pre-Book Review pass-5 structural changes. Login (empty fields, mocked) navigates to Pre-Book Review. 3-column arrangement confirmed: .pbx-cols wraps .pbx-primary (SKU Demand table) + .pbx-rail (sticky right rail with Ready card, Purchasing preview, and Drop health pb-stat-combined). Seasons sidebar sits to the left of .pbx-cols. Rail contents verified: 'Ready for customer visibility · Drop is published to customer portals · READY'; Purchasing preview with pb-preview-details toggle (opens details body + pb-cons-toggle inside for consolidation details); pb-stat-combined showing 4 metrics (Units committed 13,328 · Wholesale value $130K · MOQ hit 2/12 · Accounts 4) plus 'Channel mix 7% USW · 93% DIST' split bar and legend rows pb-stat-usw ('US Wholesale 932 · $19K · MOQ 10%') and pb-stat-dist ('Distributor 12,396 · $112K · MOQ 38%'). Table header column renamed from 'Status' to 'Gap' (Status count=0, Gap count=1). All 10 Gap pills render single-line (bounding-box height 27.25px, screenshots confirm no wrapping) — samples: 'At MOQ', '−156', '−240', '−288', '−120', '−180'. SKU codes fit without clipping at both 1920 and 1280 viewports. pb-demand-all/hit/under counts show 12/2/10; pb-demand-totals row reactive: All 'Σ · 12 SKUs · 232 · 2,100 · — · 2,332 · 4,476 · 52%'; Hit '2 SKUs · 160 · 540 · — · 700 · 660 · 106%'; Under '10 SKUs · 72 · 1,560 · — · 1,632 · 3,816 · 43%'; Search Trailblazer '1 SKUs · 100 · 300 · — · 400 · 360 · 111%'. pb-panel-search filters correctly. pb-sku-row-* click expands pb-sku-expand-* (verified for first row). pb-subtab-orders renders 4-row Orders table within .pbx-primary — fits cleanly next to rail (screenshot pbr_orders.png). Regression: pb-actions-btn opens pb-actions-menu; pb-more-btn opens pb-more-menu; pb-drop-drop1/drop2/drop3 switching works; pb-preview-details + pb-cons-toggle toggle bodies; pb-show-archived visible in Seasons sidebar on Review tab (screenshot 1); Setup tab renders pb-new-prebook. Screenshots at 1920x1080 and 1280 both clean — no wrapping, no clipping, no overlaps, well-aligned. Only console messages = benign Recharts width(-1)/height(-1) first-paint warnings (same as previous iterations, not blocking). No page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx:81 still caps row-level fill % at 100 via Math.min(100,...) while pb-demand-totals row uses uncapped math — Trailblazer row shows '100% · At MOQ' but totals-when-scoped shows 111%. Same nit as iteration_35; low priority, may be intentional UX.",
+    "Naming inconsistency persists: Review sidebar uses data-testid pb-drop-drop1/drop2/drop3 while Setup uses pb-drop-d1/d2/d3."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password on login → mocked demo user (ryan@mirabile.com)",
+  "seed_data_creation": "None (all data mocked in PreBookPage.tsx)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Pass-5 structural verified: .pbx-cols (primary + rail) grid, rail contains Ready + Purchasing preview + pb-stat-combined with 4 metrics + channel-mix legend (pb-stat-usw / pb-stat-dist). Table 'Gap' column present (Status renamed), pills single-line at both 1920 and 1280. All testids from review request exist and function. Only outstanding nit is row-level fill % Math.min cap (see iteration_35)."
+}

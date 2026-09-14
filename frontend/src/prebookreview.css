@@ -102,6 +102,27 @@
 .pb-preview-legend b.ok { color: #12805a; } .pb-preview-legend b.warn { color: #b06a12; }
 .pb-preview-legend .sep { margin: 0 8px; color: #c9b98a; }
 
+/* columns: table primary + sticky rail */
+.pbx-cols { display: grid; grid-template-columns: 1fr 300px; gap: 22px; align-items: start; margin-top: 18px; }
+.pbx-primary { min-width: 0; }
+.pbx-primary .pb-panel { margin-top: 0; }
+.pbx-rail { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 8px; }
+.pbx-rail .pb-ready, .pbx-rail .pb-preview { margin-top: 0; }
+.pbx-rail .pb-ready { flex-wrap: wrap; }
+.pbx-rail .pb-preview-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+.pbx-rail .pb-details { align-self: flex-start; }
+.pbx-rail .pbx-health { grid-template-columns: 1fr; gap: 16px; margin-top: 0; padding: 18px; }
+.pbx-rail .pbx-health-metrics { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.pbx-rail .pb-metric strong { font-size: 22px; }
+.pbx-rail .pbx-health-split { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 14px; }
+.pbx-rail .pbx-split-legend li b { font-size: 12.5px; }
+.pbx-status-grid { display: contents; }
+@media (max-width: 1400px) {
+  .pbx-cols { grid-template-columns: 1fr; }
+  .pbx-rail { position: static; flex-direction: row; flex-wrap: wrap; }
+  .pbx-rail > * { flex: 1 1 280px; }
+}
+
 /* drop health */
 .pbx-health { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; margin-top: 18px; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 20px 24px; }
 .pbx-health-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; align-content: center; }
@@ -168,18 +189,18 @@
 /* tables */
 .pbx-table { border-top: 1px solid #edf0ee; }
 .pb-tr { display: grid; align-items: center; gap: 10px; }
-.pbx-table--demand .pb-tr { grid-template-columns: minmax(150px,1.5fr) 1.6fr .6fr .6fr .6fr .7fr .7fr 1.3fr 1fr 20px; }
+.pbx-table--demand .pb-tr { grid-template-columns: minmax(150px,1.4fr) 1.4fr .5fr .5fr .5fr .6fr .6fr 1.1fr .8fr 12px; }
 .pbx-table--orders .pb-tr { grid-template-columns: 34px .7fr 2fr .9fr .7fr 1fr .6fr 1.1fr 40px; }
-.pb-th, .pb-oth { padding: 13px 6px; position: sticky; top: 0; background: #fff; z-index: 1; }
+.pb-th, .pb-oth { padding: 13px 6px; background: #fff; }
 .pb-th span, .pb-oth span { font-family: var(--ui); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); }
 .pb-th span.r, .pb-oth span.r { text-align: right; }
 .pb-row-wrap { border-top: 1px solid #f2f4f2; }
 .pb-row, .pb-orow { padding: 14px 8px; cursor: pointer; transition: background .14s; }
 .pb-row:hover, .pb-orow:hover { background: var(--sub); }
 .pb-orow { border-top: 1px solid #f2f4f2; cursor: default; }
-.pb-sku-code { display: inline-flex; align-items: center; gap: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #55605a; }
+.pb-sku-code { display: inline-flex; align-items: center; gap: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: #55605a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pb-sku-code svg { color: #b7c0ba; transition: transform .2s; flex-shrink: 0; }
-.pb-sku-name { font-size: 14px; font-weight: 600; color: #1a2820; }
+.pb-sku-name { font-size: 13.5px; font-weight: 600; color: #1a2820; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pb-status.under { color: #b8790c; background: #fdf2dd; font-variant-numeric: tabular-nums; }
 .pb-status.close { color: #16907a; background: #e2f7f2; font-variant-numeric: tabular-nums; }
 .pbx-season-prog { height: 4px; border-radius: 999px; background: #e1e8e4; margin: 8px 10px 0; overflow: hidden; }
@@ -209,7 +230,7 @@
 .pb-fill-track i.close { background: linear-gradient(90deg, #6fe3c9, #2bb597); }
 .pb-fill-track i.hit { background: linear-gradient(90deg, #34b98f, #0b6e50); }
 .pb-fill em { font-size: 12.5px; color: #55605a; font-weight: 600; width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
-.pb-status { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+.pb-status { font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .pb-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .pb-status.under { color: #b8790c; background: #fdf2dd; }
 .pb-status.hit { color: #0f8a66; background: #e4f5ee; }

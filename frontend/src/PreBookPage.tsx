@@ -285,57 +285,8 @@ export default function PreBookPage({ onNavigate }: Props) {
                 </div>
               </div>
 
-              {/* status row */}
-              <div className="pbx-status-grid">
-              <div className="pb-ready"><span className="pbx-ready-ico"><CheckCircle2 size={17} /></span><div><span>Ready for customer visibility</span><small>Drop is published to customer portals</small></div><em>READY</em></div>
-
-              {/* purchasing preview */}
-              <div className={`pb-preview ${previewOpen ? 'is-open' : ''}`} data-testid="pb-preview">
-                <div className="pb-preview-row">
-                  <div className="pb-preview-lead">
-                    <span className="pb-preview-ico"><Layers size={16} /></span>
-                    <div><strong>Purchasing preview</strong> <span className="pb-preview-meta">4 standard · 0 consolidated</span><div className="pb-preview-warn">No POs created · consolidated release blocked</div></div>
-                  </div>
-                  <button className="pb-details" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details">Details <ChevronDown size={14} className={previewOpen ? 'flip' : ''} /></button>
-                </div>
-                {previewOpen && (
-                  <div className="pb-preview-body">
-                    <p className="pb-preview-note"><Lock size={13} /> Sales channel: Not configured — freeze is unavailable</p>
-                    <button className="pb-cons" onClick={() => setConsOpen((v) => !v)} data-testid="pb-cons-toggle">Consolidation details · 4 standard / 0 consolidated <ChevronDown size={16} className={consOpen ? 'flip' : ''} /></button>
-                    {consOpen && (
-                      <div className="pb-cons-table" data-testid="pb-cons-table">
-                        <div className="pb-cons-tr pb-cons-th"><span>Order</span><span>Channel</span><span>Type</span><span className="r">Units</span><span>PO</span></div>
-                        {orders.map((o) => (
-                          <div className="pb-cons-tr" key={o.id}><span>{o.id}</span><span><em className={`pb-channel ${o.channel.toLowerCase()}`}>{o.channel}</em></span><span>Standard</span><span className="r">{o.units.toLocaleString()}</span><span className="pb-mut">Not created</span></div>
-                        ))}
-                      </div>
-                    )}
-                    <button className="pb-freeze" disabled title="Configure a sales channel to enable"><Snowflake size={15} /> Freeze batch for review</button>
-                    <p className="pb-preview-legend"><b className="ok">Standard</b> 4 releasable orders <span className="sep">·</span> <b className="warn">Consolidated</b> 0 blocked orders · 0 PO buckets</p>
-                  </div>
-                )}
-              </div>
-
-              </div>
-
-              {/* drop health */}
-              <div className="pbx-health" data-testid="pb-stat-combined">
-                <div className="pbx-health-metrics">
-                  <div className="pb-metric"><small>Units committed</small><strong>{combined.units.toLocaleString()}</strong></div>
-                  <div className="pb-metric"><small>Wholesale value</small><strong className="green">{combined.wholesale}</strong></div>
-                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
-                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
-                </div>
-                <div className="pbx-health-split">
-                  <div className="pbx-health-split-head"><span>Channel mix</span><span>{Math.round((chan.usw.units / combined.units) * 100)}% USW · {Math.round((chan.dist.units / combined.units) * 100)}% DIST</span></div>
-                  <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
-                  <ul className="pbx-split-legend">
-                    <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} /><span>US Wholesale</span><b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale} · MOQ {chan.usw.moq}</em></li>
-                    <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} /><span>Distributor</span><b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale} · MOQ {chan.dist.moq}</em></li>
-                  </ul>
-                </div>
-              </div>
-
+              <div className="pbx-cols">
+                <div className="pbx-primary">
               {/* panel */}
               <section className="pb-panel">
                 <div className="pb-panel-head">
@@ -366,7 +317,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                 {subTab === 'demand' ? (
                   <div className="pbx-table pbx-table--demand">
                     <div className="pb-tr pb-th">
-                      <span>SKU</span><span>Name</span><span className="r">USW</span><span className="r">DIST</span><span className="r">EXT</span><span className="r">Total</span><span className="r">MOQ</span><span>Fill</span><span>Status</span><span />
+                      <span>SKU</span><span>Name</span><span className="r">USW</span><span className="r">DIST</span><span className="r">EXT</span><span className="r">Total</span><span className="r">MOQ</span><span>Fill</span><span>Gap</span><span />
                     </div>
                     {demandRows.length > 0 && (
                       <div className="pb-tr pb-total-row" data-testid="pb-demand-totals">
@@ -395,7 +346,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                             <span className="r pb-strong">{s.total.toLocaleString()}</span>
                             <span className="r pb-mut">{s.moq}</span>
                             <Fill total={s.total} moq={s.moq} />
-                            <span><em className={`pb-status ${hit ? 'hit' : s.total / s.moq >= 0.75 ? 'close' : 'under'}`}>{hit ? 'At MOQ' : s.total / s.moq >= 0.75 ? `Close · −${(s.moq - s.total).toLocaleString()}` : `Under · −${(s.moq - s.total).toLocaleString()}`}</em></span>
+                            <span><em className={`pb-status ${hit ? 'hit' : s.total / s.moq >= 0.75 ? 'close' : 'under'}`}>{hit ? 'At MOQ' : `−${(s.moq - s.total).toLocaleString()}`}</em></span>
                             <span />
                           </div>
                           {open && (
@@ -461,6 +412,58 @@ export default function PreBookPage({ onNavigate }: Props) {
                   </div>
                 )}
               </section>
+                </div>
+                <aside className="pbx-rail">
+              {/* status row */}
+              <div className="pb-ready"><span className="pbx-ready-ico"><CheckCircle2 size={17} /></span><div><span>Ready for customer visibility</span><small>Drop is published to customer portals</small></div><em>READY</em></div>
+
+              {/* purchasing preview */}
+              <div className={`pb-preview ${previewOpen ? 'is-open' : ''}`} data-testid="pb-preview">
+                <div className="pb-preview-row">
+                  <div className="pb-preview-lead">
+                    <span className="pb-preview-ico"><Layers size={16} /></span>
+                    <div><strong>Purchasing preview</strong> <span className="pb-preview-meta">4 standard · 0 consolidated</span><div className="pb-preview-warn">No POs created · consolidated release blocked</div></div>
+                  </div>
+                  <button className="pb-details" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details">Details <ChevronDown size={14} className={previewOpen ? 'flip' : ''} /></button>
+                </div>
+                {previewOpen && (
+                  <div className="pb-preview-body">
+                    <p className="pb-preview-note"><Lock size={13} /> Sales channel: Not configured — freeze is unavailable</p>
+                    <button className="pb-cons" onClick={() => setConsOpen((v) => !v)} data-testid="pb-cons-toggle">Consolidation details · 4 standard / 0 consolidated <ChevronDown size={16} className={consOpen ? 'flip' : ''} /></button>
+                    {consOpen && (
+                      <div className="pb-cons-table" data-testid="pb-cons-table">
+                        <div className="pb-cons-tr pb-cons-th"><span>Order</span><span>Channel</span><span>Type</span><span className="r">Units</span><span>PO</span></div>
+                        {orders.map((o) => (
+                          <div className="pb-cons-tr" key={o.id}><span>{o.id}</span><span><em className={`pb-channel ${o.channel.toLowerCase()}`}>{o.channel}</em></span><span>Standard</span><span className="r">{o.units.toLocaleString()}</span><span className="pb-mut">Not created</span></div>
+                        ))}
+                      </div>
+                    )}
+                    <button className="pb-freeze" disabled title="Configure a sales channel to enable"><Snowflake size={15} /> Freeze batch for review</button>
+                    <p className="pb-preview-legend"><b className="ok">Standard</b> 4 releasable orders <span className="sep">·</span> <b className="warn">Consolidated</b> 0 blocked orders · 0 PO buckets</p>
+                  </div>
+                )}
+              </div>
+
+              {/* drop health */}
+              <div className="pbx-health" data-testid="pb-stat-combined">
+                <div className="pbx-health-metrics">
+                  <div className="pb-metric"><small>Units committed</small><strong>{combined.units.toLocaleString()}</strong></div>
+                  <div className="pb-metric"><small>Wholesale value</small><strong className="green">{combined.wholesale}</strong></div>
+                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
+                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
+                </div>
+                <div className="pbx-health-split">
+                  <div className="pbx-health-split-head"><span>Channel mix</span><span>{Math.round((chan.usw.units / combined.units) * 100)}% USW · {Math.round((chan.dist.units / combined.units) * 100)}% DIST</span></div>
+                  <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
+                  <ul className="pbx-split-legend">
+                    <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} /><span>US Wholesale</span><b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale} · MOQ {chan.usw.moq}</em></li>
+                    <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} /><span>Distributor</span><b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale} · MOQ {chan.dist.moq}</em></li>
+                  </ul>
+                </div>
+              </div>
+
+                </aside>
+              </div>
             </>
           ) : (
             /* ---------- SETUP ---------- */
