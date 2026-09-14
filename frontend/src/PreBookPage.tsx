@@ -340,7 +340,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                     {subTab === 'demand' ? (
                       <div className="pb-seg3" role="tablist">
                         {(['all', 'hit', 'under'] as const).map((f) => (
-                          <button key={f} className={demandFilter === f ? 'active' : ''} onClick={() => setDemandFilter(f)} data-testid={`pb-demand-${f}`}>{f[0].toUpperCase() + f.slice(1)}</button>
+                          <button key={f} className={demandFilter === f ? 'active' : ''} onClick={() => setDemandFilter(f)} data-testid={`pb-demand-${f}`}>{f[0].toUpperCase() + f.slice(1)} <b>{f === 'all' ? skus.length : f === 'hit' ? atOrAbove : skus.length - atOrAbove}</b></button>
                         ))}
                       </div>
                     ) : (
@@ -374,7 +374,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                             <span className="r pb-strong">{s.total.toLocaleString()}</span>
                             <span className="r pb-mut">{s.moq}</span>
                             <Fill total={s.total} moq={s.moq} />
-                            <span><em className={`pb-status ${hit ? 'hit' : 'under'}`}>{hit ? 'At MOQ' : 'Under MOQ'}</em></span>
+                            <span><em className={`pb-status ${hit ? 'hit' : 'under'}`}>{hit ? 'At MOQ' : `Under · −${(s.moq - s.total).toLocaleString()}`}</em></span>
                             <span />
                           </div>
                           {open && (

@@ -94,3 +94,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Consolidation pass: hero now includes Annual goal side panel; 3 KPIs merged into one strip card (5 cards → 2). iteration_29.
 - Segments card removed; channel goal rows integrated into hero goal panel; right column = Top accounts (8). iteration_30.
 - Simplification (b): removed hero stats strip, KPI bars/legends, TODAY line + Forecast series, Top accounts card; chart full width; Accounts table ranked with Top 1-5 pins. iteration_31.
+- Pre-Book refine 2: stat strip card, filter counts, Under gap pills, sticky header/sidebar. iteration_32.

@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only regression of Pre-Book Review refinement. Login (empty fields) navigates to dashboard; sidebar item 'Pre-Book Review' loads prebook-page. Verified: (1) stat strip renders pb-stat-combined/usw/dist in one bordered strip with MOQ hit % text and progress bars; (2) demand filter chips show counts 'All 12', 'Hit 2', 'Under 10' — clicking each filters rows correctly (12/2/10); (3) pb-panel-search filters (typing 'GOAT' -> 1 row); (4) Under-MOQ rows show pill 'Under · −240' (etc.), at-MOQ rows show 'At MOQ'; (5) pb-sku-row-* expand renders pb-sku-expand-*; (6) pb-subtab-orders shows 4 orders; (7) pb-actions-btn opens pb-actions-menu, pb-more-btn opens pb-more-menu; (8) pb-preview-details toggles and reveals pb-cons-toggle; (9) sidebar seasons card auto-height (~297px, not stretched); pb-drop-1/2/3 switch active; (10) Setup tab renders pb-new-prebook. 1920x1080 and 1280x900 screenshots captured. No console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Review @ 1280x900", "issues": ["Stat strip (Total Combined / US Wholesale / Distributor) overflows horizontally at 1280 width — Distributor card is clipped on the right edge of the main panel. The three cards side-by-side with left sidebar (~280px) do not fit; consider collapsing to 2-per-row or reducing internal padding under 1280 viewport."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: fix stat-strip overflow at ~1280 widths — either make .pb-stats wrap (grid auto-fit minmax) or reduce card min-width so all three fit inside main panel."
+  ],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx is ~493 lines; still readable, but Setup panel could be split into its own component for maintainability.",
+    "Ternary in pb-panel-tabs: `SKU Demand{subTab === 'orders' ? ` (${skus.length})` : ''}` shows SKU count only when Orders is active — inverted UX; probably intended when demand is active."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty-field login (mocked) -> ryan@mirabile.com",
+  "seed_data_creation": "None (all data mocked in PreBookPage.tsx)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All required data-testids for Pre-Book Review refinement are wired and functional. Only issue is stat-strip horizontal overflow at 1280 viewport width."
+}
