@@ -33,10 +33,27 @@ import './prebookreview.css';
 type Props = { onNavigate: (label: string) => void };
 
 /* ---------- seasons / drops ---------- */
-const seasonDrops = [
-  { id: 'drop1', label: 'Drop 1', status: 'closed' as const },
-  { id: 'drop2', label: 'Drop 2', status: 'closed' as const },
-  { id: 'drop3', label: 'Drop 3', status: 'open' as const, count: 21 },
+type DropT = { id: string; label: string; status: 'open' | 'closed'; count?: number };
+type SeasonT = { id: string; status: 'open' | 'closing' | 'closed'; archived?: boolean; deadline: string; drops: DropT[] };
+const SEASONS: SeasonT[] = [
+  { id: 'SS27', status: 'closing', deadline: '9/21/2026', drops: [
+    { id: 'drop1', label: 'Drop 1', status: 'closed' },
+    { id: 'drop2', label: 'Drop 2', status: 'closed' },
+    { id: 'drop3', label: 'Drop 3', status: 'open', count: 21 },
+  ] },
+  { id: 'FW27', status: 'open', deadline: '12/15/2026', drops: [
+    { id: 'drop1', label: 'Drop 1', status: 'open', count: 8 },
+    { id: 'drop2', label: 'Drop 2', status: 'open', count: 3 },
+  ] },
+  { id: 'FW26', status: 'closed', archived: true, deadline: '12/10/2025', drops: [
+    { id: 'drop1', label: 'Drop 1', status: 'closed' },
+    { id: 'drop2', label: 'Drop 2', status: 'closed' },
+    { id: 'drop3', label: 'Drop 3', status: 'closed' },
+  ] },
+  { id: 'SS26', status: 'closed', archived: true, deadline: '9/18/2025', drops: [
+    { id: 'drop1', label: 'Drop 1', status: 'closed' },
+    { id: 'drop2', label: 'Drop 2', status: 'closed' },
+  ] },
 ];
 
 const combined = { accounts: 4, units: 13328, wholesale: '$130K', moqTone: 'amber' };
@@ -135,6 +152,13 @@ export default function PreBookPage({ onNavigate }: Props) {
   const [skuQuery, setSkuQuery] = useState('');
   const [orderQuery, setOrderQuery] = useState('');
   const [activeDrop, setActiveDrop] = useState('drop3');
+  const [activeSeason, setActiveSeason] = useState('SS27');
+  const [seasonOpen, setSeasonOpen] = useState(false);
+  const season = SEASONS.find((x) => x.id === activeSeason) ?? SEASONS[0];
+  const seasonDrops = season.drops;
+  const drop = seasonDrops.find((d) => d.id === activeDrop) ?? seasonDrops[seasonDrops.length - 1];
+  const dropIndex = seasonDrops.indexOf(drop) + 1;
+  const pickSeason = (id: string) => { const sn = SEASONS.find((x) => x.id === id)!; setActiveSeason(id); setActiveDrop((sn.drops.find((d) => d.status === 'open') ?? sn.drops[sn.drops.length - 1]).id); setSeasonOpen(false); };
 
   // setup state
   const [setupDrops, setSetupDrops] = useState(initialSetupDrops);
@@ -173,7 +197,7 @@ export default function PreBookPage({ onNavigate }: Props) {
   const atOrAbove = skus.filter((s) => s.total >= s.moq).length;
   const ordUnits = orders.reduce((t, o) => t + o.units, 0);
   const ordWhsl = orders.reduce((t, o) => t + o.wholesale, 0);
-  const daysLeft = Math.max(0, Math.ceil((new Date(2026, 8, 21).getTime() - Date.now()) / 86_400_000));
+  const daysLeft = Math.max(0, Math.ceil((new Date(season.deadline).getTime() - Date.now()) / 86_400_000));
   const selCount = selected.size;
 
   const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -228,7 +252,7 @@ export default function PreBookPage({ onNavigate }: Props) {
           )}
           <div className="pb-side-foot">
             {tab === 'review'
-              ? <><label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label><span>{setupDrops.length} drops</span></>
+              ? <span className="pb-mut">{setupDrops.length} drops</span>
               : <><button className="pb-foot-link" onClick={() => { const n = `SS${28 + collections.length - 1}`; setCollections((c) => [...c, n]); setActiveColl(n); toast(`Created ${n}`); }} data-testid="pb-new-prebook"><Plus size={14} /> New Pre-Book</button><button className="pb-foot-link muted" onClick={() => toast('Enable existing pre-book')}>Enable existing</button></>}
           </div>
         </aside>
@@ -240,7 +264,23 @@ export default function PreBookPage({ onNavigate }: Props) {
               {/* hero */}
               <div className="pbx-hero">
               <div className="pbx-switch" data-testid="pb-drop-switcher">
-                <button className="pbx-season-pill" onClick={() => toast('Switch season')}><strong>SS27</strong><em className="pb-badge closing">Closing</em><ChevronDown size={14} /></button>
+                <div className="pbx-season-wrap">
+                  <button className="pbx-season-pill" onClick={() => setSeasonOpen((v) => !v)} aria-expanded={seasonOpen} data-testid="pb-season-pill"><strong>{season.id}</strong><em className={`pb-badge ${season.status}`}>{season.status === 'closing' ? 'Closing' : season.status === 'open' ? 'Open' : 'Closed'}</em><ChevronDown size={14} className={seasonOpen ? 'flip' : ''} /></button>
+                  {seasonOpen && (
+                    <>
+                      <div className="pb-menu-backdrop" onClick={() => setSeasonOpen(false)} />
+                      <div className="pb-menu pbx-season-menu" role="listbox" data-testid="pb-season-menu">
+                        <p className="pb-menu-head">Seasons</p>
+                        {SEASONS.filter((x) => showArchived || !x.archived).map((x) => (
+                          <button key={x.id} role="option" aria-selected={x.id === season.id} className={`pb-menu-item pbx-season-item ${x.id === season.id ? 'active' : ''}`} onClick={() => pickSeason(x.id)} data-testid={`pb-season-${x.id}`}>
+                            <strong>{x.id}</strong><span>{x.drops.length} drops · {x.drops.filter((d) => d.status === 'open').length} open</span><em className={`pb-badge ${x.status}`}>{x.archived ? 'Archived' : x.status === 'closing' ? 'Closing' : x.status === 'open' ? 'Open' : 'Closed'}</em>
+                          </button>
+                        ))}
+                        {!showArchived && <p className="pbx-season-hint">{SEASONS.filter((x) => x.archived).length} archived hidden · enable “Show archived”</p>}
+                      </div>
+                    </>
+                  )}
+                </div>
                 <div className="pbx-drop-tabs" role="tablist">
                   {seasonDrops.map((d) => (
                     <button key={d.id} role="tab" aria-selected={activeDrop === d.id} className={`${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
@@ -255,10 +295,10 @@ export default function PreBookPage({ onNavigate }: Props) {
 
               <div className="pbx-hero-body">
                 <div className="pbx-hero-main">
-                  <p className="pbx-kicker"><span className="pb-live" />Season SS27 · Drop 3 of 3 · <b>{daysLeft} days left</b></p>
-                  <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
+                  <p className="pbx-kicker"><span className={`pb-live ${drop.status}`} />Season {season.id} · Drop {dropIndex} of {seasonDrops.length}{drop.status === 'open' && <> · <b>{daysLeft} days left</b></>}</p>
+                  <div className="pb-drop-idtop"><strong>{season.id} <span>/ {drop.label}</span></strong><em className={`pb-open-pill ${drop.status}`}>{drop.status.toUpperCase()}</em></div>
                   <div className="pbx-deadline-wrap">
-                    <span className="pbx-deadline"><Calendar size={14} /> Closes 9/21/2026</span>
+                    <span className="pbx-deadline"><Calendar size={14} /> {drop.status === 'open' ? 'Closes' : 'Closed'} {season.deadline}</span>
                     <span className="pbx-days-track" aria-hidden="true"><i style={{ width: `${Math.max(4, 100 - (daysLeft / 90) * 100)}%` }} /></span>
                   </div>
                   <div className="pbx-hero-status">

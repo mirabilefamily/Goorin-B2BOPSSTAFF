@@ -1,0 +1,30 @@
+{
+  "summary": "Verified Pre-Book Review season picker fix. Season pill (pb-season-pill) now opens a menu (pb-season-menu) with SS27/FW27 by default plus a hint about archived; enabling pb-show-archived reveals FW26/SS26 with an 'Archived' badge. Selecting FW27 swaps drop tabs (Drop 1 OPEN·8 active, Drop 2 OPEN·3), updates hero to 'FW27 / Drop 1 OPEN' with 'Closes 12/15/2026' and '92 days left'; clicking pb-drop-drop2 swaps hero to 'FW27 / Drop 2'. FW26 (archived) shows all drops CLOSED, hero CLOSED pill with 'Closed 12/10/2025' and no 'days left'. Back to SS27 auto-selects the open Drop 3 (SS27 / Drop 3 OPEN, 7 days left). Exactly one pb-show-archived in DOM. Regression testids (pb-actions-btn, pb-more-btn, pb-preview-details, pb-demand-*, pb-sku-row-*, pb-subtab-orders, Setup → pb-new-prebook) all present. Backdrop click closes menu. No console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Review hero kicker", "issues": ["Kicker text is styled UPPERCASE via CSS but the DOM text is also literal uppercase (e.g. 'SEASON FW27 · DROP 1 OF 2'). Spec wording used 'Season FW27 · Drop 1 of 2'. Purely cosmetic; visual matches."]}
+    ]
+  },
+  "critical_code_review_comments": [
+    "No data-testid on the hero title element (pb-hero-title referenced in tests but not present in /app/frontend/src/PreBookPage.tsx). Consider adding data-testid=\"pb-hero-title\" to the H1/H2 for stable testing.",
+    "There are two duplicated buttons per drop (pb-drop-drop1..N) — one in the main .pb-drop-header (visible) and one in pb-drop-switcher (0×0 hidden). Strict selectors fail; recommend either removing the hidden duplicates or adding aria-hidden + unique testids to disambiguate.",
+    "Recharts container width/height=-1 warnings on dashboard render (pre-existing, unrelated to this change) — set explicit container min-width/height."
+  ],
+  "test_report_links": [],
+  "action_items": [
+    "(Optional) Add data-testid=\"pb-hero-title\" to the hero H1 for direct assertion.",
+    "(Optional) De-duplicate pb-drop-drop* buttons or hide the switcher variants from strict-mode testing (aria-hidden/no testid).",
+    "(Optional) Normalize kicker DOM text-case to sentence-case and rely on CSS for uppercase display."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100% (all acceptance checks passed)"},
+  "test_credentials": "Empty email/password → demo login (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "None (frontend fully mocked)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Frontend-only mocked app at REACT_APP_BACKEND_URL. Pre-Book Review lives in /app/frontend/src/PreBookPage.tsx with SEASONS constant containing SS27 (Closing, drops closed/closed/open-21), FW27 (Open, 2 open drops), FW26 (archived, all closed 12/10/2025), SS26 (archived). Season pill opens pb-season-menu; archived seasons only appear when pb-show-archived is checked. Use force=True clicks for the pb-show-archived label (hidden input inside). Note pb-drop-drop{N} testid appears twice (main header + hidden switcher) — use CSS `button.pb-drop-item` or JS click to disambiguate. There is no pb-hero-title testid.",
+  "rca of the issue": "N/A — this iteration verifies E1's fix (season picker + drop-tab swap + archived visibility + de-duped pb-show-archived). All checks pass."
+}
