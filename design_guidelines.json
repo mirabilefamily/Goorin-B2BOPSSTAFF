@@ -1,50 +1,204 @@
 {
-  "theme": {
-    "page_background": "#f5f6f3",
-    "sidebar_background": "#17191a",
-    "brand_accent": "#00d4a1",
-    "brand_accent_light": "rgba(0, 212, 161, 0.12)",
-    "notification_bell_dot": "#ff3048",
-    "card_dark_bg": "#121415",
-    "card_light_bg": "#ffffff",
-    "card_border_light": "rgba(0, 0, 0, 0.06)",
-    "card_border_dark": "rgba(255, 255, 255, 0.08)",
-    "text_primary_dark": "#ffffff",
-    "text_secondary_dark": "#8e9396",
-    "text_primary_light": "#121415",
-    "text_secondary_light": "#686e73",
-    "chip_bg_light": "#eef1ed",
-    "chip_text_light": "#2d3235"
-  },
+  "project_name": "Goorin B2B Staff Portal — Revenue Ops Dashboard Redesign",
+  "archetype": "Architectural Craft & High-Density B2B Performance (Goorin Bros Heritage Wholesale)",
+  "context": "Internal B2B Staff Dashboard (Desktop-First, Light App Shell)",
+  "version": "2026.1",
   "typography": {
-    "font_family": "DM Sans, sans-serif",
-    "hero_eyebrow": { "size": "11px", "weight": 700, "letter_spacing": "0.12em", "transform": "uppercase", "color": "#686e73" },
-    "hero_title": { "size": "26px", "weight": 700, "color": "#121415" },
-    "stat_card_headline": { "size": "32px", "weight": 700, "letter_spacing": "-0.02em" },
-    "stat_card_label": { "size": "13px", "weight": 600, "color_light": "#686e73", "color_dark": "#8e9396" },
-    "stat_card_submetric_value": { "size": "15px", "weight": 700 },
-    "stat_card_submetric_label": { "size": "11px", "weight": 500, "color_light": "#686e73", "color_dark": "#8e9396" },
-    "quick_action_title": { "size": "15px", "weight": 700, "color": "#121415" },
-    "quick_action_subtitle": { "size": "12px", "weight": 400, "color": "#686e73" }
+    "google_fonts_link": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;600;700;800&display=swap",
+    "headline_font": "'Barlow Condensed', 'Outfit', sans-serif",
+    "heading_font": "'Outfit', 'DM Sans', sans-serif",
+    "body_font": "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+    "mono_data_font": "'JetBrains Mono', monospace",
+    "rules": {
+      "H1_Hero_Figure": "font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem (56px); font-weight: 800; letter-spacing: -0.03em; line-height: 1;",
+      "H2_Section": "font-family: 'Outfit', sans-serif; font-size: 1.25rem (20px); font-weight: 700; letter-spacing: -0.015em; color: var(--color-slate-900);",
+      "H3_Subhead": "font-family: 'Outfit', sans-serif; font-size: 1.05rem (17px); font-weight: 600; color: var(--color-slate-800);",
+      "KPI_Value": "font-family: 'Barlow Condensed', sans-serif; font-size: 2rem (32px); font-weight: 800; letter-spacing: -0.02em;",
+      "Table_Numeric": "font-family: 'JetBrains Mono', monospace; font-size: 0.875rem (14px); font-weight: 700; font-variant-numeric: tabular-nums;",
+      "Overline_Labels": "font-family: 'Outfit', sans-serif; font-size: 0.725rem (11.5px); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;",
+      "Forbidden_Fonts": "FORBIDDEN: Space Grotesk (dashboard rule) and Inter for headings."
+    }
   },
-  "component_refinement_spec": {
-    "hero_header": { "instruction": "Keep greeting Good evening, Ryan., eyebrow THE GOORIN BROS. B2B PORTAL, date pill on right. Ensure notification bell red dot (#ff3048) is preserved." },
-    "stat_card_1_ytd_spend": { "bg": "#121415", "text_color": "#ffffff", "headline": "$4,563.00", "label": "YTD Spend", "toggle": ["Year to Date", "Last 12 months"], "chart": { "bars": 12, "active_color": "#00d4a1", "inactive_color": "rgba(255, 255, 255, 0.15)", "height": "42px", "clean_tooltip": true }, "footer": { "left": { "label": "Year progress", "value": "69%" }, "right": { "label": "Open amount", "value": "$51 (3 orders)" } } },
-    "stat_card_2_outstanding_balance": { "bg": "#ffffff", "border": "1px solid rgba(0, 0, 0, 0.06)", "headline": "$51.00", "label": "Outstanding balance", "chip": { "text": "No past-due balance", "bg": "#eef8f4", "color": "#008a65" }, "footer": { "left": { "label": "Past due", "value": "$0.00" }, "right": { "label": "Current balance", "value": "$51.00" } } },
-    "stat_card_3_payment_terms": { "bg": "#ffffff", "border": "1px solid rgba(0, 0, 0, 0.06)", "headline": "50% Prepay, 50% Net 60", "headline_size": "20px", "label": "Payment terms", "chip": { "text": "Invoiced account", "bg": "#eef1ed", "color": "#2d3235" }, "footer": { "left": { "label": "Active orders", "value": "3 open" }, "right": { "label": "Last order placed", "value": "Sep 2 (7d ago)" } } },
-    "quick_actions": { "layout": "4 equal columns (grid-cols-1 sm:grid-cols-2 lg:grid-cols-4)", "gap": "16px", "items": [
-      { "title": "Browse Catalog", "subtitle": "Shop current in-stock items", "cta": "Shop now", "icon": "ShoppingBag" },
-      { "title": "Pre-Book Orders", "subtitle": "Plan upcoming seasonal releases", "cta": "View pre-books", "icon": "Calendar" },
-      { "title": "Track Orders", "subtitle": "3 open orders in fulfillment", "cta": "3 open orders", "icon": "Truck" },
-      { "title": "Brand Assets", "subtitle": "Download line sheets & media", "cta": "Resources", "icon": "FolderDown" }
-    ] }
+  "colors": {
+    "palette_name": "Heritage Emerald, Warm Sand & Deep Obsidian",
+    "forbidden_colors_check": "VERIFIED ABSENT: No Teal Green/Teal Blue (#1B93A4) used. No purple gradients.",
+    "css_variables": {
+      "--bg-app-base": "#f8faf9",
+      "--bg-card": "#ffffff",
+      "--bg-card-subtle": "#f4f7f5",
+      "--bg-hero": "linear-gradient(145deg, #0b130f 0%, #111c16 55%, #08100d 100%)",
+      "--border-light": "#e4eae6",
+      "--border-medium": "#d1dad5",
+      "--border-hero": "rgba(255, 255, 255, 0.11)",
+      "--color-emerald-primary": "#128258",
+      "--color-emerald-vibrant": "#10b981",
+      "--color-emerald-light": "#e6f7f0",
+      "--color-emerald-glow": "rgba(16, 185, 129, 0.22)",
+      "--color-cobalt-primary": "#1e40af",
+      "--color-cobalt-vibrant": "#3b82f6",
+      "--color-cobalt-light": "#eff6ff",
+      "--color-amber-pace": "#d97706",
+      "--color-amber-light": "#fef3c7",
+      "--color-crimson-loss": "#dc2626",
+      "--color-crimson-light": "#fef2f2",
+      "--color-slate-900": "#0b130f",
+      "--color-slate-800": "#1c2a23",
+      "--color-slate-600": "#4a5952",
+      "--color-slate-400": "#85938d",
+      "--color-slate-200": "#e4eae6"
+    },
+    "charts": {
+      "invoiced_bar": {
+        "gradient_start": "#10b981",
+        "gradient_end": "#047857",
+        "legend_label": "Invoiced"
+      },
+      "open_orders_bar": {
+        "gradient_start": "#6ee7b7",
+        "gradient_end": "#10b981",
+        "legend_label": "Open Orders"
+      },
+      "total_line": {
+        "color": "#1e40af",
+        "stroke_width": 2.8,
+        "legend_label": "Total (Invoiced + Open)"
+      },
+      "forecast_line": {
+        "color": "#d97706",
+        "dash_array": "5 4",
+        "stroke_width": 2.2,
+        "legend_label": "Forecast"
+      },
+      "gridlines": "#e6eae8",
+      "tooltip_background": "rgba(255, 255, 255, 0.96)",
+      "tooltip_border": "#d1dad5"
+    }
   },
-  "css_snippet": "/* Modern Clean Refined B2B Stat Cards & Quick Actions */\n.stat-card-modern-dark { background-color: #121415; color: #ffffff; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; shadow: 0 4px 20px rgba(0,0,0,0.15); }\n.stat-card-modern-light { background-color: #ffffff; color: #121415; border: 1px solid rgba(0,0,0,0.06); border-radius: 16px; padding: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; shadow: 0 2px 12px rgba(0,0,0,0.03); }\n.quick-action-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 20px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }\n.quick-action-card:hover { border-color: rgba(0, 212, 161, 0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 212, 161, 0.08); }\n.quick-action-icon-box { width: 42px; height: 42px; border-radius: 10px; background: rgba(0, 212, 161, 0.08); color: #00b88c; display: flex; align-items: center; justify-content: center; }",
+  "spacing_and_layout": {
+    "page_container": "max-width: 1440px; margin: 0 auto; padding: 12px 16px 48px; display: flex; flex-direction: column; gap: 24px;",
+    "bento_grid_mid": "display: grid; grid-template-columns: 1.8fr 1fr; gap: 24px; align-items: stretch;",
+    "card_padding": "padding: 24px 28px;",
+    "radii": {
+      "hero_card": "20px",
+      "standard_card": "16px",
+      "inner_widget": "12px",
+      "pill_badge": "9999px",
+      "input_field": "10px"
+    },
+    "shadows": {
+      "card_ambient": "0 10px 30px -18px rgba(11, 19, 15, 0.08), 0 2px 6px -1px rgba(11, 19, 15, 0.04)",
+      "card_hover": "0 20px 40px -20px rgba(11, 19, 15, 0.14), 0 4px 12px -2px rgba(11, 19, 15, 0.06)",
+      "hero_glow": "0 24px 60px -20px rgba(11, 19, 15, 0.7)",
+      "tooltip": "0 20px 48px -16px rgba(11, 19, 15, 0.25)"
+    }
+  },
+  "component_blueprints": {
+    "hero_section": {
+      "description": "Premium dark obsidian card with heritage green/gold ambient lighting, tactical live dot indicator, Barlow Condensed YTD invoiced figure, sparkline, segmented control, KPI 3-column bento, and goal progress pace bar.",
+      "styles": {
+        "background": "var(--bg-hero)",
+        "color": "#ffffff",
+        "border": "1px solid rgba(255, 255, 255, 0.12)",
+        "segment_control": "sliding white indicator on dark translucent background (calc((100% - 8px) / 3))"
+      },
+      "elements": [
+        "Invoiced YTD hero text + delta badge + 9-month sparkline",
+        "Segment switcher (All, US Wholesale, Distributors)",
+        "3 KPI Tiles: Open orders, Total, Forecast with micro vertical spark bars",
+        "Annual Goal Progress Bar with pace marker (#d97706 line) and % indicator"
+      ]
+    },
+    "chart_card": {
+      "description": "Light & airy Revenue by Month ComposedChart card with range switcher pills (YTD, 12M, Quarter), CSV export button, crisp custom legend, reference line for current month, and cursor-line APCA compliant tooltip.",
+      "styles": {
+        "background": "#ffffff",
+        "border": "1px solid var(--border-light)",
+        "border_radius": "16px"
+      },
+      "elements": [
+        "Header: Title + Range Switcher (YTD / 12M / Quarter)",
+        "Header Right: Color legend + Export CSV button",
+        "Chart area: Height 380px, responsive, stacked bars for Invoiced/Open, Total blue line, Forecast amber dashed line, reference line on current month"
+      ]
+    },
+    "segments_and_top_accounts_card": {
+      "description": "Right side bento column split into top Segments (US Wholesale & Distributors with progress bars & % of goal pills) and Ranked Top 1-5 Accounts list with rank badge, account name, formatted amount, and triangle delta indicators.",
+      "styles": {
+        "background": "#ffffff",
+        "border": "1px solid var(--border-light)",
+        "border_radius": "16px"
+      }
+    },
+    "account_detail_table": {
+      "description": "Comprehensive B2B account table with live search input, count badge, avatar initials with color seeds, STRATEGIC tags, invoiced horizontal mini-bar, vs Goal pill, YoY delta, and keyboard-accessible accordion expansion showing 5 key metrics and 'Open account' navigation CTA.",
+      "styles": {
+        "row_hover": "background: #f4f7f5;",
+        "expanded_card": "background: #fbfcfb; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--border-medium);"
+      }
+    }
+  },
+  "motion_and_interactions": {
+    "hero_entrance": "animation: rv-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;",
+    "mid_entrance": "animation: rv-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both 0.08s;",
+    "table_entrance": "animation: rv-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both 0.16s;",
+    "progress_bar_fill": "animation: rv-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s;",
+    "card_hover_lift": "transform: translateY(-2px); transition: transform 0.2s ease, box-shadow 0.2s ease;",
+    "reduced_motion": "@media (prefers-reduced-motion: reduce) { animation: none !important; transition: none !important; }"
+  },
+  "data_testid_inventory": {
+    "dashboard_page": "dashboard-page",
+    "rv_hero": "rv-hero",
+    "rv_invoiced_ytd": "rv-invoiced-ytd",
+    "rv_invoiced_delta": "rv-invoiced-delta",
+    "rv_seg_all": "rv-seg-all",
+    "rv_seg_us": "rv-seg-us",
+    "rv_seg_dist": "rv-seg-dist",
+    "rv_tile_open": "rv-tile-open",
+    "rv_tile_total": "rv-tile-total",
+    "rv_tile_forecast": "rv-tile-forecast",
+    "rv_goal_pct": "rv-goal-pct",
+    "rv_chart_card": "rv-chart-card",
+    "rv_range_ytd": "rv-range-ytd",
+    "rv_range_12m": "rv-range-12m",
+    "rv_range_q": "rv-range-q",
+    "rv_export_btn": "rv-export-btn",
+    "rv_chart": "rv-chart",
+    "revenue_tooltip": "revenue-tooltip",
+    "rv_segments_card": "rv-segments-card",
+    "rv_segment_us": "rv-segment-us",
+    "rv_segment_dist": "rv-segment-dist",
+    "rv_top_accounts": "rv-top-accounts",
+    "rv_top_account_1": "rv-top-account-1",
+    "rv_top_account_2": "rv-top-account-2",
+    "rv_top_account_3": "rv-top-account-3",
+    "rv_top_account_4": "rv-top-account-4",
+    "rv_top_account_5": "rv-top-account-5",
+    "rv_account_detail": "rv-account-detail",
+    "rv_account_search": "rv-account-search",
+    "rv_account_row_id": "rv-account-row-[id]",
+    "rv_account_expand_id": "rv-account-expand-[id]",
+    "rv_open_account_id": "rv-open-account-[id]",
+    "rv_account_empty": "rv-account-empty"
+  },
+  "instructions_to_main_agent": [
+    "Ensure Google Fonts link for Barlow Condensed, Outfit, DM Sans, and JetBrains Mono is present in public/index.html or imported in index.css.",
+    "Verify all data-testid attributes listed in data_testid_inventory match exactly in DashboardPage.tsx.",
+    "Do NOT use Space Grotesk or Inter for headings.",
+    "Do NOT use teal green/blue (#1B93A4) anywhere in palette.",
+    "Maintain APCA contrast: high contrast dark theme for Hero section, crisp light theme for Chart & Detail sections.",
+    "Keep interactive element states (hover, focus-visible) clear with 2px outline offsets."
+  ],
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "Include data-testid on all interactive buttons, cards, toggles, tabs, and links.",
-    "Do not add new features like announcements or live data sync.",
-    "Notification bell red dot must stay #ff3048.",
-    "Maintain exact brand accent green #00d4a1, sidebar dark #17191a, page background #f5f6f3.",
-    "Do not use transparent background on dropdowns or overlays."
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) on tooltips and floating navs.",
+    "You MUST NOT apply universal transition (e.g. transition: all). This breaks transforms. Always add transitions for specific interactive elements.",
+    "You MUST NOT center align the app container. Keep left-aligned natural hierarchy.",
+    "Always use modern button styles with clear hover/active micro-interactions.",
+    "NEVER use AI assistant Emoji characters (🤖, 🧠, 💭, 💡, 🔮, 🎯) for UI icons.",
+    "Every interaction needs micro-animations - hover states, transitions, entrance animations. Static = dead.",
+    "Use generous spacing (p-6, p-8, p-12) to avoid cramped layouts."
   ]
 }

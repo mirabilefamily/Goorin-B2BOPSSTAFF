@@ -66,8 +66,8 @@ const buildMonths = (scale: number): MRow[] => {
 };
 
 const SEGMENTS = [
-  { key: 'us', name: 'US Wholesale', color: '#16a37a', invoiced: 6_400_000, goal: 8_900_000, pct: 72 },
-  { key: 'dist', name: 'Distributors', color: '#3b6ef6', invoiced: 5_100_000, goal: 8_400_000, pct: 61 },
+  { key: 'us', name: 'US Wholesale', color: '#10b981', invoiced: 6_400_000, goal: 8_900_000, pct: 72 },
+  { key: 'dist', name: 'Distributors', color: '#3b82f6', invoiced: 5_100_000, goal: 8_400_000, pct: 61 },
 ];
 
 const TOP_ACCOUNTS = [
@@ -115,10 +115,10 @@ function RevTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const row = payload[0].payload as MRow;
   const items = [
-    { k: 'Invoiced', v: row.invoiced, c: '#0f7a56' },
-    { k: 'Open Orders', v: row.open, c: '#22c6a6' },
-    { k: 'Total', v: row.total, c: '#16307a' },
-    { k: 'Forecast', v: row.forecast, c: '#e0940f' },
+    { k: 'Invoiced', v: row.invoiced, c: '#059669' },
+    { k: 'Open Orders', v: row.open, c: '#34d399' },
+    { k: 'Total', v: row.total, c: '#1e40af' },
+    { k: 'Forecast', v: row.forecast, c: '#d97706' },
   ];
   return (
     <div className="rv-tip" data-testid="revenue-tooltip">
@@ -165,10 +165,12 @@ export default function DashboardPage({ onNavigate }: Props) {
   };
 
   const tiles = [
-    { k: 'Open orders', v: h.open, testid: 'rv-tile-open', spark: [40, 52, 48, 63, 58, 72] },
-    { k: 'Total (invoiced + open)', v: h.total, testid: 'rv-tile-total', spark: [55, 60, 58, 66, 70, 78] },
-    { k: 'Forecast', v: h.forecast, testid: 'rv-tile-forecast', spark: [50, 47, 53, 49, 56, 60] },
+    { k: 'Open orders', v: h.open, cap: 'booked, not yet invoiced', testid: 'rv-tile-open', spark: [40, 52, 48, 63, 58, 72] },
+    { k: 'Total', v: h.total, cap: 'invoiced + open', testid: 'rv-tile-total', spark: [55, 60, 58, 66, 70, 78] },
+    { k: 'Forecast', v: h.forecast, cap: 'full-year projection', testid: 'rv-tile-forecast', spark: [50, 47, 53, 49, 56, 60] },
   ];
+
+  const gap = h.goalPct - h.pace;
 
   return (
     <div className="rv" data-testid="dashboard-page">
@@ -177,59 +179,60 @@ export default function DashboardPage({ onNavigate }: Props) {
         <div className="rv-hero-glow" aria-hidden="true" />
         <div className="rv-hero-glow rv-hero-glow2" aria-hidden="true" />
         <div className="rv-hero-grid" aria-hidden="true" />
-        <div className="rv-hero-top">
-          <div className="rv-hero-lead">
+        <div className="rv-hero-lead">
+          <div className="rv-hero-row">
             <p className="rv-eyebrow"><span className="rv-live-dot" /> Invoiced revenue · year to date</p>
-            <div className="rv-figure">
-              <strong data-testid="rv-invoiced-ytd">{fmtFull(h.invoiced)}</strong>
-              <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">{h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}%</span>
-            </div>
-            <div className="rv-spark">
-              <ResponsiveContainer width={168} height={40}>
-                <AreaChart data={spark} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                  <defs><linearGradient id="gSpark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4fe0b2" stopOpacity={0.55} /><stop offset="100%" stopColor="#4fe0b2" stopOpacity={0} /></linearGradient></defs>
-                  <Area type="monotone" dataKey="v" stroke="#4fe0b2" strokeWidth={2} fill="url(#gSpark)" dot={false} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-              <span className="rv-spark-cap">9-month invoiced trend</span>
+            <div className="rv-seg" role="tablist" aria-label="Revenue segment">
+              <span className="rv-seg-ind" style={{ transform: `translateX(${segIndex * 100}%)` }} aria-hidden="true" />
+              {SEG_LABELS.map((s) => (
+                <button key={s.id} role="tab" aria-selected={seg === s.id} className={seg === s.id ? 'active' : ''} onClick={() => setSeg(s.id)} data-testid={`rv-seg-${s.id}`}>{s.label}</button>
+              ))}
             </div>
           </div>
-          <div className="rv-seg" role="tablist" aria-label="Revenue segment">
-            <span className="rv-seg-ind" style={{ transform: `translateX(${segIndex * 100}%)` }} aria-hidden="true" />
-            {SEG_LABELS.map((s) => (
-              <button key={s.id} role="tab" aria-selected={seg === s.id} className={seg === s.id ? 'active' : ''} onClick={() => setSeg(s.id)} data-testid={`rv-seg-${s.id}`}>{s.label}</button>
-            ))}
+          <div className="rv-figure">
+            <strong data-testid="rv-invoiced-ytd">{fmtFull(h.invoiced)}</strong>
+            <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">{h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}% <small>vs LY</small></span>
+          </div>
+          <div className="rv-spark">
+            <ResponsiveContainer width={220} height={56}>
+              <AreaChart data={spark} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                <defs><linearGradient id="gSpark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10b981" stopOpacity={0.5} /><stop offset="100%" stopColor="#10b981" stopOpacity={0} /></linearGradient></defs>
+                <Area type="monotone" dataKey="v" stroke="#34d399" strokeWidth={2} fill="url(#gSpark)" dot={false} isAnimationActive={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+            <span className="rv-spark-cap">9-month invoiced trend</span>
+          </div>
+
+          <div className="rv-goal">
+            <div className="rv-goal-head">
+              <span>Annual goal progress</span>
+              <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? 'On pace' : `${Math.abs(gap)} pts behind pace`}</em>
+            </div>
+            <div className="rv-goal-bar">
+              <i style={{ width: `${h.goalPct}%` }} />
+              <b className="rv-goal-pace" style={{ left: `${h.pace}%` }} title={`Pace ${h.pace}%`} />
+            </div>
+            <div className="rv-goal-foot">
+              <span><strong data-testid="rv-goal-pct">{h.goalPct}%</strong> · {compact(h.goalCur)} of {compact(h.goalTarget)}</span>
+              <span className="rv-goal-pacetxt"><i />Pace {h.pace}%</span>
+            </div>
           </div>
         </div>
 
         <div className="rv-tiles">
-          {tiles.map((t) => {
+          {tiles.map((t, idx) => {
             const mx = Math.max(...t.spark);
             return (
-              <div className="rv-tile" key={t.k} data-testid={t.testid}>
+              <div className="rv-tile" key={t.k} data-testid={t.testid} style={{ animationDelay: `${0.15 + idx * 0.07}s` }}>
                 <div className="rv-tile-body">
                   <span>{t.k}</span>
                   <strong>{compact(t.v)}</strong>
+                  <small>{t.cap}</small>
                 </div>
                 <div className="rv-tile-spark" aria-hidden="true">{t.spark.map((v, i) => <i key={i} style={{ height: `${(v / mx) * 100}%` }} />)}</div>
               </div>
             );
           })}
-        </div>
-
-        <div className="rv-goal">
-          <div className="rv-goal-head">
-            <span>Annual Goal Progress</span>
-            <em className={`rv-pace-badge ${h.goalPct >= h.pace ? 'ok' : 'behind'}`}>{h.goalPct >= h.pace ? 'On pace' : 'Behind pace'}</em>
-          </div>
-          <div className="rv-goal-bar">
-            <i style={{ width: `${h.goalPct}%` }} />
-            <b className="rv-goal-pace" style={{ left: `${h.pace}%` }} title={`Pace ${h.pace}%`} />
-          </div>
-          <div className="rv-goal-foot">
-            <span><strong data-testid="rv-goal-pct">{h.goalPct}%</strong> {compact(h.goalCur)} of {compact(h.goalTarget)}</span>
-            <span className="rv-goal-pacetxt"><i />Pace {h.pace}%</span>
-          </div>
         </div>
       </section>
 
@@ -238,16 +241,16 @@ export default function DashboardPage({ onNavigate }: Props) {
         <section className="rv-card rv-chart-card" data-testid="rv-chart-card">
           <div className="rv-card-head">
             <div className="rv-card-title">
-              <h2>Revenue by Month</h2>
+              <div><p className="rv-kicker">Performance</p><h2>Revenue by Month</h2></div>
               <div className="rv-range" role="tablist" aria-label="Chart range">
                 {RANGES.map((r) => <button key={r.id} className={range === r.id ? 'active' : ''} onClick={() => setRange(r.id)} data-testid={`rv-range-${r.id}`}>{r.label}</button>)}
               </div>
             </div>
             <div className="rv-head-right">
               <div className="rv-legend">
-                <span><i className="dot" style={{ background: '#0f7a56' }} />Invoiced</span>
-                <span><i className="dot" style={{ background: '#22c6a6' }} />Open Orders</span>
-                <span><i className="line" style={{ background: '#16307a' }} />Total</span>
+                <span><i className="dot" style={{ background: '#059669' }} />Invoiced</span>
+                <span><i className="dot" style={{ background: '#34d399' }} />Open Orders</span>
+                <span><i className="line" style={{ background: '#1e40af' }} />Total</span>
                 <span><i className="dash" />Forecast</span>
               </div>
               <button className="rv-export" onClick={exportCsv} data-testid="rv-export-btn"><Download size={15} /> Export</button>
@@ -257,27 +260,27 @@ export default function DashboardPage({ onNavigate }: Props) {
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={months} margin={{ top: 12, right: 8, left: 4, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3aa77e" /><stop offset="100%" stopColor="#0e6b4c" /></linearGradient>
-                  <linearGradient id="gOpen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4ad6b8" /><stop offset="100%" stopColor="#1fa98c" /></linearGradient>
-                  <linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16307a" stopOpacity={0.16} /><stop offset="100%" stopColor="#16307a" stopOpacity={0} /></linearGradient>
+                  <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10b981" /><stop offset="100%" stopColor="#047857" /></linearGradient>
+                  <linearGradient id="gOpen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6ee7b7" /><stop offset="100%" stopColor="#10b981" /></linearGradient>
+                  <linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1e40af" stopOpacity={0.12} /><stop offset="100%" stopColor="#1e40af" stopOpacity={0} /></linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="#eef1f0" />
-                <XAxis dataKey="m" tickLine={false} axisLine={{ stroke: '#e6eae8' }} tick={{ fill: '#8a938e', fontSize: 12 }} dy={8} />
-                <YAxis tickFormatter={(v) => compact(v)} tickLine={false} axisLine={false} tick={{ fill: '#a3aaa5', fontSize: 11 }} width={52} domain={[0, chartMax]} />
+                <CartesianGrid vertical={false} stroke="#e6eae8" />
+                <XAxis dataKey="m" tickLine={false} axisLine={{ stroke: '#e4eae6' }} tick={{ fill: '#85938d', fontSize: 12, fontFamily: 'JetBrains Mono' }} dy={8} />
+                <YAxis tickFormatter={(v) => compact(v)} tickLine={false} axisLine={false} tick={{ fill: '#a0aca6', fontSize: 11, fontFamily: 'JetBrains Mono' }} width={56} domain={[0, chartMax]} />
                 <Tooltip cursor={{ stroke: '#b8c0bb', strokeWidth: 1 }} content={<RevTooltip />} />
-                {months.some((m) => m.m === 'Sep') && <ReferenceLine x="Sep" stroke="#c9ced2" strokeDasharray="4 4" />}
+                {months.some((m) => m.m === 'Sep') && <ReferenceLine x="Sep" stroke="#c9ced2" strokeDasharray="4 4" label={{ value: 'TODAY', position: 'insideTopRight', fill: '#a0aca6', fontSize: 10, fontFamily: 'Outfit', fontWeight: 800 }} />}
                 <Area type="monotone" dataKey="total" stroke="none" fill="url(#gTotal)" isAnimationActive={false} activeDot={false} />
                 <Bar dataKey="invoiced" stackId="rev" fill="url(#gInv)" maxBarSize={30} isAnimationActive={false} />
                 <Bar dataKey="open" stackId="rev" fill="url(#gOpen)" radius={[6, 6, 0, 0]} maxBarSize={30} isAnimationActive={false} />
-                <Line type="monotone" dataKey="total" stroke="#16307a" strokeWidth={2.6} dot={false} activeDot={{ r: 5, fill: '#16307a', stroke: '#fff', strokeWidth: 2 }} isAnimationActive={false} />
-                <Line type="monotone" dataKey="forecast" stroke="#e0940f" strokeWidth={2.2} strokeDasharray="6 5" dot={false} activeDot={{ r: 5, fill: '#fff', stroke: '#e0940f', strokeWidth: 2 }} isAnimationActive={false} />
+                <Line type="monotone" dataKey="total" stroke="#1e40af" strokeWidth={2.8} dot={false} activeDot={{ r: 5, fill: '#1e40af', stroke: '#fff', strokeWidth: 2 }} isAnimationActive={false} />
+                <Line type="monotone" dataKey="forecast" stroke="#d97706" strokeWidth={2.2} strokeDasharray="5 4" dot={false} activeDot={{ r: 5, fill: '#fff', stroke: '#d97706', strokeWidth: 2 }} isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
         </section>
 
         <section className="rv-card rv-segs" data-testid="rv-segments-card">
-          <div className="rv-card-head rv-segs-head"><h2>Segments</h2><span className="rv-muted rv-segs-tag">YTD pace</span></div>
+          <div className="rv-card-head rv-segs-head"><div><p className="rv-kicker">Channels</p><h2>Segments</h2></div><span className="rv-muted rv-segs-tag">YTD pace</span></div>
           <div className="rv-seg-list">
             {SEGMENTS.map((s) => (
               <div className="rv-seg-item" key={s.key} data-testid={`rv-segment-${s.key}`}>
@@ -310,7 +313,7 @@ export default function DashboardPage({ onNavigate }: Props) {
       {/* ACCOUNT DETAIL */}
       <section className="rv-card rv-acct" data-testid="rv-account-detail">
         <div className="rv-acct-head">
-          <div><h2>Account Detail</h2><p>Click any row to expand metrics</p></div>
+          <div><p className="rv-kicker">Accounts</p><h2>Account Detail</h2><p>Click any row to expand metrics</p></div>
           <div className="rv-acct-tools">
             <label className="rv-acct-search"><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search accounts..." data-testid="rv-account-search" /></label>
             <span className="rv-acct-count">{query.trim() ? `${rows.length} of 220 accounts` : '220 accounts'}</span>

@@ -84,3 +84,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Top accounts: ranked #1-5 with triangle YoY deltas
 - Chart: cursor line, active dots, larger tooltip, 'Open Orders' legend, conditional Sep reference line
 - Chart card and Segments card now equal height (grid stretch, chart fills, iteration_20 PASS)
+- 2026-06 Full dashboard redesign: Heritage Emerald/Obsidian palette, Barlow Condensed/Outfit/JetBrains Mono fonts, 2-col hero with vertical KPI stack, kickers on cards, mono numerics (iteration_21 PASS). Design spec at /app/design_guidelines.json
