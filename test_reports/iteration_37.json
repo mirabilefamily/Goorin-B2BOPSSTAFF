@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of Pre-Book Review v6 layout. Login (empty fields, mocked) → Pre-Book Review renders. Screenshots at 1920x1080 and 1280 both clean, no wrapping/overlap/horizontal scroll. Layout: on Review tab the seasons sidebar is correctly hidden (aside.pb-side has class pb-side--hidden, display:none). New top drop-switcher strip pb-drop-switcher shows SS27 Closing pill + Drop 1/2/3 tabs + '+' add button + pb-show-archived checkbox on the right. Full-width hero card renders with kicker ('Season SS27 · Drop 3 of 3 · 7 days left'), pb-drop-idtop 'SS27 / Drop 3 OPEN', deadline 'Closes 9/21/2026', progress track, status chips: green 'Ready for customer visibility' and clickable 'Purchasing · 4 standard · 0 consolidated · no POs' (pb-preview-details) — expanding opens pb-preview panel with pb-cons-toggle which opens pb-cons-table. Right side pb-stat-combined shows the 4 metrics (Units 13,328 · Wholesale $130K · MOQ hit 2/12 · Accounts 4) and channel-mix split-bar + legend rows pb-stat-usw ('USW 932 $19K') and pb-stat-dist ('DIST 12,396 $112K'). pb-actions-btn opens pb-actions-menu and pb-more-btn opens pb-more-menu; Escape closes them. Switcher tabs pb-drop-drop1/2/3 all toggle active state; pb-show-archived custom checkbox toggles false→true. SKU Demand table: pb-demand-all=12, pb-demand-hit=2, pb-demand-under=10 (default). pb-demand-totals row present ('Σ · 10 SKUs · 72 · 1,560 · — · 1,632 · 3,816 · 43%' on Under). pb-panel-search filters. pb-sku-row-* click expands pb-sku-expand-*. Gap pills all single-line at 27.25px height for all 10 rows (both viewports). pb-subtab-orders switches to 4-row Orders table. Setup tab: aside.pb-side becomes visible again (display: flex/block), Pre-book Collections list shown, pb-new-prebook works (adds SS28 collection). Switching back to Review hides sidebar again. No console errors or page errors captured; only benign Recharts sizing warnings on first paint (same as previous iterations).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx renders duplicate data-testid values (pb-drop-drop1/drop2/drop3 and pb-show-archived) inside both the hidden aside.pb-side (lines 214, 231) and the visible switcher (lines 245, 252). Only the switcher copy is user-visible on Review because the aside has pb-side--hidden{display:none}, but duplicate data-testids in the DOM violate the uniqueness contract and will break Playwright locators using page.locator('[data-testid=...]') under strict mode. Recommend removing the sidebar copies when tab==='review' (or rendering the aside only on Setup).",
+    "Fill.tsx caps row-level fill % via Math.min(100, ...) while pb-demand-totals uses uncapped math (e.g., Trailblazer row shows '111%' in scoped totals but '100%' in the row). Same nit carried over from iterations 35/36; low priority.",
+    "Setup drops still use data-testid pb-drop-d1/d2/d3 while Review switcher uses pb-drop-drop1/drop2/drop3 — inconsistent testid naming across tabs."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email + empty password on login → mocked demo user (ryan@mirabile.com)",
+  "seed_data_creation": "None (all data mocked in PreBookPage.tsx)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "v6 layout verified: switcher strip + full-width hero card + full-width SKU/Orders table; sidebar only on Setup. Note the duplicated data-testids between hidden sidebar copy and visible switcher — use scoped locator like [data-testid='pb-drop-switcher'] [data-testid='pb-drop-drop3'] to disambiguate in future tests."
+}

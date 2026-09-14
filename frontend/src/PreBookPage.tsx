@@ -200,9 +200,9 @@ export default function PreBookPage({ onNavigate }: Props) {
         <button className="pb-ghost-btn" onClick={() => toast('Exporting all drops…')} data-testid="pb-export-all"><Download size={15} /> Export all drops</button>
       </div>
 
-      <div className="pb-body">
+      <div className={`pb-body ${tab === 'review' ? 'pb-body--review' : ''}`}>
         {/* sidebar */}
-        <aside className="pb-side">
+        <aside className={`pb-side ${tab === 'review' ? 'pb-side--hidden' : ''}`}>
           <div className="pb-side-head"><span>{tab === 'setup' ? 'Pre-book Collections' : 'Seasons'}</span>{tab === 'review' && <button className="pb-side-add" aria-label="Add season" onClick={() => toast('New season')}><Plus size={15} /></button>}</div>
           {tab === 'review' ? (
             <div className="pbx-season">
@@ -237,17 +237,46 @@ export default function PreBookPage({ onNavigate }: Props) {
         <main className="pb-main">
           {tab === 'review' ? (
             <>
-              {/* drop header */}
-              <div className="pbx-drop-head">
-                <div className="pbx-drop-title">
-                  <div className="pb-drop-idblock">
-                    <p className="pbx-kicker"><span className="pb-live" />Season SS27 · Drop 3 of 3</p>
-                    <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
-                    <div className="pbx-deadline-wrap">
-                      <span className="pbx-deadline"><Calendar size={14} /> Closes 9/21/2026</span>
-                      <span className="pbx-days-track" aria-hidden="true"><i style={{ width: `${Math.max(4, 100 - (daysLeft / 90) * 100)}%` }} /></span>
-                      <em className="pbx-days">{daysLeft} days left</em>
-                    </div>
+              {/* drop switcher */}
+              <div className="pbx-switch" data-testid="pb-drop-switcher">
+                <button className="pbx-season-pill" onClick={() => toast('Switch season')}><strong>SS27</strong><em className="pb-badge closing">Closing</em><ChevronDown size={14} /></button>
+                <div className="pbx-drop-tabs" role="tablist">
+                  {seasonDrops.map((d) => (
+                    <button key={d.id} role="tab" aria-selected={activeDrop === d.id} className={`${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
+                      <span>{d.label}</span>
+                      {d.status === 'open' ? <em className="pbx-tab-open">Open · {d.count}</em> : <em className="pbx-tab-closed">Closed</em>}
+                    </button>
+                  ))}
+                  <button className="pbx-drop-add" aria-label="Add drop" onClick={() => toast('New drop')}><Plus size={14} /></button>
+                </div>
+                <label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label>
+              </div>
+
+              {/* hero */}
+              <div className="pbx-hero">
+                <div className="pbx-hero-main">
+                  <p className="pbx-kicker"><span className="pb-live" />Season SS27 · Drop 3 of 3 · <b>{daysLeft} days left</b></p>
+                  <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
+                  <div className="pbx-deadline-wrap">
+                    <span className="pbx-deadline"><Calendar size={14} /> Closes 9/21/2026</span>
+                    <span className="pbx-days-track" aria-hidden="true"><i style={{ width: `${Math.max(4, 100 - (daysLeft / 90) * 100)}%` }} /></span>
+                  </div>
+                  <div className="pbx-hero-status">
+                    <span className="pbx-chip ok"><CheckCircle2 size={14} /> Ready for customer visibility</span>
+                    <button className="pbx-chip warn" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details"><Layers size={14} /> Purchasing · 4 standard · 0 consolidated · no POs <ChevronDown size={13} className={previewOpen ? 'flip' : ''} /></button>
+                  </div>
+                </div>
+                <div className="pbx-hero-stats" data-testid="pb-stat-combined">
+                  <div className="pb-metric"><small>Units</small><strong>{combined.units.toLocaleString()}</strong></div>
+                  <div className="pb-metric"><small>Wholesale</small><strong className="green">{combined.wholesale}</strong></div>
+                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
+                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
+                  <div className="pbx-mix">
+                    <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
+                    <ul className="pbx-mix-legend">
+                      <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} />USW <b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale}</em></li>
+                      <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} />DIST <b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale}</em></li>
+                    </ul>
                   </div>
                 </div>
                 <div className="pb-drop-actions">
@@ -284,9 +313,25 @@ export default function PreBookPage({ onNavigate }: Props) {
                   </div>
                 </div>
               </div>
+              {previewOpen && (
+                <div className="pb-preview is-open pbx-preview-panel" data-testid="pb-preview">
+                  <div className="pb-preview-body">
+                    <p className="pb-preview-note"><Lock size={13} /> Sales channel: Not configured — freeze is unavailable</p>
+                    <button className="pb-cons" onClick={() => setConsOpen((v) => !v)} data-testid="pb-cons-toggle">Consolidation details · 4 standard / 0 consolidated <ChevronDown size={16} className={consOpen ? 'flip' : ''} /></button>
+                    {consOpen && (
+                      <div className="pb-cons-table" data-testid="pb-cons-table">
+                        <div className="pb-cons-tr pb-cons-th"><span>Order</span><span>Channel</span><span>Type</span><span className="r">Units</span><span>PO</span></div>
+                        {orders.map((o) => (
+                          <div className="pb-cons-tr" key={o.id}><span>{o.id}</span><span><em className={`pb-channel ${o.channel.toLowerCase()}`}>{o.channel}</em></span><span>Standard</span><span className="r">{o.units.toLocaleString()}</span><span className="pb-mut">Not created</span></div>
+                        )
+                        )}
+                      </div>
+                    )}
+                    <p className="pb-preview-legend"><b className="ok">Standard</b> 4 releasable orders <span className="sep">·</span> <b className="warn">Consolidated</b> 0 blocked orders · 0 PO buckets</p>
+                  </div>
+                </div>
+              )}
 
-              <div className="pbx-cols">
-                <div className="pbx-primary">
               {/* panel */}
               <section className="pb-panel">
                 <div className="pb-panel-head">
@@ -412,58 +457,6 @@ export default function PreBookPage({ onNavigate }: Props) {
                   </div>
                 )}
               </section>
-                </div>
-                <aside className="pbx-rail">
-              {/* status row */}
-              <div className="pb-ready"><span className="pbx-ready-ico"><CheckCircle2 size={17} /></span><div><span>Ready for customer visibility</span><small>Drop is published to customer portals</small></div><em>READY</em></div>
-
-              {/* purchasing preview */}
-              <div className={`pb-preview ${previewOpen ? 'is-open' : ''}`} data-testid="pb-preview">
-                <div className="pb-preview-row">
-                  <div className="pb-preview-lead">
-                    <span className="pb-preview-ico"><Layers size={16} /></span>
-                    <div><strong>Purchasing preview</strong> <span className="pb-preview-meta">4 standard · 0 consolidated</span><div className="pb-preview-warn">No POs created · consolidated release blocked</div></div>
-                  </div>
-                  <button className="pb-details" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details">Details <ChevronDown size={14} className={previewOpen ? 'flip' : ''} /></button>
-                </div>
-                {previewOpen && (
-                  <div className="pb-preview-body">
-                    <p className="pb-preview-note"><Lock size={13} /> Sales channel: Not configured — freeze is unavailable</p>
-                    <button className="pb-cons" onClick={() => setConsOpen((v) => !v)} data-testid="pb-cons-toggle">Consolidation details · 4 standard / 0 consolidated <ChevronDown size={16} className={consOpen ? 'flip' : ''} /></button>
-                    {consOpen && (
-                      <div className="pb-cons-table" data-testid="pb-cons-table">
-                        <div className="pb-cons-tr pb-cons-th"><span>Order</span><span>Channel</span><span>Type</span><span className="r">Units</span><span>PO</span></div>
-                        {orders.map((o) => (
-                          <div className="pb-cons-tr" key={o.id}><span>{o.id}</span><span><em className={`pb-channel ${o.channel.toLowerCase()}`}>{o.channel}</em></span><span>Standard</span><span className="r">{o.units.toLocaleString()}</span><span className="pb-mut">Not created</span></div>
-                        ))}
-                      </div>
-                    )}
-                    <button className="pb-freeze" disabled title="Configure a sales channel to enable"><Snowflake size={15} /> Freeze batch for review</button>
-                    <p className="pb-preview-legend"><b className="ok">Standard</b> 4 releasable orders <span className="sep">·</span> <b className="warn">Consolidated</b> 0 blocked orders · 0 PO buckets</p>
-                  </div>
-                )}
-              </div>
-
-              {/* drop health */}
-              <div className="pbx-health" data-testid="pb-stat-combined">
-                <div className="pbx-health-metrics">
-                  <div className="pb-metric"><small>Units committed</small><strong>{combined.units.toLocaleString()}</strong></div>
-                  <div className="pb-metric"><small>Wholesale value</small><strong className="green">{combined.wholesale}</strong></div>
-                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
-                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
-                </div>
-                <div className="pbx-health-split">
-                  <div className="pbx-health-split-head"><span>Channel mix</span><span>{Math.round((chan.usw.units / combined.units) * 100)}% USW · {Math.round((chan.dist.units / combined.units) * 100)}% DIST</span></div>
-                  <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
-                  <ul className="pbx-split-legend">
-                    <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} /><span>US Wholesale</span><b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale} · MOQ {chan.usw.moq}</em></li>
-                    <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} /><span>Distributor</span><b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale} · MOQ {chan.dist.moq}</em></li>
-                  </ul>
-                </div>
-              </div>
-
-                </aside>
-              </div>
             </>
           ) : (
             /* ---------- SETUP ---------- */
