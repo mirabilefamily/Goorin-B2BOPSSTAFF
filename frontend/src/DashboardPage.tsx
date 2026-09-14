@@ -123,16 +123,16 @@ function RevTooltip({ active, payload, label }: any) {
 function Gauge({ pct, pace }: { pct: number; pace: number }) {
   const r = 54; const c = 2 * Math.PI * r;
   const a = (pace / 100) * 360 - 90;
-  const px = 64 + 62 * Math.cos((a * Math.PI) / 180); const py = 64 + 62 * Math.sin((a * Math.PI) / 180);
+  const px = 64 + 61 * Math.cos((a * Math.PI) / 180); const py = 64 + 61 * Math.sin((a * Math.PI) / 180);
   return (
     <div className="rv-gauge-wrap">
       <svg className="rv-gauge" viewBox="0 0 128 128" aria-hidden="true">
         <defs><linearGradient id="gGauge" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#34b98f" /><stop offset="100%" stopColor="#0b6e50" /></linearGradient></defs>
         <circle cx="64" cy="64" r={r} fill="none" stroke="#eef1ef" strokeWidth="11" />
         <circle cx="64" cy="64" r={r} fill="none" stroke="url(#gGauge)" strokeWidth="11" strokeLinecap="round" strokeDasharray={`${(pct / 100) * c} ${c}`} transform="rotate(-90 64 64)" className="rv-gauge-arc" />
-        <circle cx={px} cy={py} r="4" fill="#e39a1c" />
+        <line x1={64 + 46 * Math.cos((a * Math.PI) / 180)} y1={64 + 46 * Math.sin((a * Math.PI) / 180)} x2={px} y2={py} stroke="#e39a1c" strokeWidth="3" strokeLinecap="round" />
       </svg>
-      <div className="rv-gauge-label"><Target size={18} /></div>
+      <div className="rv-gauge-label"><strong className="rv-gauge-num">{pct}%</strong><small className="rv-gauge-cap">of goal</small></div>
     </div>
   );
 }
@@ -169,10 +169,11 @@ export default function DashboardPage({ onNavigate }: Props) {
     URL.revokeObjectURL(a.href);
   };
 
+  const q4 = allMonths.slice(9);
   const kpis = [
-    { k: 'Open orders', v: h.open, cap: 'booked, not invoiced', chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', barLabel: 'of total pipeline', pct: Math.round((h.open / h.total) * 100) },
-    { k: 'Total', v: h.total, cap: 'invoiced + open', chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', barLabel: 'of annual goal', pct: Math.round((h.total / h.goalTarget) * 100) },
-    { k: 'Forecast', v: h.forecast, cap: 'full-year projection', chip: 'rv-chip-amber', icon: <TrendingUp size={16} />, testid: 'rv-tile-forecast', barLabel: 'of annual goal', pct: Math.round((h.forecast / h.goalTarget) * 100) },
+    { k: 'Open orders', v: h.open, cap: 'booked, not yet invoiced', chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', foot: 'by ship month', parts: q4.map((m, i) => ({ label: m.m, value: m.open, color: ['#16907a', '#3ecfb0', '#9fe5d6'][i] })) },
+    { k: 'Total', v: h.total, cap: 'invoiced + open orders', chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', foot: 'composition', parts: [{ label: 'Invoiced', value: h.invoiced, color: '#1e3a8a' }, { label: 'Open', value: h.total - h.invoiced, color: '#8fa6e8' }] },
+    { k: 'Forecast', v: h.forecast, cap: 'full-year projection', chip: 'rv-chip-amber', icon: <TrendingUp size={16} />, testid: 'rv-tile-forecast', foot: 'vs annual goal', parts: [{ label: 'Forecast', value: Math.min(h.forecast, h.goalTarget), color: '#e39a1c' }, { label: h.forecast >= h.goalTarget ? 'Above goal' : 'Gap to goal', value: Math.abs(h.goalTarget - h.forecast), color: h.forecast >= h.goalTarget ? '#3ecfb0' : '#efe4cf' }] },
   ];
   const gap = h.goalPct - h.pace;
   const best = allMonths.slice(0, 9).reduce((a, b) => (b.invoiced > a.invoiced ? b : a));
@@ -218,23 +219,29 @@ export default function DashboardPage({ onNavigate }: Props) {
           <div className="rv-kpi-goal-body">
             <Gauge pct={h.goalPct} pace={h.pace} />
             <div className="rv-kpi-goal-facts">
-              <strong data-testid="rv-goal-pct">{h.goalPct}%</strong>
-              <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? 'On pace' : `${Math.abs(gap)} pts behind`}</em>
-              <small>{compact(h.goalCur)} of {compact(h.goalTarget)}</small>
-              <small><i />Pace {h.pace}%</small>
+              <div className="rv-goal-line"><strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong><span>of {compact(h.goalTarget)}</span></div>
+              <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</em>
+              <ul className="rv-goal-mini">
+                <li><span>Remaining</span><b>{compact(h.goalTarget - h.goalCur)}</b></li>
+                <li><span><i />Pace target</span><b>{h.pace}%</b></li>
+              </ul>
             </div>
           </div>
         </section>
 
-        {kpis.map((t) => (
-          <section className="rv-card rv-kpi" key={t.k} data-testid={t.testid}>
-            <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span></div>
-            <div><strong className="rv-kpi-v">{compact(t.v)}</strong><small className="rv-kpi-cap">{t.cap}</small></div>
-            <div className="rv-kpi-foot">
-              <div className="rv-kpi-meter"><span><b>{t.pct}%</b> {t.barLabel}</span><div className={`rv-kpi-bar ${t.chip}`}><i style={{ width: `${Math.min(t.pct, 100)}%` }} /></div></div>
-            </div>
-          </section>
-        ))}
+        {kpis.map((t) => {
+          const sum = t.parts.reduce((x, p) => x + p.value, 0) || 1;
+          return (
+            <section className="rv-card rv-kpi" key={t.k} data-testid={t.testid}>
+              <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span><span className="rv-kpi-tag">{t.foot}</span></div>
+              <div><strong className="rv-kpi-v">{compact(t.v)}</strong><small className="rv-kpi-cap">{t.cap}</small></div>
+              <div className="rv-kpi-foot">
+                <div className="rv-kpi-stack">{t.parts.map((p) => <i key={p.label} style={{ width: `${(p.value / sum) * 100}%`, background: p.color }} />)}</div>
+                <ul className="rv-kpi-parts">{t.parts.map((p) => <li key={p.label}><i style={{ background: p.color }} /><span>{p.label}</span><b>{compact(p.value)}</b></li>)}</ul>
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {/* MID */}
