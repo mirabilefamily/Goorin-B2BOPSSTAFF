@@ -97,3 +97,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Pre-Book refine 2: stat strip card, filter counts, Under gap pills, sticky header/sidebar. iteration_32.
 - Pre-Book pass 3: themed custom checkbox (Show archived), mint hero header w/ kicker + deadline progress track, 'Close' MOQ state (>=75%), season drop progress, entrance animation. iteration_33.
 - Final polish pass both pages: removed zebra, single pill per account row, white status cards w/ icon chips on Pre-Book, unified paddings. iteration_34.
+- Pre-Book pass 4: 3 stat cards → one Drop health card (4 metrics + channel mix bar); SKU rows sorted by fill% desc; totals row. iteration_35.

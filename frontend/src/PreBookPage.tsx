@@ -39,11 +39,8 @@ const seasonDrops = [
   { id: 'drop3', label: 'Drop 3', status: 'open' as const, count: 21 },
 ];
 
-const statCards = [
-  { key: 'combined', name: 'Total Combined', dot: '#e9ece9', accounts: 4, units: 13328, wholesale: '$130K', moq: '43%', moqTone: 'amber', hit: '9/21', pct: (9 / 21) * 100, bar: '#38b26f' },
-  { key: 'usw', name: 'US Wholesale', dot: '#2fbf71', accounts: 2, units: 932, wholesale: '$19K', moq: '10%', moqTone: 'red', hit: '2/21', pct: (2 / 21) * 100, bar: '#38b26f' },
-  { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: 12396, wholesale: '$112K', moq: '38%', moqTone: 'red', hit: '8/21', pct: (8 / 21) * 100, bar: '#3b82f6' },
-];
+const combined = { accounts: 4, units: 13328, wholesale: '$130K', moqTone: 'amber' };
+const chan = { usw: { units: 932, wholesale: '$19K', moq: '10%' }, dist: { units: 12396, wholesale: '$112K', moq: '38%' } };
 
 type Sku = { sku: string; name: string; usw: number; dist: number; ext: number | null; total: number; moq: number };
 const skus: Sku[] = [
@@ -160,7 +157,7 @@ export default function PreBookPage({ onNavigate }: Props) {
       if (demandFilter === 'under' && hit) return false;
       if (q && !s.name.toLowerCase().includes(q) && !s.sku.toLowerCase().includes(q)) return false;
       return true;
-    });
+    }).sort((a, b) => b.total / b.moq - a.total / a.moq);
   }, [demandFilter, skuQuery]);
 
   const orderRows = useMemo(() => {
@@ -321,19 +318,22 @@ export default function PreBookPage({ onNavigate }: Props) {
 
               </div>
 
-              {/* stat cards */}
-              <div className="pb-stats">
-                {statCards.map((c) => (
-                  <div className={`pb-stat pb-stat--${c.key}`} key={c.key} data-testid={`pb-stat-${c.key}`}>
-                    <div className="pb-stat-head"><span className="pb-stat-name"><i style={{ background: c.dot }} />{c.name}</span><span className="pb-stat-acc">{c.accounts} accounts</span></div>
-                    <div className="pb-stat-metrics">
-                      <div className="pb-metric"><small>Units</small><strong>{c.units.toLocaleString()}</strong></div>
-                      <div className="pb-metric"><small>Wholesale</small><strong className="green">{c.wholesale}</strong></div>
-                      <div className="pb-metric"><small>MOQ rate</small><strong className={c.moqTone}>{c.moq}</strong></div>
-                    </div>
-                    <div className="pbx-moq"><span>MOQ hit <b>{Math.round(c.pct)}%</b></span><div className="pbx-moq-bar"><i style={{ width: `${c.pct}%`, background: c.bar }} /></div><em>{c.hit} SKUs</em></div>
-                  </div>
-                ))}
+              {/* drop health */}
+              <div className="pbx-health" data-testid="pb-stat-combined">
+                <div className="pbx-health-metrics">
+                  <div className="pb-metric"><small>Units committed</small><strong>{combined.units.toLocaleString()}</strong></div>
+                  <div className="pb-metric"><small>Wholesale value</small><strong className="green">{combined.wholesale}</strong></div>
+                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
+                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
+                </div>
+                <div className="pbx-health-split">
+                  <div className="pbx-health-split-head"><span>Channel mix</span><span>{Math.round((chan.usw.units / combined.units) * 100)}% USW · {Math.round((chan.dist.units / combined.units) * 100)}% DIST</span></div>
+                  <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
+                  <ul className="pbx-split-legend">
+                    <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} /><span>US Wholesale</span><b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale} · MOQ {chan.usw.moq}</em></li>
+                    <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} /><span>Distributor</span><b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale} · MOQ {chan.dist.moq}</em></li>
+                  </ul>
+                </div>
               </div>
 
               {/* panel */}
@@ -368,6 +368,19 @@ export default function PreBookPage({ onNavigate }: Props) {
                     <div className="pb-tr pb-th">
                       <span>SKU</span><span>Name</span><span className="r">USW</span><span className="r">DIST</span><span className="r">EXT</span><span className="r">Total</span><span className="r">MOQ</span><span>Fill</span><span>Status</span><span />
                     </div>
+                    {demandRows.length > 0 && (
+                      <div className="pb-tr pb-total-row" data-testid="pb-demand-totals">
+                        <span className="pb-sku-code">Σ</span>
+                        <span className="pb-sku-name">{demandRows.length} SKUs</span>
+                        <span className="r">{demandRows.reduce((x, r) => x + r.usw, 0).toLocaleString()}</span>
+                        <span className="r">{demandRows.reduce((x, r) => x + r.dist, 0).toLocaleString()}</span>
+                        <span className="r pb-mut">—</span>
+                        <span className="r pb-strong">{demandRows.reduce((x, r) => x + r.total, 0).toLocaleString()}</span>
+                        <span className="r pb-mut">{demandRows.reduce((x, r) => x + r.moq, 0).toLocaleString()}</span>
+                        <span className="pb-fill"><em>{Math.round((demandRows.reduce((x, r) => x + r.total, 0) / demandRows.reduce((x, r) => x + r.moq, 0)) * 100)}%</em></span>
+                        <span /><span />
+                      </div>
+                    )}
                     {demandRows.map((s) => {
                       const hit = s.total >= s.moq;
                       const open = expanded === s.sku;

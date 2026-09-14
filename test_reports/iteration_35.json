@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only verification of Pre-Book Review pass-4 structural changes. Login (empty fields, mocked) navigates to Pre-Book Review page. pb-stat-combined card verified with all 4 metrics: 'Units committed 13,328', 'Wholesale value $130K', 'MOQ hit 2/12', 'Accounts 4', plus 'Channel mix 7% USW · 93% DIST' split bar. Legend rows pb-stat-usw ('US Wholesale 932 · $19K · MOQ 10%') and pb-stat-dist ('Distributor 12,396 · $112K · MOQ 38%') present as <li> elements as expected. No 'Total Combined' heading present anywhere. pb-demand-totals row present and updates correctly: All -> 'Σ · 12 SKUs · 232 · 2,100 · — · 2,332 · 4,476 · 52%'; Hit -> '2 SKUs · 160 · 540 · — · 700 · 660 · 106%'; Under -> '10 SKUs · 72 · 1,560 · — · 1,632 · 3,816 · 43%'; Search 'Trailblazer' -> '1 SKUs · 100 · 300 · — · 400 · 360 · 111%' (search totals do show 111% since totals uses non-capped math). Row sort by fill% desc VERIFIED under All filter: Trailblazer first (400/360=111%, displayed 100%), Coastal Snapback 100%, Wilderness Patch 46%, then 44% rows, Summit Camp 38%, Desert Rose 33%. Filter counts: All 12, Hit 2, Under 10. Row expand pb-sku-expand-* renders on click of pb-sku-row-*. Regression: pb-subtab-orders switches, pb-actions-btn opens pb-actions-menu, pb-more-btn opens pb-more-menu, pb-preview-details toggles, pb-show-archived toggles, pb-drop-drop1/drop2/drop3 switch. Setup tab pb-new-prebook present. Screenshots at 1920x1080 and 1280x900 look clean and well-aligned. Only console noise = benign Recharts width(-1)/height(-1) first-paint warnings (same as prior iterations). No page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Review · SKU Demand row fill %", "issues": ["Row-level fill % is capped at 100% via Math.min(100, ...) at PreBookPage.tsx:81, so Trailblazer displays '100% · At MOQ' even though the actual ratio is 111% (400/360). The pb-demand-totals row (which uses non-capped math) correctly shows 111% when filtered/searched to just Trailblazer. Review request expected the row itself to show '111%'. This is intentional (Math.min cap) — if 111% is the desired UX, remove the Math.min in the row pct computation or expose an over-MOQ variant. Sort order itself is unaffected because sort uses raw total/moq ratio."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: decide whether row-level pct should display over-MOQ values (e.g., 111%) instead of being capped at 100% at PreBookPage.tsx:81 to match review pass-4 spec. Totals row already shows 111% when scoped to Trailblazer."
+  ],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx:81 caps row fill % at 100 via Math.min(100, ...), inconsistent with totals row (line 380) which allows >100%. Consider aligning both.",
+    "Naming inconsistency persists: Review sidebar uses pb-drop-drop1/2/3 while Setup uses pb-drop-d1/d2/d3."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password on login -> mocked demo user",
+  "seed_data_creation": "None (all data mocked in PreBookPage.tsx)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Pass-4 structural changes verified: pb-stat-combined (4 metrics + channel-mix split bar), pb-stat-usw/dist legend <li>s, pb-demand-totals row present and reactive to filters/search, rows sorted by fill% desc under All (Trailblazer then Coastal Snapback). Only nit: row-level pct is Math.min-capped at 100 so Trailblazer displays 100% not 111% — totals row correctly displays 111% when scoped."
+}
