@@ -20,12 +20,19 @@
 .rv-strong { color: var(--ink); font-weight: 700; }
 .rv-num, .rv-top-amt, .rv-acct-inv b, .rv-metric strong, .rv-tip-row b, .rv-figure strong, .rv-kpi-v { font-variant-numeric: tabular-nums; }
 
-.rv-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 24px 26px; box-shadow: var(--sh); transition: box-shadow .22s ease, transform .22s ease, border-color .22s ease; }
-.rv-card:hover { box-shadow: var(--sh-h); border-color: var(--line-md); }
+.rv-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 24px 28px; box-shadow: var(--sh); transition: box-shadow .22s ease, border-color .22s ease; }
+.rv-card:hover { box-shadow: var(--sh-h); }
 
 /* ---- HERO ---- */
 .rv-hero { display: grid; grid-template-columns: 1fr 272px; gap: 0; padding: 0; overflow: hidden; background: linear-gradient(160deg, #f1faf6 0%, #ffffff 60%); border-color: #dcebe3; }
 .rv-hero-left { display: flex; flex-direction: column; padding: 26px 28px 22px; min-height: 300px; }
+.rv-hero-goal { padding: 24px 28px 22px; }
+.rv-kpi { padding: 22px 28px; }
+.rv-th { padding: 12px 10px 12px 12px; }
+.rv-row { padding: 14px 12px; }
+.rv-legend span { color: var(--ink-4); }
+.rv-export { border-color: var(--line); color: var(--ink-3); }
+.rv-acct-count { display: none; }
 .rv-hero-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
 .rv-eyebrow { display: inline-flex; align-items: center; gap: 9px; font-family: var(--ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
 .rv-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-v); box-shadow: 0 0 0 4px rgba(22,163,122,.16); animation: rv-pulse 2.4s ease-in-out infinite; }
@@ -185,7 +192,6 @@
 .rv-th span:nth-child(6), .rv-th span:nth-child(7) { text-align: right; }
 .rv-num .rv-vspill { display: inline-block; min-width: 64px; text-align: center; }
 .rv-row-wrap { border-bottom: 1px solid #f0f3f1; transition: background .14s ease; }
-.rv-row-wrap:nth-child(even):not(.is-open) { background: #fbfcfb; }
 .rv-row-wrap.is-open { background: var(--sub); border-radius: 16px; border-bottom-color: transparent; }
 .rv-row { padding: 15px 10px; cursor: pointer; transition: background .14s ease; outline: none; border-radius: 12px; }
 .rv-row:hover { background: var(--sub); }

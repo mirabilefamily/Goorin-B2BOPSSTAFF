@@ -289,7 +289,7 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <div className="rv-tr rv-row" role="row" tabIndex={0} onClick={() => setExpanded(isOpen ? null : a.id)} onKeyDown={(e) => e.key === 'Enter' && setExpanded(isOpen ? null : a.id)} data-testid={`rv-account-row-${a.id}`}>
                   <span className="rv-acct-name">
                     <span className="rv-ava">{initials(a.name)}</span>
-                    <span className="rv-acct-nametext"><b>{a.name}{TOP5.has(a.id) && !query.trim() && <em className="rv-strategic rv-top5">Top {SORTED.indexOf(a) + 1}</em>}{a.strategic && <em className="rv-strategic">Strategic</em>}</b><small>{a.segment}</small></span>
+                    <span className="rv-acct-nametext"><b>{a.name}{TOP5.has(a.id) && !query.trim() ? <em className="rv-strategic rv-top5">Top {SORTED.indexOf(a) + 1}</em> : a.strategic && <em className="rv-strategic">Strategic</em>}</b><small>{a.segment}</small></span>
                   </span>
                   <span className="rv-acct-inv"><b>{compact(a.invoiced)}</b><span className="rv-acct-track"><i className={a.vsGoal >= 0 ? 'ok' : 'warn'} style={{ width: `${Math.max(6, barPct)}%` }} /></span></span>
                   <span className="rv-num rv-muted">{compact(a.open)}</span>
