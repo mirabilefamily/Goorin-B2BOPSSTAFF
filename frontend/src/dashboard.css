@@ -84,7 +84,7 @@
 
 /* ---- KPI STRIP ---- */
 .rv-strip { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0; overflow: hidden; }
-.rv-kpi { display: flex; flex-direction: column; gap: 12px; padding: 22px 26px; border-right: 1px solid var(--line); transition: background .2s ease; }
+.rv-kpi { display: flex; flex-direction: column; gap: 14px; padding: 22px 26px; border-right: 1px solid var(--line); transition: background .2s ease; }
 .rv-kpi:last-child { border-right: none; }
 .rv-kpi:hover { background: #fbfcfb; }
 .rv-kpi-head { display: flex; align-items: center; gap: 10px; }
@@ -102,9 +102,10 @@
 .rv-kpi-parts li b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ---- MID ---- */
-.rv-mid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: stretch; }
+.rv-mid { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: stretch; }
 .rv-chart-card { display: flex; flex-direction: column; }
-.rv-chart-card .rv-chart { flex: 1; min-height: 380px; }
+.rv-chart-card .rv-chart { flex: 1; min-height: 340px; }
+.rv-top5 { color: var(--green); background: var(--green-l); }
 .rv-card-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .rv-card-title { display: flex; align-items: center; gap: 14px; }
 .rv-head-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
