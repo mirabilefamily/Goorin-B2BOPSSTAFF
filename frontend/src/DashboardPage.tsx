@@ -170,11 +170,12 @@ export default function DashboardPage({ onNavigate }: Props) {
   };
 
   const kpis = [
-    { k: 'Open orders', v: h.open, cap: 'booked, not invoiced', d: 6.2, chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', spark: [40, 52, 48, 63, 58, 72] },
-    { k: 'Total', v: h.total, cap: 'invoiced + open', d: -3.1, chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', spark: [55, 60, 58, 66, 70, 78] },
-    { k: 'Forecast', v: h.forecast, cap: 'full-year projection', d: 1.8, chip: 'rv-chip-amber', icon: <TrendingUp size={16} />, testid: 'rv-tile-forecast', spark: [50, 47, 53, 49, 56, 60] },
+    { k: 'Open orders', v: h.open, cap: 'booked, not invoiced', chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', barLabel: 'of total pipeline', pct: Math.round((h.open / h.total) * 100) },
+    { k: 'Total', v: h.total, cap: 'invoiced + open', chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', barLabel: 'of annual goal', pct: Math.round((h.total / h.goalTarget) * 100) },
+    { k: 'Forecast', v: h.forecast, cap: 'full-year projection', chip: 'rv-chip-amber', icon: <TrendingUp size={16} />, testid: 'rv-tile-forecast', barLabel: 'of annual goal', pct: Math.round((h.forecast / h.goalTarget) * 100) },
   ];
   const gap = h.goalPct - h.pace;
+  const best = allMonths.slice(0, 9).reduce((a, b) => (b.invoiced > a.invoiced ? b : a));
 
   return (
     <div className="rv" data-testid="dashboard-page">
@@ -194,6 +195,11 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <button key={s.id} role="tab" aria-selected={seg === s.id} className={seg === s.id ? 'active' : ''} onClick={() => setSeg(s.id)} data-testid={`rv-seg-${s.id}`}>{s.label}</button>
               ))}
             </div>
+          </div>
+          <div className="rv-hero-stats">
+                <div><span>Prior YTD</span><b>{compact(h.invoiced / (1 + h.delta / 100))}</b></div>
+                <div><span>Avg / month</span><b>{compact(h.invoiced / 9)}</b></div>
+                <div><span>Best month</span><b>{best.m} · {compact(best.invoiced)}</b></div>
           </div>
           <div className="rv-hero-chart">
             <ResponsiveContainer width="100%" height="100%">
@@ -220,19 +226,15 @@ export default function DashboardPage({ onNavigate }: Props) {
           </div>
         </section>
 
-        {kpis.map((t) => {
-          const mx = Math.max(...t.spark);
-          return (
-            <section className="rv-card rv-kpi" key={t.k} data-testid={t.testid}>
-              <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span></div>
-              <strong className="rv-kpi-v">{compact(t.v)}</strong>
-              <div className="rv-kpi-foot">
-                <small><Delta v={t.d} size={12} /> {t.cap}</small>
-                <div className="rv-kpi-spark" aria-hidden="true">{t.spark.map((v, i) => <i key={i} style={{ height: `${(v / mx) * 100}%` }} />)}</div>
-              </div>
-            </section>
-          );
-        })}
+        {kpis.map((t) => (
+          <section className="rv-card rv-kpi" key={t.k} data-testid={t.testid}>
+            <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span></div>
+            <div><strong className="rv-kpi-v">{compact(t.v)}</strong><small className="rv-kpi-cap">{t.cap}</small></div>
+            <div className="rv-kpi-foot">
+              <div className="rv-kpi-meter"><span><b>{Math.min(t.pct, 100)}%</b> {t.barLabel}</span><div className={`rv-kpi-bar ${t.chip}`}><i style={{ width: `${Math.min(t.pct, 100)}%` }} /></div></div>
+            </div>
+          </section>
+        ))}
       </div>
 
       {/* MID */}
@@ -240,7 +242,7 @@ export default function DashboardPage({ onNavigate }: Props) {
         <section className="rv-card rv-chart-card" data-testid="rv-chart-card">
           <div className="rv-card-head">
             <div className="rv-card-title">
-              <h2>Revenue by Month</h2>
+              <h2>Revenue by month</h2>
               <div className="rv-range" role="tablist" aria-label="Chart range">
                 {RANGES.map((r) => <button key={r.id} className={range === r.id ? 'active' : ''} onClick={() => setRange(r.id)} data-testid={`rv-range-${r.id}`}>{r.label}</button>)}
               </div>
@@ -286,7 +288,7 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <div className="rv-ring" style={{ background: `conic-gradient(${s.color} ${s.pct * 3.6}deg, #eef1ef 0)` }}><span>{s.pct}<em>%</em></span></div>
                 <div className="rv-seg-info">
                   <div className="rv-seg-row1"><span className="rv-seg-name">{s.name}</span><em className={`rv-seg-pill ${s.pct >= h.pace ? 'ok' : 'behind'}`}>{s.share}% share</em></div>
-                  <div className="rv-seg-row2"><strong>{compact(s.invoiced)}</strong><span className="rv-muted">of {compact(s.goal)} goal</span></div>
+                  <div className="rv-seg-row2"><strong>{compact(s.invoiced)}</strong><span className="rv-muted">of {compact(s.goal)} goal</span><span className={`rv-seg-vs ${s.pct >= h.pace ? 'ok' : 'behind'}`}>{s.pct >= h.pace ? '+' : ''}{s.pct - h.pace} pts vs pace</span></div>
                   <div className="rv-seg-bar"><i style={{ width: `${s.pct}%`, background: s.color }} /><b style={{ left: `${h.pace}%` }} /></div>
                 </div>
               </div>

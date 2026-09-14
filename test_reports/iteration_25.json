@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend-only verification of KPI card refactor (removed decorative sparklines, added labeled meter bar). Logged in via mock auth (empty fields) → dashboard-page renders. Verified all 3 KPI cards (rv-tile-open, rv-tile-total, rv-tile-forecast) show: value, caption, '<pct>% <label>' meter text, and a filled .rv-kpi-bar i with width>0. .rv-kpi-spark selector count = 0 (removed). Percentages update per segment and cap at 100%. Regression selectors (rv-goal-pct, rv-range-*, revenue-tooltip, rv-export-btn, rv-segment-us/dist, rv-top-account-1..5, rv-account-row-lids expand) all pass with 0 page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "DashboardPage rv-hero (pre-existing from iteration_24, unchanged in this pass)", "issue": "Segment pills (rv-seg-all/us/dist) render on their own row ABOVE the eyebrow/figure at 1920 (pill y=122 vs fig y=155) — not on same row as $11,572,416 figure. Layout is still balanced (no overlap / no large empty gaps) but does not match 'top-right same row' spec.", "selector": ".rv-hero-top / [data-testid=rv-seg-all]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_details": {
+    "kpi_no_sparkline": ".rv-kpi-spark selector count = 0 across the page (decorative bar cluster confirmed removed).",
+    "kpi_open_all": "rv-tile-open: value=$9.2M, cap='booked, not invoiced', meter='44% of total pipeline', inline width=44%, rendered bar rect ≈ 141px.",
+    "kpi_total_all": "rv-tile-total: value=$20.7M, cap='invoiced + open', meter='100% of annual goal' (capped from 120%), inline width=100%, rendered bar ≈ 321px.",
+    "kpi_forecast_all": "rv-tile-forecast: value=$17.3M, cap='full-year projection', meter='100% of annual goal', inline width=100%, rendered bar ≈ 321px.",
+    "segment_switch": "US: open 44% / total 100% / fc 100%. Dist: open 45% / total 100% / fc 94%. Back to All: matches baseline.",
+    "capping": "Total (all) computed pct=120% → displayed and bar width both capped at 100%. Confirmed via Math.min(pct,100).",
+    "regression": "rv-goal-pct=1, rv-export-btn=1, rv-segment-us=1, rv-segment-dist=1, rv-top-account-1..5 all present, rv-account-row-lids expand → rv-account-expand-lids visible, rv-range-ytd/12m/q clickable, revenue-tooltip appears on chart hover (visible=True).",
+    "layout_1920": "KPI cards render as 2x2 bento: rv-goal-card (x=1120,y=92,w=371,h=201) and rv-tile-open (x=1511,y=92,h=201) on row1; rv-tile-total (x=1120,y=313,h=196) and rv-tile-forecast (x=1511,y=313,h=196) on row2. No overlap, no large empty gaps, symmetric heights (Δh=5px within row group).",
+    "console": "0 pageerrors. Only harmless recharts width(-1)/height(-1) warnings during initial mount."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Carried over from iter 24, not part of this fix) Hero segment pills placement: consider putting them inline with the figure ($11,572,416) on the same row rather than on their own row above the eyebrow."
+  ],
+  "critical_code_review_comments": [
+    "KPI pct computed inline in kpis array using Math.round((h.open/h.total)*100) and (h.total/h.goalTarget)*100 — clean, and Math.min(t.pct,100) applied in both the number label AND the bar width, so cap is consistent.",
+    "Consider adding aria-label to .rv-kpi-bar (progressbar role) for accessibility since it now represents a metric."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100% (KPI refactor)"},
+  "test_credentials": "Mock auth: click 'Log in' with empty fields.",
+  "seed_data_creation": "None (all mocked client-side).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "KPI card refactor verified green. Sparklines removed (.rv-kpi-spark=0), meter bars render at correct widths and cap at 100%, percentages update across segments. Only outstanding UI note is the hero pill placement (pre-existing from iter 24, low priority)."
+}

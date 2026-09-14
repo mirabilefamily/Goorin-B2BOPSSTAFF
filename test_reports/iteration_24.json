@@ -1,0 +1,40 @@
+{
+  "summary": "Frontend refinement pass verification of Dashboard bento redesign. Logged in via mock auth (empty fields) → dashboard-page renders. Verified all rv-* testids, hero 3-stat strip (Prior YTD / Avg / month / Best month) updates per segment, KPI cards + colored sparklines (6 bars each, teal/navy/amber), segments show ring %, share pill and 'pts vs pace' text, top accounts 1..5, account search/expand/empty, CSV export, chart tooltip, range toggles, and chart↔segments card height parity (637 vs 637 = 0px diff). No console errors. Tested at 1920x1080 and 1280x900. One visual defect: at 1920 the segment pills wrap onto a separate row BELOW the figure instead of sitting top-right on the same row.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "DashboardPage rv-hero", "issue": "At 1920, segment pills (rv-seg-all/us/dist) wrap to a second row (y=240) below the figure (y=155) rather than being top-right on the same row as the $11,572,416 figure. Root cause: .rv-hero-top uses justify-content: space-between with flex-wrap: wrap. The 60px-font figure + delta pill consumes enough width that the pill group is pushed onto its own line because the eyebrow+figure sub-block is a single flex child taking full available width until it overflows and wraps the sibling. Fix: place .rv-eyebrow at top and move the pill segmented control up next to the eyebrow (top row) — OR put the .rv-seg absolutely on top-right of the hero card — OR restructure hero-top so eyebrow row and figure row are separate, with .rv-seg positioned in the eyebrow row (top-right).", "selector": ".rv-hero-top / [data-testid=rv-seg-all]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_details": {
+    "login": "Empty-field login → routes to #dashboard; dashboard-page renders. No console errors.",
+    "hero": "rv-invoiced-ytd=$11,572,416 (all), $6,412,880 (US), $5,159,536 (dist). rv-invoiced-delta shows '14.7% vs LY' with down arrow. Segment pills switch figure + stats + KPI tiles correctly.",
+    "hero_stats_strip": "All: Prior YTD $13.6M / Avg $1.3M / Best FEB $1.6M. US: $7.1M / $712.5K / FEB $870.8K. Dist: $6.6M / $573.3K / FEB $684.2K. Updates on segment switch.",
+    "goal_card": "rv-goal-pct=67%, '8 pts behind' badge, '$11.6M of $17.3M · Pace 75%'.",
+    "kpi_tiles": "rv-tile-open=$9.2M (+6.2%, teal spark 6 bars), rv-tile-total=$20.7M (-3.1%, navy spark), rv-tile-forecast=$17.3M (+1.8%, amber spark). Values update per segment.",
+    "chart_card": "rv-range-ytd/12m/q toggle. Tooltip revenue-tooltip shows on hover with Invoiced/Open/Total/Forecast rows. rv-export-btn downloads goorin-revenue-by-month.csv.",
+    "height_parity": "rv-chart-card=637px, rv-segments-card=637px, diff=0px (within ±2px).",
+    "segments": "rv-segment-us: 72% ring / 55% share / $6.4M of $8.9M / '-3 pts vs pace'. rv-segment-dist: 61% / 45% / $5.1M of $8.4M / '-14 pts vs pace'.",
+    "top_accounts": "rv-top-account-1..5 all visible (Lids $2.7M ▼20.1%, SASAtrend $1.4M ▼10.4%, Industrias Mercury $1.0M ▲62.6%, Nordstrom $726.5K ▼19.6%, Buckle $616.6K ▼54.8%).",
+    "account_table": "rv-account-search filters. 'lids' → rv-account-row-lids expands showing rv-account-expand-lids + rv-open-account-lids. 'zzqqxx' → rv-account-empty visible.",
+    "responsive": "1280 renders without horizontal overflow (sw=cw=1280). At 1280 the bento reflows to 2 cols and pills naturally sit under the eyebrow which is fine at this breakpoint.",
+    "console": "0 console errors captured."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix hero segment pills at 1920: they should sit top-right on the same row as (or above) the figure, currently wrapping to a second line. Suggested: restructure .rv-hero-top so .rv-eyebrow and .rv-seg share the top row (space-between), then the figure sits below on its own line — matches spec 'segment pills top-right'."
+  ],
+  "critical_code_review_comments": [
+    "Hero-stats 'Prior YTD' is computed as h.invoiced / (1 + h.delta/100) but h.delta values are stored as negative percentages (e.g., -14.7); the formula would divide by (1 - 0.147) which correctly implies prior=invoiced/(1+delta/100) when delta = (cur-prior)/prior. For 'all' delta=-14.7 → prior≈$13.57M matches display ($13.6M). Verified numerically consistent.",
+    "Recharts occasionally logs 'width(-1) and height(-1)' warnings during initial mount (harmless)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "95%"},
+  "test_credentials": "Mock auth: click 'Log in' with empty fields (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None (all frontend data mocked).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All bento refinement items pass except the hero segment-pill placement at 1920: pills wrap below the figure due to .rv-hero-top { justify-content: space-between; flex-wrap: wrap } layout. Everything else (stats strip, sparklines, pts-vs-pace, height parity 637=637, CSV export, tooltip, account expand/empty) verified green."
+}
