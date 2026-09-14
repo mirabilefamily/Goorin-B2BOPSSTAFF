@@ -90,3 +90,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Refinement: hero stats strip (Prior YTD/Avg/Best month), segment pts-vs-pace, zebra rows; removed decorative KPI spark bars → labeled meter bars (0f pipeline / 0f goal). iteration_24/25.
 - Refinement 2: true % on KPI meters, fixed-width invoiced progress track in table, rank chips, lowercase labels. iteration_26.
 - KPI cards v3: goal ring w/ % inside + pace tick + remaining; KPI cards show stacked composition bars (ship month / invoiced-open / forecast vs goal). iteration_27.
+- 2026-06 Pre-Book Review restyled to bento look: light stat cards w/ MOQ %, side-by-side status cards, days-left chip, pill controls, zebra table. iteration_28.

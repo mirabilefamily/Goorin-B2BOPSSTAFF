@@ -174,6 +174,7 @@ export default function PreBookPage({ onNavigate }: Props) {
   const atOrAbove = skus.filter((s) => s.total >= s.moq).length;
   const ordUnits = orders.reduce((t, o) => t + o.units, 0);
   const ordWhsl = orders.reduce((t, o) => t + o.wholesale, 0);
+  const daysLeft = Math.max(0, Math.ceil((new Date(2026, 8, 21).getTime() - Date.now()) / 86_400_000));
   const selCount = selected.size;
 
   const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -241,7 +242,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                   <span className="pb-live" />
                   <div className="pb-drop-idblock">
                     <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
-                    <span className="pbx-deadline"><Calendar size={14} /> Deadline 9/21/2026</span>
+                    <span className="pbx-deadline"><Calendar size={14} /> Deadline 9/21/2026 <em className="pbx-days">{daysLeft} days left</em></span>
                   </div>
                 </div>
                 <div className="pb-drop-actions">
@@ -279,8 +280,9 @@ export default function PreBookPage({ onNavigate }: Props) {
                 </div>
               </div>
 
-              {/* ready strip */}
-              <div className="pb-ready"><CheckCircle2 size={17} /><span>Ready for customer visibility</span><em>READY</em></div>
+              {/* status row */}
+              <div className="pbx-status-grid">
+              <div className="pb-ready"><span className="pbx-ready-ico"><CheckCircle2 size={17} /></span><div><span>Ready for customer visibility</span><small>Drop is published to customer portals</small></div><em>READY</em></div>
 
               {/* purchasing preview */}
               <div className={`pb-preview ${previewOpen ? 'is-open' : ''}`} data-testid="pb-preview">
@@ -309,6 +311,8 @@ export default function PreBookPage({ onNavigate }: Props) {
                 )}
               </div>
 
+              </div>
+
               {/* stat cards */}
               <div className="pb-stats">
                 {statCards.map((c) => (
@@ -319,7 +323,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                       <div className="pb-metric"><small>Wholesale</small><strong className="green">{c.wholesale}</strong></div>
                       <div className="pb-metric"><small>MOQ rate</small><strong className={c.moqTone}>{c.moq}</strong></div>
                     </div>
-                    <div className="pbx-moq"><span>MOQ hit</span><div className="pbx-moq-bar"><i style={{ width: `${c.pct}%`, background: c.bar }} /></div><em>{c.hit}</em></div>
+                    <div className="pbx-moq"><span>MOQ hit <b>{Math.round(c.pct)}%</b></span><div className="pbx-moq-bar"><i style={{ width: `${c.pct}%`, background: c.bar }} /></div><em>{c.hit} SKUs</em></div>
                   </div>
                 ))}
               </div>

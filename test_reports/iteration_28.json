@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only regression test of Pre-Book Review page restyle (bento cards, pill buttons, deadline chip, side-by-side status cards, light stat cards with MOQ %, zebra table, status pills). All functional selectors and flows verified. Zero console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Review @ 1280x900", "issues": ["When Purchasing preview 'Details' is expanded, the Consolidation details table (Order/Channel/Type + Units column) overflows past the right viewport edge; right-most Units column values get clipped. Consider allowing the details block to reflow below at narrow widths, or reduce column widths / add horizontal scroll container."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Address horizontal overflow of Purchasing-preview consolidation table at 1280px width when pb-preview-details is expanded (details card extends beyond right viewport edge)."
+  ],
+  "critical_code_review_comments": [
+    "pb-cons-toggle is only rendered after pb-preview-details is expanded; that is expected but worth documenting in the review-request selector list to avoid confusion.",
+    "pb-new-prebook only exists under the Setup tab (not Review) — matches expected behavior."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> demo login (ryan@mirabile.com)",
+  "seed_data_creation": "None (all data mocked client-side)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Verified at 1920x1080: Header shows 'SS27 / Drop 3' + OPEN pill + 'Deadline 9/21/2026' + '7 days left' chip. pb-more-btn opens pb-more-menu; pb-actions-btn opens pb-actions-menu. Status row shows Ready card + Purchasing preview side-by-side; pb-preview-details toggles body; pb-cons-toggle then shows pb-cons-table (Consolidation details table: #444/#443/#442/#441 with USW/DIST channel pills). Stat cards - pb-stat-combined: 13,328 units, $130K wholesale, 43% MOQ, 'MOQ hit 43%' 9/21 SKUs. pb-stat-usw: 932 / $19K / 10% / 2/21. pb-stat-dist: 12,396 / $112K / 38% / 8/21. SKU Demand table filters (pb-demand-all/hit/under) and pb-panel-search work; pb-sku-row-* click reveals pb-sku-expand-*. pb-subtab-orders shows orders with pb-order-selectall and 4x pb-order-menu-*. Sidebar drops: pb-drop-drop1/drop2/drop3 switch (drop1&drop2 CLOSED, drop3 OPEN 21). Setup tab shows pb-new-prebook button. Only design nit: consolidation details table overflows right edge at 1280 wide when preview details expanded."
+}
