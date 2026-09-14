@@ -57,7 +57,7 @@
 
 /* ---- cards ---- */
 .rv-card { background: #fff; border: 1px solid #edf0ee; border-radius: 20px; padding: 24px 26px; box-shadow: 0 14px 40px -32px rgba(16, 35, 27, 0.5); }
-.rv-mid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; }
+.rv-mid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: start; }
 .rv-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .rv-card-title { display: flex; align-items: center; gap: 14px; }
 .rv-head-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
