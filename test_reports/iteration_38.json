@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of Pre-Book Review header unification. Login (empty fields, mocked) → landed on Pre-Book Review page; header title 'Pre-Book Review' renders in top bar. DOM confirms new nesting: .pbx-hero children order is exactly ['pbx-switch','pbx-hero-body'], i.e. the drop switcher strip (data-testid=pb-drop-switcher containing SS27 Closing pill, pb-drop-drop1/2/3 tabs, '+' add, pb-show-archived) is the top band INSIDE the hero card, followed by .pbx-hero-body (kicker, SS27/Drop 3 OPEN, deadline, progress, chips, pb-preview-details, pb-stat-combined/usw/dist, Actions/more). Screenshots at 1920x1080 and 1280x900 both clean — no wrapping, overlap, or horizontal scroll (document.body.scrollWidth = window.innerWidth = 1920). Review/Setup tabs render as underline text tabs (pb-tab-review/pb-tab-setup: active tab carries 'active' class, no legacy button/border chrome). pb-tab-setup switches to Setup mode: aside.pb-side becomes visible (display:flex, no pb-side--hidden class) and pb-new-prebook is rendered; switching back to Review re-hides sidebar (display:none, pb-side--hidden present). Regression: pb-drop-drop1/2/3 all switch active state correctly (drop1 'active closed', drop2 'active closed', drop3 'active open'); pb-show-archived toggles false→true and back; pb-preview-details expands revealing pb-cons-toggle which opens pb-cons-table; pb-actions-btn opens pb-actions-menu; pb-more-btn opens pb-more-menu; Escape closes both. Stat values verified — pb-stat-combined 'Units 13,328 · Wholesale $130K · MOQ hit 2/12 · Accounts 4', pb-stat-usw 'USW 932 $19K', pb-stat-dist 'DIST 12,396 $112K'. Demand counts pb-demand-all=12, pb-demand-hit=2, pb-demand-under=10 (default) and pb-demand-totals row 'Σ · 10 SKUs · 72 · 1,560 · — · 1,632 · 3,816 · 43%'. 10 pb-sku-row-* rows; first expand yields pb-sku-expand-* panel. pb-subtab-orders switches to Orders table with 4 pb-order-row-* rows. No console errors and no page errors captured; only benign Recharts sizing warnings on first paint (unchanged from prior iterations).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Duplicate data-testid values (pb-drop-drop1/drop2/drop3 and pb-show-archived) still exist inside both the hidden aside.pb-side and the visible .pbx-switch inside .pbx-hero. Only the switcher copy is user-visible on Review, but duplicate testids violate strict-mode uniqueness — carried over from iteration_37. Recommend rendering the sidebar copies only when tab==='setup'.",
+    "Setup drops still use data-testid pb-drop-d1/d2/d3 while Review switcher uses pb-drop-drop1/drop2/drop3 — inconsistent testid naming across tabs (carried over).",
+    "Fill.tsx caps row-level fill % via Math.min(100,...) while pb-demand-totals uses uncapped math (carried over, low priority)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email + empty password → mocked demo user ryan@mirabile.com",
+  "seed_data_creation": "None (all data mocked in PreBookPage.tsx)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Header unified — .pbx-switch is now the first child of .pbx-hero, followed by .pbx-hero-body. Use scoped locator page.locator(\"[data-testid='pb-drop-switcher'] [data-testid='...']\") when testing drop tabs/archived to avoid the duplicate-testid ambiguity with the hidden sidebar copy."
+}

@@ -2,9 +2,12 @@
 .pb { --ui: 'Outfit', 'DM Sans', sans-serif; --sub: #f4f7f5; --line: #e6ebe8; --ink: #0f1f18; --ink-3: #66746d; --ink-4: #98a39d; --sh: 0 2px 4px rgba(15,31,24,.03), 0 18px 40px -28px rgba(15,31,24,.22); display: flex; flex-direction: column; gap: 20px; padding: 2px 0 48px; color: #16241d; }
 .pb h2, .pb strong, .pb-setup-h { font-family: var(--ui); }
 .pb-topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.pb-tabs { display: inline-flex; gap: 2px; background: var(--sub); border-radius: 999px; padding: 4px; }
-.pb-tabs button { border: none; background: transparent; color: #6b756e; font-family: var(--ui); font-size: 13.5px; font-weight: 600; padding: 8px 20px; border-radius: 999px; cursor: pointer; transition: all .16s; }
-.pb-tabs button.active { background: #0f1f18; color: #fff; }
+.pb-tabs { display: inline-flex; gap: 18px; background: transparent; border-radius: 0; padding: 0; }
+.pb-tabs button { border: none; background: transparent; color: #8a938d; font-family: var(--ui); font-size: 15px; font-weight: 600; padding: 6px 0 10px; border-radius: 0; cursor: pointer; position: relative; transition: color .16s; }
+.pb-tabs button::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: #0f1f18; transform: scaleX(0); transition: transform .22s cubic-bezier(.16,1,.3,1); }
+.pb-tabs button.active { background: transparent; color: #0f1f18; }
+.pb-tabs button.active::after { transform: scaleX(1); }
+.pb-topbar { padding: 0 4px; }
 .pb-ghost-btn { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: #fff; color: #0f1f18; font-family: var(--ui); font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: background .16s, color .16s, border-color .16s; }
 .pb-ghost-btn:hover { background: #0f1f18; color: #fff; border-color: #0f1f18; }
 
@@ -122,7 +125,13 @@
 .pbx-drop-add { width: 30px; height: 30px; justify-content: center; padding: 0 !important; color: var(--ink-4); }
 .pbx-switch .pb-archive { margin-left: auto; font-size: 12.5px; color: var(--ink-3); }
 
-.pbx-hero { display: grid; grid-template-columns: 1.1fr 1fr auto; gap: 28px; align-items: start; background: linear-gradient(160deg, #f1faf6 0%, #ffffff 60%); border: 1px solid #dcebe3; border-radius: 22px; padding: 24px 28px; box-shadow: var(--sh); }
+.pbx-hero { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--sh); overflow: hidden; }
+.pbx-hero .pbx-switch { margin: 0; padding: 14px 20px; border-bottom: 1px solid var(--line); background: #fbfcfb; }
+.pbx-hero-body { display: grid; grid-template-columns: 1.1fr 1fr auto; gap: 28px; align-items: start; padding: 24px 28px; background: linear-gradient(160deg, #f1faf6 0%, #ffffff 60%); }
+.pbx-season-pill { border-color: transparent; background: transparent; padding-left: 4px; }
+.pbx-season-pill strong { font-size: 15px; }
+.pbx-drop-tabs { background: #fff; border: 1px solid var(--line); }
+.pbx-drop-tabs button.active { box-shadow: none; }
 .pbx-hero-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .pbx-hero-main .pbx-kicker { margin-bottom: 0; }
 .pbx-hero-main .pbx-kicker b { color: #b8790c; font-weight: 700; letter-spacing: 0; text-transform: none; font-size: 12px; }
@@ -148,7 +157,7 @@
 .pb-body--review .pb-panel-head { margin-bottom: 0; }
 .pb-body--review .pbx-table--demand .pb-tr { grid-template-columns: minmax(180px,1.5fr) 1.6fr .6fr .6fr .6fr .7fr .7fr 1.3fr 1fr 20px; }
 @media (max-width: 1280px) {
-  .pbx-hero { grid-template-columns: 1fr; }
+  .pbx-hero-body { grid-template-columns: 1fr; }
   .pbx-hero-stats { padding-left: 0; border-left: none; border-top: 1px solid #e3ede7; padding-top: 16px; grid-template-columns: repeat(2, 1fr); }
 }
 

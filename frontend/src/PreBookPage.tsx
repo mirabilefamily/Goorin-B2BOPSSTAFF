@@ -237,7 +237,8 @@ export default function PreBookPage({ onNavigate }: Props) {
         <main className="pb-main">
           {tab === 'review' ? (
             <>
-              {/* drop switcher */}
+              {/* hero */}
+              <div className="pbx-hero">
               <div className="pbx-switch" data-testid="pb-drop-switcher">
                 <button className="pbx-season-pill" onClick={() => toast('Switch season')}><strong>SS27</strong><em className="pb-badge closing">Closing</em><ChevronDown size={14} /></button>
                 <div className="pbx-drop-tabs" role="tablist">
@@ -252,8 +253,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                 <label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label>
               </div>
 
-              {/* hero */}
-              <div className="pbx-hero">
+              <div className="pbx-hero-body">
                 <div className="pbx-hero-main">
                   <p className="pbx-kicker"><span className="pb-live" />Season SS27 · Drop 3 of 3 · <b>{daysLeft} days left</b></p>
                   <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
@@ -312,6 +312,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                     )}
                   </div>
                 </div>
+              </div>
               </div>
               {previewOpen && (
                 <div className="pb-preview is-open pbx-preview-panel" data-testid="pb-preview">
