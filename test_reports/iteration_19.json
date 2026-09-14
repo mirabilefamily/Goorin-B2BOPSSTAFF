@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only smoke of refined Dashboard (Segments, Top Accounts, Chart tooltip + ranges). All acceptance criteria pass. Login with empty fields lands on dashboard-page. Segments card renders rv-segment-us and rv-segment-dist with '% of goal' pill, invoiced amount, Goal $X, and segment bar (no rings). Top accounts list rv-top-account-1..5 render ranks, names, amounts and triangle YoY deltas. Legend shows 'Open Orders'. Hover over chart shows revenue-tooltip with Invoiced/Open Orders/Total/Forecast rows and a vertical cursor line (recharts-tooltip-cursor present). Range toggles YTD/12M/Quarter all switch data with no console errors; Quarter view (no Sep) does not error because ReferenceLine is conditionally rendered. No horizontal overflow at 1920 width.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "DashboardPage.tsx (~360 lines) is fine size-wise but a lot of mocked data is inlined; consider extracting HEADER/SEGMENTS/TOP_ACCOUNTS/ACCOUNTS into a data module for maintainability.",
+    "Tooltip uses payload[0].payload which is safe here but consider guarding against undefined payload rows for robustness.",
+    "All interactive elements have data-testid; good."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Mock login: empty email/password -> demo (ryan@mirabile.com). See /app/memory/test_credentials.md.",
+  "seed_data_creation": "None (all data mocked in-browser).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Chart is below the fold at viewport height 800; use 1080 or scroll_into_view before hovering to trigger tooltip. Use svg.recharts-surface bounding box and mouse.move with steps=8 to activate recharts hover."
+}

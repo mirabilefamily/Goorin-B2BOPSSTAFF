@@ -73,33 +73,41 @@
 .rv-legend .dash { width: 16px; height: 0; border-top: 2px dashed #e0940f; }
 .rv-chart { margin-top: 16px; }
 
-.rv-tip { background: rgba(255,255,255,.96); backdrop-filter: blur(6px); border: 1px solid #e9edea; border-radius: 12px; padding: 12px 14px; box-shadow: 0 16px 40px -18px rgba(16, 35, 27, 0.35); min-width: 180px; }
-.rv-tip-h { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #8b958e; margin-bottom: 8px; }
-.rv-tip-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 3px 0; font-size: 13px; }
-.rv-tip-row span { display: inline-flex; align-items: center; gap: 8px; color: #55605a; }
-.rv-tip-row i { width: 9px; height: 9px; border-radius: 3px; }
-.rv-tip-row b { color: #10231b; font-weight: 700; }
+.rv-tip { background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border: 1px solid #e9edea; border-radius: 16px; padding: 16px 20px; box-shadow: 0 24px 56px -24px rgba(16, 35, 27, 0.4); min-width: 230px; }
+.rv-tip-h { font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; color: #7f8a83; margin-bottom: 10px; }
+.rv-tip-row { display: flex; justify-content: space-between; align-items: center; gap: 28px; padding: 5px 0; font-size: 14px; }
+.rv-tip-row span { display: inline-flex; align-items: center; gap: 10px; color: #55605a; }
+.rv-tip-row i { width: 10px; height: 10px; border-radius: 50%; }
+.rv-tip-row b { color: #10231b; font-weight: 800; }
 
-/* segments with rings */
+/* segments */
 .rv-segs-head { align-items: center; }
-.rv-seg-list { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
-.rv-seg-item { display: flex; align-items: center; gap: 16px; background: #fafbfa; border: 1px solid #eef1ef; border-radius: 16px; padding: 16px 18px; }
-.rv-ring { position: relative; width: 58px; height: 58px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; }
-.rv-ring::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; background: #fafbfa; }
-.rv-ring span { position: relative; font-size: 15px; font-weight: 800; color: #16261e; }
-.rv-ring span em { font-size: 10px; font-style: normal; color: #97a19a; }
-.rv-seg-info { flex: 1; min-width: 0; }
-.rv-seg-name { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 700; color: #17271f; }
+.rv-segs-tag { padding-left: 10px; border-left: 1px solid #e6eae8; }
+.rv-seg-list { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.rv-seg-item { background: #fbfcfb; border: 1px solid #eef1ef; border-radius: 16px; padding: 18px 20px; }
+.rv-seg-row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rv-seg-name { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; color: #17271f; }
 .rv-seg-name i { width: 9px; height: 9px; border-radius: 50%; }
-.rv-seg-row2 { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; }
-.rv-seg-row2 strong { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #10231b; }
-.rv-seg-bar { position: relative; height: 7px; margin-top: 10px; border-radius: 999px; background: #eaeeeb; overflow: hidden; }
+.rv-seg-pill { font-style: normal; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.rv-seg-pill.behind { color: #b8730a; background: #fdf3e2; }
+.rv-seg-pill.ok { color: #12a150; background: #e7f6ee; }
+.rv-seg-row2 { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; }
+.rv-seg-row2 strong { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; color: #10231b; }
+.rv-seg-goal { margin-left: auto; }
+.rv-seg-bar { position: relative; height: 8px; margin-top: 12px; border-radius: 999px; background: #eaeeeb; }
 .rv-seg-bar > i { display: block; height: 100%; border-radius: 999px; }
+.rv-seg-pace { position: absolute; top: -3px; width: 2px; height: 14px; border-radius: 2px; background: #8c968f; }
 
-.rv-sub-label { margin-top: 22px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #97a19a; }
+.rv-sub-label { margin-top: 26px; padding-top: 22px; border-top: 1px solid #eef1ef; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #97a19a; }
 .rv-top { list-style: none; margin-top: 8px; }
-.rv-top li { display: grid; grid-template-columns: 34px 1fr auto auto; align-items: center; gap: 12px; padding: 10px 6px; border-radius: 10px; transition: background .16s; }
+.rv-top li { display: grid; grid-template-columns: 26px 1fr auto auto; align-items: center; gap: 12px; padding: 14px 6px; border-bottom: 1px solid #f2f4f2; transition: background .16s; }
+.rv-top li:last-child { border-bottom: none; }
 .rv-top li:hover { background: #f7f9f8; }
+.rv-rank { font-size: 15px; font-weight: 800; color: #c3cac6; font-variant-numeric: tabular-nums; }
+.rv-tri { min-width: 62px; justify-content: flex-end; }
+.rv-tri i { width: 0; height: 0; border-left: 4.5px solid transparent; border-right: 4.5px solid transparent; }
+.rv-tri.up i { border-bottom: 7px solid #12a150; }
+.rv-tri.down i { border-top: 7px solid #e5484d; }
 .rv-ava { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #fff; font-size: 12px; font-weight: 800; letter-spacing: -0.01em; flex-shrink: 0; }
 .rv-ava.sm { width: 34px; height: 34px; border-radius: 11px; font-size: 13px; }
 .rv-top-name { font-size: 14px; font-weight: 600; color: #24312b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -166,6 +174,9 @@
 .rv-goal-bar > i { transform-origin: left; animation: rv-grow .9s cubic-bezier(.2,.7,.2,1) both .32s; }
 .rv-seg-bar > i { transform-origin: left; animation: rv-grow .9s cubic-bezier(.2,.7,.2,1) both .4s; }
 .rv-seg-item { transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+.rv-top li { transition: background .16s ease, transform .16s ease; }
+.rv-top li:hover { transform: translateX(2px); }
+.rv-top li:hover .rv-rank { color: #16a37a; }
 .rv-seg-item:hover { transform: translateY(-2px); border-color: #dde5e0; box-shadow: 0 14px 30px -24px rgba(16,35,27,.5); }
 .rv-metric { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .rv-metric:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -22px rgba(16,35,27,.4); border-color: #e2e7e3; }
