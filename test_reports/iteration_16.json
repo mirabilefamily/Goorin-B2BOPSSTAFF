@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only verification of the rewritten DashboardPage (revenue-ops view) and PreBookPage (Pre-Book Review console). Mock login (empty fields, data-testid='login-submit-btn') logs in and lands on dashboard-page. DASHBOARD: hero YTD $11,572,416 with -14.7% delta shown (rv-invoiced-ytd / rv-invoiced-delta); segment toggle All/US/Dist correctly swaps values ($11.57M / $6.41M / $5.16M) without crash; three tiles (rv-tile-open $9.2M, rv-tile-total $20.7M, rv-tile-forecast $17.3M) and Annual Goal 67% (rv-goal-pct) render; recharts Revenue by Month chart (rv-chart) visible; Export button clicks; Segments card visible; Top accounts list shows exactly 5 rows; Account Detail table visible with 220 accounts; clicking rv-account-row-lids expands rv-account-expand-lids with 5 metric tiles + Open account link; search 'lids' filters to 1 row. PRE-BOOK: prebook-page renders; pb-tab-review / pb-tab-setup switch; SS27 seasons sidebar with pb-drop-drop1/2/3 all visible and switchable; Actions dropdown pb-actions-btn opens pb-actions-menu with 3 items, clicking an item shows a toast ('Released all confirmed orders.') and closes the menu; pb-preview-details toggle works; pb-stat-combined / pb-stat-usw / pb-stat-dist all render; pb-subtab-orders shows 4 order rows including pb-order-row-444; pb-subtab-demand chips All/Hit/Under filter to 12/2/10 rows; clicking a pb-sku-row-* expands detail; Setup tab shows Pre-book Drops and Product Groups sections (SS27 - US & INTL B2B 203 products with Majors/Boutiques/Distributors chips, SS27 - Lids SMU 13 products with Lids chip). ZERO console errors or page exceptions observed across all interactions.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Setup", "issues": ["Product Groups header shows count '3' but only 2 product groups are listed (SS27 - US & INTL B2B, SS27 - Lids SMU). Minor mismatch — verify the group count source."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: Reconcile Product Groups count badge ('3') on the Setup tab with the 2 visible group rows."
+  ],
+  "critical_code_review_comments": [
+    "DashboardPage and PreBookPage now use rich local state (segment, expanded rows, tabs, filters) — consider adding lightweight unit tests around the segment/filter reducers once they stabilize.",
+    "Actions menu closes via click-outside/handler correctly; ensure keyboard (Escape) and focus-trap are added for a11y in a future pass."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Mock login: empty email+password -> click data-testid='login-submit-btn'",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Dashboard and Pre-Book Review pages both fully verified in iteration_16 against the reference-screenshot rewrite. Use empty-field mock login. All rv-* and pb-* data-testids listed in the review request exist and behave correctly. Only cosmetic note is the Product Groups '3' badge showing while 2 groups render."
+}
