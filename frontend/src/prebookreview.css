@@ -248,7 +248,9 @@
 .pbx-table { border-top: 1px solid #edf0ee; }
 .pb-tr { display: grid; align-items: center; gap: 10px; }
 .pbx-table--demand .pb-tr { grid-template-columns: minmax(150px,1.4fr) 1.4fr .5fr .5fr .5fr .6fr .6fr 1.1fr .8fr 12px; }
-.pbx-table--orders .pb-tr { grid-template-columns: 34px .7fr 2fr .9fr .7fr 1fr .6fr 1.1fr 40px; }
+.pbx-table--orders .pb-tr { grid-template-columns: 34px .7fr 2fr .9fr .8fr 1fr .8fr 1.1fr 40px; }
+.pbx-table--orders .pb-oth span:nth-child(5), .pbx-table--orders .pb-oth span:nth-child(6) { text-align: right; }
+.pb-th span, .pb-oth span { font-size: 10.5px; letter-spacing: 0.06em; }
 .pb-th, .pb-oth { padding: 13px 6px; background: #fff; }
 .pb-th span, .pb-oth span { font-family: var(--ui); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); }
 .pb-th span.r, .pb-oth span.r { text-align: right; }

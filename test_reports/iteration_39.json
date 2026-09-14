@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only polish verification for Dashboard and Pre-Book Review. Login (empty fields, mocked) signed in as ryan@mirabile.com and landed on Dashboard. Dashboard: rv-account-row-lids expands rv-account-expand-lids showing exactly 5 metric tiles (OPEN PIPELINE $1,744,320, CONSERVATIVE LAND $4,460,373, FULL-YEAR FORECAST $4,460,373 +$1.5M vs goal, ANNUAL GOAL $3,000,000 target, PRIOR YEAR $4,683,724 YTD $3.4M · -20.1% YoY) plus rv-open-account-lids ('Open account') button — spacing looks clean in 1920 screenshot. Hero rv-goal-card renders 'ANNUAL GOAL' eyebrow with a ::before dot (content='\"\"', bg rgb(227,154,28), 7x7px). Regression rv-seg-* (3), rv-range-* (3), rv-export-btn (1) all present. Pre-Book Review: pb-subtab-demand text is exactly 'SKU Demand\\n12' — contains 'SKU Demand' and count '12' pill. pb-subtab-orders renders 4 pb-order-row-* rows with Units and Wholesale cells computed textAlign='right' (verified for both rows; SO# column shows '—' with textAlign='start', no overlap with numeric cols). Screenshots at 1920x1080 and 1280x900 both clean — document.body.scrollWidth == window.innerWidth at both widths (no horizontal scroll/overlap). Regression on Pre-Book: pb-drop-drop1/2/3 clickable; pb-preview-details expands; pb-actions-btn opens pb-actions-menu; Escape closes; pb-demand-* filters count = 4; 10 pb-sku-row-* rows, first expands into pb-sku-expand-* panel. Zero console errors and zero page errors captured during full run.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Order table uses div/role rather than semantic <th>/<td> (querySelectorAll('th') returned 0 while cells still expose correct computed textAlign). Consider semantic table markup for a11y even though visual alignment is correct.",
+    "Duplicate data-testid for pb-drop-drop1/2/3 and pb-show-archived still exist in hidden setup sidebar (carried over from iteration 38). Use scoped locators or render sidebar copies only in Setup mode."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email + empty password → mocked demo user ryan@mirabile.com",
+  "seed_data_creation": "None (all data mocked client-side)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Polish pass verified. On Pre-Book Orders table, headers are rendered as non-<th> elements — assert alignment on the row cells (td/div) via getComputedStyle(textAlign) for Units/Wholesale (both 'right'). Numeric right-alignment confirmed on rows; SO# column with '—' remains left-aligned but has no overlap. rv-account-expand-lids emits 5 metric tiles in order: OPEN PIPELINE, CONSERVATIVE LAND, FULL-YEAR FORECAST, ANNUAL GOAL, PRIOR YEAR, followed by rv-open-account-lids button."
+}

@@ -337,7 +337,7 @@ export default function PreBookPage({ onNavigate }: Props) {
               <section className="pb-panel">
                 <div className="pb-panel-head">
                   <div className="pb-panel-tabs">
-                    <button className={subTab === 'demand' ? 'active' : ''} onClick={() => setSubTab('demand')} data-testid="pb-subtab-demand">SKU Demand{subTab === 'orders' ? ` (${skus.length})` : ''}</button>
+                    <button className={subTab === 'demand' ? 'active' : ''} onClick={() => setSubTab('demand')} data-testid="pb-subtab-demand">SKU Demand <b className="pb-count">{skus.length}</b></button>
                     <button className={subTab === 'orders' ? 'active' : ''} onClick={() => setSubTab('orders')} data-testid="pb-subtab-orders">Orders <b className="pb-count">{orders.length}</b></button>
                     {subTab === 'demand' && <><span className="pb-panel-num">{atOrAbove}/{skus.length}</span><button className="pb-ext" onClick={() => toast('Import external volume')} data-testid="pb-ext-btn"><Upload size={14} /> External volume</button></>}
                   </div>

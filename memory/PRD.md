@@ -101,3 +101,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Pre-Book pass 5 (structural): 3-column layout — seasons | SKU table (primary) | sticky rail (Ready, Purchasing preview, Drop health). Status col → Gap pill. iteration_36.
 - Pre-Book v6 (Review tab): sidebar removed → top drop switcher strip; full-width hero (title, deadline, status chips, stats + channel mix, actions); collapsible purchasing preview; full-width table. Setup tab keeps sidebar. iteration_37.
 - Pre-Book header unified: switcher band moved inside hero card (top band), Review/Setup as underline text tabs. iteration_38.
+- Polish: SKU Demand tab count pill, orders header alignment, dashboard expand spacing. iteration_39.

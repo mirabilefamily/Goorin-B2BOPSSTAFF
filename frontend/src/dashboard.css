@@ -191,6 +191,10 @@
 .rv-th span:not(:first-child):not(:last-child) { text-align: right; }
 .rv-th span:nth-child(6), .rv-th span:nth-child(7) { text-align: right; }
 .rv-num .rv-vspill { display: inline-block; min-width: 64px; text-align: center; }
+.rv-metric small { white-space: nowrap; }
+.rv-expand { padding: 4px 12px 20px; }
+.rv-open-acct { margin-top: 12px; }
+.rv-hero-goal .rv-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
 .rv-row-wrap { border-bottom: 1px solid #f0f3f1; transition: background .14s ease; }
 .rv-row-wrap.is-open { background: var(--sub); border-radius: 16px; border-bottom-color: transparent; }
 .rv-row { padding: 15px 10px; cursor: pointer; transition: background .14s ease; outline: none; border-radius: 12px; }
