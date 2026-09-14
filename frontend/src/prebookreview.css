@@ -35,20 +35,33 @@
 .pb-drop-open b { background: rgba(255,255,255,.16); color: #fff; padding: 2px 7px; border-radius: 6px; }
 .pb-coll { display: flex; align-items: center; gap: 9px; width: 100%; border: none; background: #eef4ff; color: #2952c8; font-size: 14px; font-weight: 600; padding: 12px; border-radius: 10px; cursor: pointer; }
 .pb-side-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid #eef1ef; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: #8a938d; }
-.pb-archive { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.pb-archive { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.pb-archive input { position: absolute; opacity: 0; width: 0; height: 0; }
+.pb-check { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 5px; border: 1.5px solid #c9d3ce; background: #fff; color: #fff; transition: background .16s ease, border-color .16s ease; }
+.pb-check svg { opacity: 0; transform: scale(.6); transition: opacity .16s ease, transform .16s ease; }
+.pb-archive input:checked + .pb-check { background: #0f1f18; border-color: #0f1f18; }
+.pb-archive input:checked + .pb-check svg { opacity: 1; transform: scale(1); }
+.pb-archive input:focus-visible + .pb-check { outline: 2px solid #16a37a; outline-offset: 2px; }
+.pb-archive:hover .pb-check { border-color: #0f1f18; }
 .pb-foot-link { display: inline-flex; align-items: center; gap: 6px; border: none; background: transparent; color: #16241d; font-size: 13px; font-weight: 600; cursor: pointer; }
 .pb-foot-link.muted { color: #8a938d; font-weight: 500; }
 
 /* main */
 .pb-main { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 24px 28px 28px; box-shadow: var(--sh); min-height: 520px; }
 
-.pbx-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid #f0f2f0; }
+.pbx-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 22px 24px; margin: -24px -28px 0; border-radius: 22px 22px 0 0; background: linear-gradient(160deg, #f1faf6 0%, #ffffff 70%); border-bottom: 1px solid #e3ede7; }
+.pbx-kicker { display: inline-flex; align-items: center; gap: 8px; font-family: var(--ui); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+.pbx-deadline-wrap { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.pbx-days-track { display: block; width: 120px; height: 5px; border-radius: 999px; background: #e1e8e4; overflow: hidden; }
+.pbx-days-track i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #f3b94a, #e39a1c); }
+.pbx-days { margin-left: 0; }
 .pbx-drop-title { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; text-align: left; }
 .pb-live { width: 10px; height: 10px; border-radius: 50%; background: #16a37a; box-shadow: 0 0 0 4px rgba(22,163,122,.16); flex-shrink: 0; animation: pbx-pulse 2.4s ease-in-out infinite; }
 @keyframes pbx-pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(22,163,122,.16); } 50% { box-shadow: 0 0 0 8px rgba(22,163,122,.05); } }
 .pb-drop-idblock { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 .pb-drop-idtop { display: flex; align-items: center; gap: 12px; }
-.pbx-drop-title strong { font-family: var(--ui); font-size: 26px; font-weight: 600; letter-spacing: -0.03em; color: #0f1a14; white-space: nowrap; }
+.pbx-drop-title strong { font-family: var(--ui); font-size: 30px; font-weight: 600; letter-spacing: -0.035em; color: #0f1a14; white-space: nowrap; line-height: 1; }
+.pb-live { width: 8px; height: 8px; }
 .pbx-drop-title strong span { color: #8a938d; font-weight: 500; }
 .pbx-deadline { display: inline-flex; align-items: center; gap: 7px; color: #8a938d; font-size: 13px; }
 .pbx-days { font-style: normal; font-size: 11px; font-weight: 700; color: #b8790c; background: #fdf2dd; padding: 3px 9px; border-radius: 999px; margin-left: 4px; }
@@ -149,6 +162,16 @@
 .pb-sku-code svg { color: #b7c0ba; transition: transform .2s; flex-shrink: 0; }
 .pb-sku-name { font-size: 14px; font-weight: 600; color: #1a2820; }
 .pb-status.under { color: #b8790c; background: #fdf2dd; font-variant-numeric: tabular-nums; }
+.pb-status.close { color: #16907a; background: #e2f7f2; font-variant-numeric: tabular-nums; }
+.pbx-season-prog { height: 4px; border-radius: 999px; background: #e1e8e4; margin: 8px 10px 0; overflow: hidden; }
+.pbx-season-prog i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #34b98f, #0b6e50); }
+.pbx-season-cap { font-size: 11.5px; color: var(--ink-4); margin: 6px 10px 8px; }
+.pb-row-wrap { transition: background .14s ease, box-shadow .14s ease; }
+.pb-row-wrap.is-open { background: #fbfcfb; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); }
+.pb-main, .pb-side { animation: pbx-in .5s cubic-bezier(.16,1,.3,1) both; }
+.pb-side { animation-delay: .06s; }
+@keyframes pbx-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pb *, .pb { animation: none !important; } }
 .pb-side-head span { font-family: var(--ui); }
 .pb-panel-head { padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 0; }
 .pbx-table { border-top: none; }
@@ -164,6 +187,7 @@
 .pb-fill-track { flex: 1; height: 6px; border-radius: 999px; background: #eef1ef; overflow: hidden; }
 .pb-fill-track i { display: block; height: 100%; border-radius: 999px; }
 .pb-fill-track i.under { background: linear-gradient(90deg, #f3b94a, #e39a1c); }
+.pb-fill-track i.close { background: linear-gradient(90deg, #6fe3c9, #2bb597); }
 .pb-fill-track i.hit { background: linear-gradient(90deg, #34b98f, #0b6e50); }
 .pb-fill em { font-size: 12.5px; color: #55605a; font-weight: 600; width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
 .pb-status { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }

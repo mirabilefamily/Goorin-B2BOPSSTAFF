@@ -83,9 +83,10 @@ const initialGroups = [
 function Fill({ total, moq }: { total: number; moq: number }) {
   const pct = Math.min(100, Math.round((total / moq) * 100));
   const hit = total >= moq;
+  const cls = hit ? 'hit' : pct >= 75 ? 'close' : 'under';
   return (
     <span className="pb-fill">
-      <span className="pb-fill-track"><i className={hit ? 'hit' : 'under'} style={{ width: `${Math.max(6, pct)}%` }} /></span>
+      <span className="pb-fill-track"><i className={cls} style={{ width: `${Math.max(6, pct)}%` }} /></span>
       <em>{pct}%</em>
     </span>
   );
@@ -122,6 +123,7 @@ export default function PreBookPage({ onNavigate }: Props) {
   void onNavigate;
   const toast = useToast();
   const [tab, setTab] = useState<'review' | 'setup'>('review');
+  const [showArchived, setShowArchived] = useState(false);
   const [subTab, setSubTab] = useState<'demand' | 'orders'>('demand');
   const [demandFilter, setDemandFilter] = useState<'all' | 'hit' | 'under'>('under');
   const [orderFilter, setOrderFilter] = useState<'All' | 'Draft' | 'Submitted' | 'Confirmed' | 'Released'>('All');
@@ -208,6 +210,8 @@ export default function PreBookPage({ onNavigate }: Props) {
           {tab === 'review' ? (
             <div className="pbx-season">
               <div className="pbx-season-head"><ChevronDown size={15} /><strong>SS27</strong><em className="pb-badge closing">Closing</em></div>
+              <div className="pbx-season-prog" aria-hidden="true"><i style={{ width: '66%' }} /></div>
+              <p className="pbx-season-cap">2 of 3 drops closed</p>
               <div className="pbx-drops">
                 {seasonDrops.map((d) => (
                   <button key={d.id} className={`pb-drop-item ${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
@@ -227,7 +231,7 @@ export default function PreBookPage({ onNavigate }: Props) {
           )}
           <div className="pb-side-foot">
             {tab === 'review'
-              ? <><label className="pb-archive"><input type="checkbox" /> Show archived</label><span>{setupDrops.length} drops</span></>
+              ? <><label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label><span>{setupDrops.length} drops</span></>
               : <><button className="pb-foot-link" onClick={() => { const n = `SS${28 + collections.length - 1}`; setCollections((c) => [...c, n]); setActiveColl(n); toast(`Created ${n}`); }} data-testid="pb-new-prebook"><Plus size={14} /> New Pre-Book</button><button className="pb-foot-link muted" onClick={() => toast('Enable existing pre-book')}>Enable existing</button></>}
           </div>
         </aside>
@@ -239,10 +243,14 @@ export default function PreBookPage({ onNavigate }: Props) {
               {/* drop header */}
               <div className="pbx-drop-head">
                 <div className="pbx-drop-title">
-                  <span className="pb-live" />
                   <div className="pb-drop-idblock">
+                    <p className="pbx-kicker"><span className="pb-live" />Season SS27 · Drop 3 of 3</p>
                     <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
-                    <span className="pbx-deadline"><Calendar size={14} /> Deadline 9/21/2026 <em className="pbx-days">{daysLeft} days left</em></span>
+                    <div className="pbx-deadline-wrap">
+                      <span className="pbx-deadline"><Calendar size={14} /> Closes 9/21/2026</span>
+                      <span className="pbx-days-track" aria-hidden="true"><i style={{ width: `${Math.max(4, 100 - (daysLeft / 90) * 100)}%` }} /></span>
+                      <em className="pbx-days">{daysLeft} days left</em>
+                    </div>
                   </div>
                 </div>
                 <div className="pb-drop-actions">
@@ -374,7 +382,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                             <span className="r pb-strong">{s.total.toLocaleString()}</span>
                             <span className="r pb-mut">{s.moq}</span>
                             <Fill total={s.total} moq={s.moq} />
-                            <span><em className={`pb-status ${hit ? 'hit' : 'under'}`}>{hit ? 'At MOQ' : `Under · −${(s.moq - s.total).toLocaleString()}`}</em></span>
+                            <span><em className={`pb-status ${hit ? 'hit' : s.total / s.moq >= 0.75 ? 'close' : 'under'}`}>{hit ? 'At MOQ' : s.total / s.moq >= 0.75 ? `Close · −${(s.moq - s.total).toLocaleString()}` : `Under · −${(s.moq - s.total).toLocaleString()}`}</em></span>
                             <span />
                           </div>
                           {open && (

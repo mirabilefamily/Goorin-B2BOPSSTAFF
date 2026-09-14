@@ -1,0 +1,15 @@
+{
+  "summary": "Frontend-only verification of Pre-Book Review updates. Verified custom pb-show-archived checkbox (native input opacity:0, .pb-check 16x16, unchecked bg white with border rgb(201,211,206), checked bg rgb(15,31,24) with visible check icon — NOT browser blue). Hero header shows kicker 'Season SS27 · Drop 3 of 3', title 'SS27 / Drop 3', OPEN pill, 'Closes 9/21/2026', .pbx-days-track and '7 days left' chip. Season card shows '2 of 3 drops closed' with progress bar. SKU Demand table filters counts (All 12, Hit 2, Under 10) match. Status pills 'At MOQ' / 'Close · −N' / 'Under · −N' rendered from code (only 'under' visible in current data). Regression passed: pb-actions-btn, pb-more-btn, pb-preview-details, pb-sku-row expand, pb-subtab-orders, pb-drop-* switching (3 drops), Setup tab pb-new-prebook. Screenshots captured at 1920 and 1280. No console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password → demo user ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Pre-Book Review page fully working. Custom checkbox styling confirmed correct. 3 drops present; only Drop 3 is OPEN. Under filter has 10 SKUs; Hit has 2; no 'close' status visible in current mock data but classname logic exists at PreBookPage.tsx:385."
+}

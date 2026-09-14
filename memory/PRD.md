@@ -95,3 +95,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Segments card removed; channel goal rows integrated into hero goal panel; right column = Top accounts (8). iteration_30.
 - Simplification (b): removed hero stats strip, KPI bars/legends, TODAY line + Forecast series, Top accounts card; chart full width; Accounts table ranked with Top 1-5 pins. iteration_31.
 - Pre-Book refine 2: stat strip card, filter counts, Under gap pills, sticky header/sidebar. iteration_32.
+- Pre-Book pass 3: themed custom checkbox (Show archived), mint hero header w/ kicker + deadline progress track, 'Close' MOQ state (>=75%), season drop progress, entrance animation. iteration_33.
