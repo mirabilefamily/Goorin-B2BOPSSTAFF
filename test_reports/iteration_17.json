@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of the rewritten PreBookPage interactivity (header more menu, actions menu driven by selection, purchasing preview consolidation table, orders row expand + row menu, SKU demand expand, and full SETUP tab: drops CRUD, product groups CRUD + chip add/remove, collections). Mock login (empty fields, data-testid='login-submit-btn') logs in; Pre-Book Review page loads (prebook-page). HEADER: pb-more-btn opens pb-more-menu with Edit/Duplicate/Export/Archive; clicking an item shows a toast and closes menu; Escape also closes menu. ACTIONS: Orders sub-tab (pb-subtab-orders); with no selection, pb-actions-menu shows 'No orders selected' + 'Release all confirmed' + additional items; selecting pb-order-check-444 updates the button badge to 'Actions1' and menu shows '1 order selected' + 'Release selected' — clicking Release selected fires a toast and clears selection (badge back to 'Actions'). pb-order-selectall selects all 4 rows -> badge 'Actions4'. PURCHASING PREVIEW: pb-preview-details expands the panel; pb-cons-toggle reveals pb-cons-table (visible) with the consolidation rows and 'Freeze batch for review' button is present and disabled as expected. ORDERS: clicking the order id/customer cell on row #444 renders pb-order-expand-444 with line items; pb-order-menu-444 opens a small menu containing 'View order' / 'Release' / 'Cancel' — clicking any of them toasts and closes. SKU DEMAND: 12 SKU rows render; clicking a pb-sku-row-* reveals a pb-sku-expand-* block with the breakdown grid. SETUP: pb-tab-setup switches; pb-new-drop appends a Drop row (3 -> 4); pb-drop-edit-d3 reveals pb-drop-editform-d3 (has 2 window inputs + 1 MOQ select) and pb-drop-save-d3 toasts 'Drop 3 saved.'; pb-drop-remove-d1 deletes the row (toast 'Drop removed.'). PRODUCT GROUPS: pb-add-group appends a group (2 -> 3); pb-group-chip-input-g1 + Enter adds 'TestChip' chip; chip X removes it (validated visually); pb-group-remove-g2 deletes the group. COLLECTIONS: pb-new-prebook adds a new collection button in the sidebar (1 -> 2) and selects it (SS28 shown). ZERO console errors and no page exceptions observed across the entire flow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx is ~487 lines with many inline sub-blocks; if it grows further, consider extracting the Orders table, SKU demand table, and Setup panels into their own components for readability.",
+    "The 'pb-order-expand-<id>' data-testid is only applied to the expanded content div — for tests that want to trigger expansion via testid, consider also adding a testid on the clickable order id/customer cell (e.g. pb-order-toggle-<id>).",
+    "Setup edits are in-component useState only (reset on reload); acceptable for the MVP mock but worth noting for persistence work."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Mock login: empty email+password -> click data-testid='login-submit-btn'",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "PreBookPage fully verified end-to-end in iteration_17. All pb-* interactions from the review request are wired (header menu, actions menu with selection-aware content + badge, orders expand/row-menu, purchasing preview consolidation table, SKU demand expand, setup drops + groups CRUD, chip add/remove, and new pre-book collection). Toasts and Escape/backdrop close all work. Zero console errors."
+}
