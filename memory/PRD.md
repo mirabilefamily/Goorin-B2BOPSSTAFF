@@ -91,3 +91,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Refinement 2: true % on KPI meters, fixed-width invoiced progress track in table, rank chips, lowercase labels. iteration_26.
 - KPI cards v3: goal ring w/ % inside + pace tick + remaining; KPI cards show stacked composition bars (ship month / invoiced-open / forecast vs goal). iteration_27.
 - 2026-06 Pre-Book Review restyled to bento look: light stat cards w/ MOQ %, side-by-side status cards, days-left chip, pill controls, zebra table. iteration_28.
+- Consolidation pass: hero now includes Annual goal side panel; 3 KPIs merged into one strip card (5 cards → 2). iteration_29.

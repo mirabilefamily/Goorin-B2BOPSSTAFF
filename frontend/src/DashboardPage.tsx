@@ -106,7 +106,7 @@ function RevTooltip({ active, payload, label }: any) {
   const row = payload[0].payload as MRow;
   const items = [
     { k: 'Invoiced', v: row.invoiced, c: '#0f8a66' },
-    { k: 'Open Orders', v: row.open, c: '#3ecfb0' },
+    { k: 'Open orders', v: row.open, c: '#3ecfb0' },
     { k: 'Total', v: row.total, c: '#1e3a8a' },
     { k: 'Forecast', v: row.forecast, c: '#e39a1c' },
   ];
@@ -171,8 +171,8 @@ export default function DashboardPage({ onNavigate }: Props) {
 
   const q4 = allMonths.slice(9);
   const kpis = [
-    { k: 'Open orders', v: h.open, cap: 'booked, not yet invoiced', chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', foot: 'by ship month', parts: q4.map((m, i) => ({ label: m.m, value: m.open, color: ['#16907a', '#3ecfb0', '#9fe5d6'][i] })) },
-    { k: 'Total', v: h.total, cap: 'invoiced + open orders', chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', foot: 'composition', parts: [{ label: 'Invoiced', value: h.invoiced, color: '#1e3a8a' }, { label: 'Open', value: h.total - h.invoiced, color: '#8fa6e8' }] },
+    { k: 'Open orders', v: h.open, cap: 'booked, not yet invoiced', chip: 'rv-chip-teal', icon: <ShoppingBag size={16} />, testid: 'rv-tile-open', foot: 'by ship month', parts: q4.map((m, i) => ({ label: m.m, value: m.open, color: ['#0f8a66', '#3ecfb0', '#bfeee2'][i] })) },
+    { k: 'Total', v: h.total, cap: 'invoiced + open orders', chip: 'rv-chip-navy', icon: <Layers size={16} />, testid: 'rv-tile-total', foot: 'composition', parts: [{ label: 'Invoiced', value: h.invoiced, color: '#0f1f18' }, { label: 'Open', value: h.total - h.invoiced, color: '#c9d3ce' }] },
     { k: 'Forecast', v: h.forecast, cap: 'full-year projection', chip: 'rv-chip-amber', icon: <TrendingUp size={16} />, testid: 'rv-tile-forecast', foot: 'vs annual goal', parts: [{ label: 'Forecast', value: Math.min(h.forecast, h.goalTarget), color: '#e39a1c' }, { label: h.forecast >= h.goalTarget ? 'Above goal' : 'Gap to goal', value: Math.abs(h.goalTarget - h.forecast), color: h.forecast >= h.goalTarget ? '#3ecfb0' : '#efe4cf' }] },
   ];
   const gap = h.goalPct - h.pace;
@@ -180,69 +180,66 @@ export default function DashboardPage({ onNavigate }: Props) {
 
   return (
     <div className="rv" data-testid="dashboard-page">
-      {/* BENTO */}
-      <div className="rv-bento">
-        <section className="rv-card rv-hero" data-testid="rv-hero">
+      {/* HERO */}
+      <section className="rv-card rv-hero" data-testid="rv-hero">
+        <div className="rv-hero-left">
           <div className="rv-hero-top">
-            <div>
-              <p className="rv-eyebrow"><span className="rv-live-dot" />Invoiced revenue · YTD</p>
-              <div className="rv-figure">
-                <strong data-testid="rv-invoiced-ytd">{fmtFull(h.invoiced)}</strong>
-                <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">{h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}% vs LY</span>
-              </div>
-            </div>
+            <p className="rv-eyebrow"><span className="rv-live-dot" />Invoiced revenue · YTD</p>
             <div className="rv-seg" role="tablist" aria-label="Revenue segment">
               {SEG_LABELS.map((s) => (
                 <button key={s.id} role="tab" aria-selected={seg === s.id} className={seg === s.id ? 'active' : ''} onClick={() => setSeg(s.id)} data-testid={`rv-seg-${s.id}`}>{s.label}</button>
               ))}
             </div>
           </div>
-          <div className="rv-hero-stats">
-                <div><span>Prior YTD</span><b>{compact(h.invoiced / (1 + h.delta / 100))}</b></div>
-                <div><span>Avg / month</span><b>{compact(h.invoiced / 9)}</b></div>
-                <div><span>Best month</span><b>{best.m} · {compact(best.invoiced)}</b></div>
+          <div className="rv-figure">
+            <strong data-testid="rv-invoiced-ytd">{fmtFull(h.invoiced)}</strong>
+            <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">{h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}% vs LY</span>
           </div>
           <div className="rv-hero-chart">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={allMonths.slice(0, 9)} margin={{ top: 10, right: 12, left: 12, bottom: 0 }}>
-                <defs><linearGradient id="gHero" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16a37a" stopOpacity={0.32} /><stop offset="100%" stopColor="#16a37a" stopOpacity={0} /></linearGradient></defs>
+                <defs><linearGradient id="gHero" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16a37a" stopOpacity={0.28} /><stop offset="100%" stopColor="#16a37a" stopOpacity={0} /></linearGradient></defs>
                 <XAxis dataKey="m" tickLine={false} axisLine={false} interval={0} tick={{ fill: '#7d8f86', fontSize: 11 }} dy={6} />
                 <Tooltip cursor={{ stroke: '#16a37a', strokeWidth: 1, strokeDasharray: '3 3' }} content={({ active, payload, label }: any) => active && payload?.length ? <div className="rv-tip rv-tip-sm"><p className="rv-tip-h">{label}</p><b>{compact(payload[0].value)}</b></div> : null} />
                 <Area type="monotone" dataKey="invoiced" stroke="#0f8a66" strokeWidth={2.5} fill="url(#gHero)" dot={false} activeDot={{ r: 5, fill: '#0f8a66', stroke: '#fff', strokeWidth: 2 }} isAnimationActive={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </section>
-
-        <section className="rv-card rv-kpi rv-kpi-goal" data-testid="rv-goal-card">
-          <div className="rv-kpi-head"><span className="rv-chip rv-chip-green"><Target size={16} /></span><span className="rv-kpi-k">Annual goal</span></div>
-          <div className="rv-kpi-goal-body">
-            <Gauge pct={h.goalPct} pace={h.pace} />
-            <div className="rv-kpi-goal-facts">
-              <div className="rv-goal-line"><strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong><span>of {compact(h.goalTarget)}</span></div>
-              <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</em>
-              <ul className="rv-goal-mini">
-                <li><span>Remaining</span><b>{compact(h.goalTarget - h.goalCur)}</b></li>
-                <li><span><i />Pace target</span><b>{h.pace}%</b></li>
-              </ul>
-            </div>
+          <div className="rv-hero-stats">
+            <div><span>Prior YTD</span><b>{compact(h.invoiced / (1 + h.delta / 100))}</b></div>
+            <div><span>Avg / month</span><b>{compact(h.invoiced / 9)}</b></div>
+            <div><span>Best month</span><b>{best.m} · {compact(best.invoiced)}</b></div>
           </div>
-        </section>
+        </div>
 
+        <aside className="rv-hero-goal" data-testid="rv-goal-card">
+          <p className="rv-eyebrow">Annual goal</p>
+          <Gauge pct={h.goalPct} pace={h.pace} />
+          <div className="rv-goal-line"><strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong><span>of {compact(h.goalTarget)}</span></div>
+          <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</em>
+          <ul className="rv-goal-mini">
+            <li><span>Remaining</span><b>{compact(h.goalTarget - h.goalCur)}</b></li>
+            <li><span><i />Pace target</span><b>{h.pace}%</b></li>
+          </ul>
+        </aside>
+      </section>
+
+      {/* KPI STRIP */}
+      <section className="rv-card rv-strip">
         {kpis.map((t) => {
           const sum = t.parts.reduce((x, p) => x + p.value, 0) || 1;
           return (
-            <section className="rv-card rv-kpi" key={t.k} data-testid={t.testid}>
-              <div className="rv-kpi-head"><span className={`rv-chip ${t.chip}`}>{t.icon}</span><span className="rv-kpi-k">{t.k}</span><span className="rv-kpi-tag">{t.foot}</span></div>
+            <div className="rv-kpi" key={t.k} data-testid={t.testid}>
+              <div className="rv-kpi-head"><span className="rv-chip">{t.icon}</span><span className="rv-kpi-k">{t.k}</span><span className="rv-kpi-tag">{t.foot}</span></div>
               <div><strong className="rv-kpi-v">{compact(t.v)}</strong><small className="rv-kpi-cap">{t.cap}</small></div>
               <div className="rv-kpi-foot">
                 <div className="rv-kpi-stack">{t.parts.map((p) => <i key={p.label} style={{ width: `${(p.value / sum) * 100}%`, background: p.color }} />)}</div>
                 <ul className="rv-kpi-parts">{t.parts.map((p) => <li key={p.label}><i style={{ background: p.color }} /><span>{p.label}</span><b>{compact(p.value)}</b></li>)}</ul>
               </div>
-            </section>
+            </div>
           );
         })}
-      </div>
+      </section>
 
       {/* MID */}
       <div className="rv-mid">
