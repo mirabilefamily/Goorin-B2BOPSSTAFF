@@ -46,6 +46,16 @@ import {
   Star,
   Users,
   Trash2,
+  BarChart3,
+  ClipboardList,
+  Layers,
+  Wallet,
+  ShieldCheck,
+  CreditCard,
+  Target,
+  Box,
+  DollarSign,
+  MessageSquarePlus,
 } from 'lucide-react';
 import type { Session } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
@@ -76,16 +86,37 @@ type NavItem = {
 
 const navGroups: { title: string; items: NavItem[] }[] = [
   {
-    title: 'My Account',
+    title: 'Analytics',
     items: [
-      { label: 'Overview', icon: LayoutGrid },
+      { label: 'Dashboard', icon: LayoutGrid },
+      { label: 'Analytics', icon: BarChart3 },
+      { label: 'Open Orders', icon: ClipboardList },
+      { label: 'Invoices', icon: FileText },
+      { label: 'Allocations', icon: Layers },
+      { label: 'Aging AR', icon: Wallet },
+    ],
+  },
+  {
+    title: 'Marketplace',
+    items: [
+      { label: 'Customers', icon: Users },
+      { label: 'Compliance', icon: ShieldCheck },
+      { label: 'Credit Terms', icon: CreditCard },
+      { label: 'Onboarding', icon: UserPlus },
       { label: 'Marketplace', icon: ShoppingBag },
-      { label: 'Pre-Book', icon: CalendarClock },
-      { label: 'My Orders', icon: Package },
-      { label: 'Shipments', icon: Ship },
-      { label: 'Resources', icon: Image },
-      { label: 'Statements', icon: FileText },
-      { label: 'Profile & Addresses', icon: UserCog },
+      { label: 'Marketing Assets', icon: Image },
+    ],
+  },
+  {
+    title: 'Tools',
+    items: [
+      { label: 'Forecast Goals', icon: Target },
+      { label: 'Pre-Book Review', icon: CalendarClock },
+      { label: 'Place Order', icon: ShoppingCart },
+      { label: 'ATS Inventory', icon: Box },
+      { label: 'Intl Shipments', icon: Ship },
+      { label: 'Commissions', icon: DollarSign },
+      { label: 'Feedback', icon: MessageSquarePlus },
     ],
   },
 ];
@@ -174,7 +205,7 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
   const [activeNav, setActiveNav] = useState<string | null>(() => {
     const labels = [...navGroups.flatMap((g) => g.items.map((i) => i.label)), 'Checkout'];
-    return labels.find((l) => `#${navSlug(l)}` === window.location.hash) ?? 'Overview';
+    return labels.find((l) => `#${navSlug(l)}` === window.location.hash) ?? 'Dashboard';
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -220,7 +251,7 @@ function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const activeLabel = activeNav ?? 'Overview';
+  const activeLabel = activeNav ?? 'Dashboard';
 
   const ActiveIcon = useMemo(() => {
     if (activeNav === 'Checkout') return ShoppingCart;
@@ -341,6 +372,7 @@ function App() {
 
         <div className="sidebar-footer">
           <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => openSettings('users')} title={sidebarCollapsed ? 'Settings' : undefined}><Settings size={21} /><span className={sidebarCollapsed ? 'sr-only' : ''}>Settings</span></button>
+          <button className={`nav-item ${view === 'dashboard' && activeNav === 'Operational Health' ? 'active' : ''}`} onClick={() => { setActiveNav('Operational Health'); setView('dashboard'); setMobileOpen(false); }} title={sidebarCollapsed ? 'Operational Health' : undefined}><Activity size={21} /><span className={sidebarCollapsed ? 'sr-only' : ''}>Operational Health</span></button>
         </div>
         <button className="collapse-button" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} aria-label="Toggle sidebar"><PanelLeftClose size={16} /></button>
       </aside>
@@ -486,24 +518,24 @@ function App() {
               </div>
             </div>
             )
-          ) : view === 'dashboard' && activeNav === 'Overview' ? (
+          ) : view === 'dashboard' && activeNav === 'Dashboard' ? (
             <DashboardPage name="Ryan" onNavigate={(label) => setActiveNav(label)} />
           ) : view === 'dashboard' && activeNav === 'Marketplace' ? (
             <MarketplacePage onCheckout={() => setActiveNav('Checkout')} />
-          ) : view === 'dashboard' && activeNav === 'Pre-Book' ? (
+          ) : view === 'dashboard' && activeNav === 'Pre-Book Review' ? (
             <PreBookPage onNavigate={(label) => setActiveNav(label)} />
-          ) : view === 'dashboard' && activeNav === 'My Orders' ? (
+          ) : view === 'dashboard' && activeNav === 'Open Orders' ? (
             <MyOrdersPage />
-          ) : view === 'dashboard' && activeNav === 'Shipments' ? (
+          ) : view === 'dashboard' && activeNav === 'Intl Shipments' ? (
             <ShipmentsPage />
-          ) : view === 'dashboard' && activeNav === 'Resources' ? (
+          ) : view === 'dashboard' && activeNav === 'Marketing Assets' ? (
             <ResourcesPage />
-          ) : view === 'dashboard' && activeNav === 'Statements' ? (
+          ) : view === 'dashboard' && activeNav === 'Invoices' ? (
             <StatementsPage />
-          ) : view === 'dashboard' && activeNav === 'Profile & Addresses' ? (
+          ) : view === 'dashboard' && activeNav === 'Credit Terms' ? (
             <ProfilePage />
           ) : view === 'dashboard' && activeNav === 'Checkout' ? (
-            <CheckoutPage onBack={() => setActiveNav('Marketplace')} onComplete={() => setActiveNav('My Orders')} />
+            <CheckoutPage onBack={() => setActiveNav('Marketplace')} onComplete={() => setActiveNav('Open Orders')} />
           ) : view === 'dashboard' ? (
             <div className="page-heading" data-testid="placeholder-page">
               <div><h1>{activeLabel}</h1><p>This section is coming soon.</p></div>

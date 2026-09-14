@@ -777,9 +777,9 @@ export default function DashboardPage({ name, onNavigate }: Props) {
 
   const actions = [
     { label: 'Marketplace', title: 'Browse Catalog', sub: 'Shop current in-stock styles at wholesale pricing.', cta: 'Shop now', icon: ShoppingBag },
-    { label: 'Pre-Book', title: 'Pre-Book Orders', sub: 'Plan and reserve upcoming seasonal releases.', cta: 'View pre-books', icon: BookOpen },
-    { label: 'My Orders', title: 'Track Orders', sub: `${openOrders.length} open order${openOrders.length === 1 ? '' : 's'} currently in fulfillment.`, cta: 'Track orders', icon: Package },
-    { label: 'Resources', title: 'Brand Assets', sub: 'Download line sheets, imagery and brand media.', cta: 'Resources', icon: BookMarked },
+    { label: 'Pre-Book Review', title: 'Pre-Book Orders', sub: 'Plan and reserve upcoming seasonal releases.', cta: 'View pre-books', icon: BookOpen },
+    { label: 'Open Orders', title: 'Track Orders', sub: `${openOrders.length} open order${openOrders.length === 1 ? '' : 's'} currently in fulfillment.`, cta: 'Track orders', icon: Package },
+    { label: 'Marketing Assets', title: 'Brand Assets', sub: 'Download line sheets, imagery and brand media.', cta: 'Resources', icon: BookMarked },
   ];
 
   if (loading) return <Skeleton />;
@@ -855,7 +855,7 @@ export default function DashboardPage({ name, onNavigate }: Props) {
         ))}
       </div>
 
-      <OrdersTable onViewAll={() => onNavigate('My Orders')} onOpen={setSelected} />
+      <OrdersTable onViewAll={() => onNavigate('Open Orders')} onOpen={setSelected} />
 
       {selected && <OrderDrawer order={selected} onClose={() => setSelected(null)} onNavigate={(l) => { setSelected(null); onNavigate(l); }} />}
     </div>

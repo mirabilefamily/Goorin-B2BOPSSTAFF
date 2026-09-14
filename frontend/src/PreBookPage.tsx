@@ -260,7 +260,7 @@ export default function PreBookPage({ onNavigate }: { onNavigate: (l: string) =>
   if (drop) {
     const qty = carts[drop.id] ?? {};
     const setQty: React.Dispatch<React.SetStateAction<Record<string, number>>> = (u) => setCarts((c) => ({ ...c, [drop.id]: typeof u === 'function' ? u(c[drop.id] ?? {}) : u }));
-    return <DropBuilder drop={drop} qty={qty} setQty={setQty} onBack={() => setDrop(null)} onSubmitted={() => { setCarts((c) => ({ ...c, [drop.id]: {} })); setDrop(null); onNavigate('My Orders'); }} />;
+    return <DropBuilder drop={drop} qty={qty} setQty={setQty} onBack={() => setDrop(null)} onSubmitted={() => { setCarts((c) => ({ ...c, [drop.id]: {} })); setDrop(null); onNavigate('Open Orders'); }} />;
   }
   return <Overview onOpen={setDrop} reserved={reserved} />;
 }
