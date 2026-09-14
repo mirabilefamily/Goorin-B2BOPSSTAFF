@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
+  Area,
+  AreaChart,
   Bar,
   CartesianGrid,
   ComposedChart,
@@ -24,7 +26,6 @@ import './dashboard.css';
 type Props = { name?: string; onNavigate: (label: string) => void };
 type Seg = 'all' | 'us' | 'dist';
 
-/* ---------- formatters ---------- */
 const fmtFull = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`;
 const compact = (n: number) => {
   const a = Math.abs(n);
@@ -33,7 +34,6 @@ const compact = (n: number) => {
   return `$${Math.round(n)}`;
 };
 
-/* ---------- header metrics per segment ---------- */
 const HEADER: Record<Seg, { invoiced: number; delta: number; open: number; total: number; forecast: number; goalPct: number; goalCur: number; goalTarget: number; pace: number }> = {
   all: { invoiced: 11_572_416, delta: -14.7, open: 9_200_000, total: 20_700_000, forecast: 17_300_000, goalPct: 67, goalCur: 11_600_000, goalTarget: 17_300_000, pace: 75 },
   us: { invoiced: 6_412_880, delta: -9.2, open: 5_100_000, total: 11_500_000, forecast: 9_400_000, goalPct: 72, goalCur: 6_400_000, goalTarget: 8_900_000, pace: 75 },
@@ -46,7 +46,6 @@ const SEG_LABELS: { id: Seg; label: string }[] = [
   { id: 'dist', label: 'Distributors' },
 ];
 
-/* ---------- monthly revenue (dollars) ---------- */
 type MRow = { m: string; invoiced: number; open: number; forecast: number; total: number };
 const buildMonths = (scale: number): MRow[] => {
   const base = [
@@ -66,7 +65,6 @@ const buildMonths = (scale: number): MRow[] => {
   return base.map((r) => ({ ...r, invoiced: r.invoiced * scale, open: r.open * scale, forecast: r.forecast * scale, total: (r.invoiced + r.open) * scale }));
 };
 
-/* ---------- segments ---------- */
 const SEGMENTS = [
   { key: 'us', name: 'US Wholesale', color: '#16a37a', invoiced: 6_400_000, goal: 8_900_000, pct: 72 },
   { key: 'dist', name: 'Distributors', color: '#3b6ef6', invoiced: 5_100_000, goal: 8_400_000, pct: 61 },
@@ -80,11 +78,7 @@ const TOP_ACCOUNTS = [
   { rank: 5, name: 'Buckle Inc., The', amount: 616_600, yoy: -54.8 },
 ];
 
-/* ---------- account detail ---------- */
-type Acct = {
-  id: string; name: string; segment: 'US Wholesale' | 'Distributors'; strategic?: boolean;
-  invoiced: number; open: number; total: number; goal: number; vsGoal: number; yoy: number; priorYear: number; priorYtd: number;
-};
+type Acct = { id: string; name: string; segment: 'US Wholesale' | 'Distributors'; strategic?: boolean; invoiced: number; open: number; total: number; goal: number; vsGoal: number; yoy: number; priorYear: number; priorYtd: number };
 const ACCOUNTS: Acct[] = [
   { id: 'lids', name: 'Lids', segment: 'US Wholesale', strategic: true, invoiced: 2_700_000, open: 1_744_320, total: 4_460_373, goal: 3_000_000, vsGoal: 48.7, yoy: -20.1, priorYear: 4_683_724, priorYtd: 3_400_000 },
   { id: 'sasa', name: 'SASAtrend', segment: 'Distributors', strategic: true, invoiced: 1_400_000, open: 860_300, total: 2_200_000, goal: 2_200_000, vsGoal: 1.3, yoy: -10.4, priorYear: 2_460_000, priorYtd: 1_560_000 },
@@ -100,17 +94,18 @@ const ACCOUNTS: Acct[] = [
   { id: 'zumiez', name: 'Zumiez Services LLC', segment: 'US Wholesale', invoiced: 184_900, open: 142_600, total: 327_500, goal: 420_000, vsGoal: -22.0, yoy: -4.1, priorYear: 341_000, priorYtd: 192_000 },
 ];
 
-/* ---------- delta chip ---------- */
-function Delta({ v, plain }: { v: number; plain?: boolean }) {
+const AV_COLORS = ['#0f7a56', '#2952c8', '#b06a12', '#7c3aed', '#0e7490', '#be123c'];
+const initials = (name: string) => {
+  const parts = name.replace(/[^A-Za-z ]/g, '').trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? name[0]) + (parts[1]?.[0] ?? '')).toUpperCase();
+};
+const avColor = (name: string) => AV_COLORS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % AV_COLORS.length];
+
+function Delta({ v }: { v: number }) {
   const up = v >= 0;
-  return (
-    <span className={`rv-yoy ${up ? 'up' : 'down'} ${plain ? 'plain' : ''}`}>
-      {up ? <MoveUpRight size={13} /> : <MoveDownRight size={13} />}{Math.abs(v).toFixed(1)}%
-    </span>
-  );
+  return <span className={`rv-yoy ${up ? 'up' : 'down'}`}>{up ? <MoveUpRight size={13} /> : <MoveDownRight size={13} />}{Math.abs(v).toFixed(1)}%</span>;
 }
 
-/* ---------- chart tooltip ---------- */
 function RevTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const row = payload[0].payload as MRow;
@@ -124,23 +119,30 @@ function RevTooltip({ active, payload, label }: any) {
     <div className="rv-tip" data-testid="revenue-tooltip">
       <p className="rv-tip-h">{label.toUpperCase()}</p>
       {items.map((it) => (
-        <div className="rv-tip-row" key={it.k}>
-          <span><i style={{ background: it.c }} />{it.k}</span>
-          <b>{compact(it.v)}</b>
-        </div>
+        <div className="rv-tip-row" key={it.k}><span><i style={{ background: it.c }} />{it.k}</span><b>{compact(it.v)}</b></div>
       ))}
     </div>
   );
 }
 
+const RANGES: { id: 'ytd' | '12m' | 'q'; label: string }[] = [
+  { id: 'ytd', label: 'YTD' },
+  { id: '12m', label: '12M' },
+  { id: 'q', label: 'Quarter' },
+];
+
 export default function DashboardPage({ onNavigate }: Props) {
   const [seg, setSeg] = useState<Seg>('all');
+  const [range, setRange] = useState<'ytd' | '12m' | 'q'>('12m');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const h = HEADER[seg];
   const scale = seg === 'all' ? 1 : seg === 'us' ? 0.56 : 0.44;
-  const months = useMemo(() => buildMonths(scale), [scale]);
-  const chartMax = useMemo(() => Math.ceil(Math.max(...months.map((m) => Math.max(m.total, m.forecast))) / 1_250_000) * 1_250_000, [months]);
+  const allMonths = useMemo(() => buildMonths(scale), [scale]);
+  const months = useMemo(() => (range === 'ytd' ? allMonths.slice(0, 9) : range === 'q' ? allMonths.slice(9) : allMonths), [allMonths, range]);
+  const chartMax = useMemo(() => Math.ceil(Math.max(...months.map((m) => Math.max(m.total, m.forecast, m.invoiced))) / 1_250_000) * 1_250_000, [months]);
+  const spark = useMemo(() => allMonths.filter((m) => m.invoiced > 0).map((m) => ({ v: m.invoiced })), [allMonths]);
+  const segIndex = SEG_LABELS.findIndex((s) => s.id === seg);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -148,9 +150,8 @@ export default function DashboardPage({ onNavigate }: Props) {
   }, [query]);
 
   const exportCsv = () => {
-    const head = 'Month,Invoiced,Open,Total,Forecast';
-    const body = months.map((m) => [m.m, m.invoiced, m.open, m.total, m.forecast].map(Math.round).join(','));
-    const blob = new Blob([[head, ...body.slice(1).map((_, i) => body[i])].join('\n')], { type: 'text/csv' });
+    const rowsCsv = months.map((m) => [m.m, m.invoiced, m.open, m.total, m.forecast].map(Math.round).join(','));
+    const blob = new Blob([['Month,Invoiced,Open,Total,Forecast', ...rowsCsv].join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'goorin-revenue-by-month.csv';
@@ -158,22 +159,38 @@ export default function DashboardPage({ onNavigate }: Props) {
     URL.revokeObjectURL(a.href);
   };
 
+  const tiles = [
+    { k: 'Open orders', v: h.open, testid: 'rv-tile-open', spark: [40, 52, 48, 63, 58, 72] },
+    { k: 'Total (invoiced + open)', v: h.total, testid: 'rv-tile-total', spark: [55, 60, 58, 66, 70, 78] },
+    { k: 'Forecast', v: h.forecast, testid: 'rv-tile-forecast', spark: [50, 47, 53, 49, 56, 60] },
+  ];
+
   return (
     <div className="rv" data-testid="dashboard-page">
       {/* HERO */}
       <section className="rv-hero" data-testid="rv-hero">
         <div className="rv-hero-glow" aria-hidden="true" />
+        <div className="rv-hero-glow rv-hero-glow2" aria-hidden="true" />
+        <div className="rv-hero-grid" aria-hidden="true" />
         <div className="rv-hero-top">
           <div className="rv-hero-lead">
+            <p className="rv-eyebrow"><span className="rv-live-dot" /> Invoiced revenue · year to date</p>
             <div className="rv-figure">
               <strong data-testid="rv-invoiced-ytd">{fmtFull(h.invoiced)}</strong>
-              <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">
-                {h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}%
-              </span>
+              <span className={`rv-delta ${h.delta >= 0 ? 'up' : 'down'}`} data-testid="rv-invoiced-delta">{h.delta >= 0 ? <MoveUpRight size={14} /> : <MoveDownRight size={14} />}{Math.abs(h.delta)}%</span>
             </div>
-            <p>Invoiced revenue · year to date</p>
+            <div className="rv-spark">
+              <ResponsiveContainer width={168} height={40}>
+                <AreaChart data={spark} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                  <defs><linearGradient id="gSpark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4fe0b2" stopOpacity={0.55} /><stop offset="100%" stopColor="#4fe0b2" stopOpacity={0} /></linearGradient></defs>
+                  <Area type="monotone" dataKey="v" stroke="#4fe0b2" strokeWidth={2} fill="url(#gSpark)" dot={false} isAnimationActive={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+              <span className="rv-spark-cap">9-month invoiced trend</span>
+            </div>
           </div>
           <div className="rv-seg" role="tablist" aria-label="Revenue segment">
+            <span className="rv-seg-ind" style={{ transform: `translateX(${segIndex * 100}%)` }} aria-hidden="true" />
             {SEG_LABELS.map((s) => (
               <button key={s.id} role="tab" aria-selected={seg === s.id} className={seg === s.id ? 'active' : ''} onClick={() => setSeg(s.id)} data-testid={`rv-seg-${s.id}`}>{s.label}</button>
             ))}
@@ -181,16 +198,18 @@ export default function DashboardPage({ onNavigate }: Props) {
         </div>
 
         <div className="rv-tiles">
-          {[
-            { k: 'Open orders', v: h.open, testid: 'rv-tile-open' },
-            { k: 'Total (invoiced + open)', v: h.total, testid: 'rv-tile-total' },
-            { k: 'Forecast', v: h.forecast, testid: 'rv-tile-forecast' },
-          ].map((t) => (
-            <div className="rv-tile" key={t.k} data-testid={t.testid}>
-              <span>{t.k}</span>
-              <strong>{compact(t.v)}</strong>
-            </div>
-          ))}
+          {tiles.map((t) => {
+            const mx = Math.max(...t.spark);
+            return (
+              <div className="rv-tile" key={t.k} data-testid={t.testid}>
+                <div className="rv-tile-body">
+                  <span>{t.k}</span>
+                  <strong>{compact(t.v)}</strong>
+                </div>
+                <div className="rv-tile-spark" aria-hidden="true">{t.spark.map((v, i) => <i key={i} style={{ height: `${(v / mx) * 100}%` }} />)}</div>
+              </div>
+            );
+          })}
         </div>
 
         <div className="rv-goal">
@@ -209,19 +228,24 @@ export default function DashboardPage({ onNavigate }: Props) {
         </div>
       </section>
 
-      {/* MID: chart + segments */}
+      {/* MID */}
       <div className="rv-mid">
         <section className="rv-card rv-chart-card" data-testid="rv-chart-card">
           <div className="rv-card-head">
             <div className="rv-card-title">
               <h2>Revenue by Month</h2>
-              <button className="rv-export" onClick={exportCsv} data-testid="rv-export-btn"><Download size={15} /> Export</button>
+              <div className="rv-range" role="tablist" aria-label="Chart range">
+                {RANGES.map((r) => <button key={r.id} className={range === r.id ? 'active' : ''} onClick={() => setRange(r.id)} data-testid={`rv-range-${r.id}`}>{r.label}</button>)}
+              </div>
             </div>
-            <div className="rv-legend">
-              <span><i className="dot" style={{ background: '#0f7a56' }} />Invoiced</span>
-              <span><i className="dot" style={{ background: '#22c6a6' }} />Open Orders</span>
-              <span><i className="line" style={{ background: '#16307a' }} />Total</span>
-              <span><i className="dash" />Forecast</span>
+            <div className="rv-head-right">
+              <div className="rv-legend">
+                <span><i className="dot" style={{ background: '#0f7a56' }} />Invoiced</span>
+                <span><i className="dot" style={{ background: '#22c6a6' }} />Open</span>
+                <span><i className="line" style={{ background: '#16307a' }} />Total</span>
+                <span><i className="dash" />Forecast</span>
+              </div>
+              <button className="rv-export" onClick={exportCsv} data-testid="rv-export-btn"><Download size={15} /> Export</button>
             </div>
           </div>
           <div className="rv-chart" data-testid="rv-chart">
@@ -230,14 +254,16 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <defs>
                   <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3aa77e" /><stop offset="100%" stopColor="#0e6b4c" /></linearGradient>
                   <linearGradient id="gOpen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4ad6b8" /><stop offset="100%" stopColor="#1fa98c" /></linearGradient>
+                  <linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16307a" stopOpacity={0.16} /><stop offset="100%" stopColor="#16307a" stopOpacity={0} /></linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="#eceef0" />
+                <CartesianGrid vertical={false} stroke="#eceef0" strokeDasharray="3 5" />
                 <XAxis dataKey="m" tickLine={false} axisLine={false} tick={{ fill: '#8a938e', fontSize: 12 }} dy={8} />
                 <YAxis tickFormatter={(v) => compact(v)} tickLine={false} axisLine={false} tick={{ fill: '#a3aaa5', fontSize: 11 }} width={52} domain={[0, chartMax]} />
                 <Tooltip cursor={{ fill: 'rgba(15,122,86,0.05)' }} content={<RevTooltip />} />
                 <ReferenceLine x="Sep" stroke="#c9ced2" strokeDasharray="4 4" />
-                <Bar dataKey="invoiced" stackId="rev" fill="url(#gInv)" radius={[0, 0, 0, 0]} maxBarSize={34} isAnimationActive={false} />
-                <Bar dataKey="open" stackId="rev" fill="url(#gOpen)" radius={[6, 6, 0, 0]} maxBarSize={34} isAnimationActive={false} />
+                <Area type="monotone" dataKey="total" stroke="none" fill="url(#gTotal)" isAnimationActive={false} />
+                <Bar dataKey="invoiced" stackId="rev" fill="url(#gInv)" maxBarSize={30} isAnimationActive={false} />
+                <Bar dataKey="open" stackId="rev" fill="url(#gOpen)" radius={[6, 6, 0, 0]} maxBarSize={30} isAnimationActive={false} />
                 <Line type="monotone" dataKey="total" stroke="#16307a" strokeWidth={2.6} dot={false} isAnimationActive={false} />
                 <Line type="monotone" dataKey="forecast" stroke="#e0940f" strokeWidth={2.2} strokeDasharray="6 5" dot={false} isAnimationActive={false} />
               </ComposedChart>
@@ -246,34 +272,24 @@ export default function DashboardPage({ onNavigate }: Props) {
         </section>
 
         <section className="rv-card rv-segs" data-testid="rv-segments-card">
-          <div className="rv-card-head rv-segs-head">
-            <h2>Segments</h2>
-            <span className="rv-muted">YTD pace</span>
-          </div>
+          <div className="rv-card-head rv-segs-head"><h2>Segments</h2><span className="rv-muted">YTD pace</span></div>
           <div className="rv-seg-list">
             {SEGMENTS.map((s) => (
               <div className="rv-seg-item" key={s.key} data-testid={`rv-segment-${s.key}`}>
-                <div className="rv-seg-row1">
-                  <span className="rv-seg-name"><i style={{ background: s.color }} />{s.name}</span>
-                  <em className="rv-seg-pct">{s.pct}% of goal</em>
-                </div>
-                <div className="rv-seg-row2">
-                  <strong>{compact(s.invoiced)} <small>invoiced</small></strong>
-                  <span className="rv-muted">Goal {compact(s.goal)}</span>
-                </div>
-                <div className="rv-seg-bar">
-                  <i style={{ width: `${s.pct}%`, background: `linear-gradient(90deg, ${s.color}bb, ${s.color})` }} />
-                  <b style={{ left: `${(s.goal / s.goal) * 100}%` }} />
+                <div className="rv-ring" style={{ background: `conic-gradient(${s.color} ${s.pct * 3.6}deg, #eef1ef 0)` }}><span>{s.pct}<em>%</em></span></div>
+                <div className="rv-seg-info">
+                  <div className="rv-seg-row1"><span className="rv-seg-name"><i style={{ background: s.color }} />{s.name}</span></div>
+                  <div className="rv-seg-row2"><strong>{compact(s.invoiced)}</strong><span className="rv-muted">of {compact(s.goal)} goal</span></div>
+                  <div className="rv-seg-bar"><i style={{ width: `${s.pct}%`, background: `linear-gradient(90deg, ${s.color}bb, ${s.color})` }} /></div>
                 </div>
               </div>
             ))}
           </div>
-
           <p className="rv-sub-label">Top accounts</p>
           <ul className="rv-top" data-testid="rv-top-accounts">
             {TOP_ACCOUNTS.map((a) => (
               <li key={a.rank}>
-                <span className="rv-top-rank">{a.rank}</span>
+                <span className="rv-ava" style={{ background: avColor(a.name) }}>{initials(a.name)}</span>
                 <span className="rv-top-name">{a.name}</span>
                 <b className="rv-top-amt">{compact(a.amount)}</b>
                 <Delta v={a.yoy} />
@@ -286,28 +302,17 @@ export default function DashboardPage({ onNavigate }: Props) {
       {/* ACCOUNT DETAIL */}
       <section className="rv-card rv-acct" data-testid="rv-account-detail">
         <div className="rv-acct-head">
-          <div>
-            <h2>Account Detail</h2>
-            <p>Click any row to expand metrics</p>
-          </div>
+          <div><h2>Account Detail</h2><p>Click any row to expand metrics</p></div>
           <div className="rv-acct-tools">
             <label className="rv-acct-search"><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search accounts..." data-testid="rv-account-search" /></label>
-            <span className="rv-acct-count">{220} accounts</span>
+            <span className="rv-acct-count">{query.trim() ? `${rows.length} of 220 accounts` : '220 accounts'}</span>
           </div>
         </div>
 
         <div className="rv-table" role="table">
           <div className="rv-tr rv-th" role="row">
-            <span role="columnheader">Account</span>
-            <span role="columnheader">Invoiced</span>
-            <span role="columnheader">Open</span>
-            <span role="columnheader">Total</span>
-            <span role="columnheader">Goal</span>
-            <span role="columnheader">vs Goal</span>
-            <span role="columnheader">YoY</span>
-            <span aria-hidden="true" />
+            <span role="columnheader">Account</span><span role="columnheader">Invoiced</span><span role="columnheader">Open</span><span role="columnheader">Total</span><span role="columnheader">Goal</span><span role="columnheader">vs Goal</span><span role="columnheader">YoY</span><span aria-hidden="true" />
           </div>
-
           {rows.map((a) => {
             const isOpen = expanded === a.id;
             const barPct = Math.min(100, (a.invoiced / a.goal) * 100);
@@ -316,17 +321,14 @@ export default function DashboardPage({ onNavigate }: Props) {
               <div key={a.id} className={`rv-row-wrap ${isOpen ? 'is-open' : ''}`}>
                 <div className="rv-tr rv-row" role="row" tabIndex={0} onClick={() => setExpanded(isOpen ? null : a.id)} onKeyDown={(e) => e.key === 'Enter' && setExpanded(isOpen ? null : a.id)} data-testid={`rv-account-row-${a.id}`}>
                   <span className="rv-acct-name">
-                    <b>{a.name}{a.strategic && <em className="rv-strategic">STRATEGIC</em>}</b>
-                    <small>{a.segment}</small>
+                    <span className="rv-ava sm" style={{ background: avColor(a.name) }}>{initials(a.name)}</span>
+                    <span className="rv-acct-nametext"><b>{a.name}{a.strategic && <em className="rv-strategic">STRATEGIC</em>}</b><small>{a.segment}</small></span>
                   </span>
-                  <span className="rv-acct-inv">
-                    <b>{compact(a.invoiced)}</b>
-                    <i className={good ? 'ok' : 'warn'} style={{ width: `${Math.max(12, barPct)}%` }} />
-                  </span>
+                  <span className="rv-acct-inv"><b>{compact(a.invoiced)}</b><i className={good ? 'ok' : 'warn'} style={{ width: `${Math.max(12, barPct)}%` }} /></span>
                   <span className="rv-num rv-muted">{compact(a.open)}</span>
                   <span className="rv-num rv-strong">{compact(a.total)}</span>
                   <span className="rv-num rv-muted">{compact(a.goal)}</span>
-                  <span className={`rv-num rv-vs ${a.vsGoal >= 0 ? 'up' : 'down'}`}>{a.vsGoal >= 0 ? '+' : ''}{a.vsGoal.toFixed(1)}%</span>
+                  <span className="rv-num"><em className={`rv-vspill ${a.vsGoal >= 0 ? 'up' : 'down'}`}>{a.vsGoal >= 0 ? '+' : ''}{a.vsGoal.toFixed(1)}%</em></span>
                   <span className="rv-num"><Delta v={a.yoy} /></span>
                   <span className="rv-chev"><ChevronDown size={17} className={isOpen ? 'spin' : ''} /></span>
                 </div>
