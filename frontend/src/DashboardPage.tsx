@@ -62,13 +62,6 @@ const SEGMENTS = [
   { key: 'dist', name: 'Distributors', color: '#3b6ef6', invoiced: 5_100_000, goal: 8_400_000, pct: 61, share: 45 },
 ];
 
-const TOP_ACCOUNTS = [
-  { rank: 1, name: 'Lids', amount: 2_700_000, yoy: -20.1 },
-  { rank: 2, name: 'SASAtrend', amount: 1_400_000, yoy: -10.4 },
-  { rank: 3, name: 'Industrias Mercury, S.A.', amount: 1_000_000, yoy: 62.6 },
-  { rank: 4, name: 'Nordstrom Accounts Payable', amount: 726_500, yoy: -19.6 },
-  { rank: 5, name: 'Buckle Inc., The', amount: 616_600, yoy: -54.8 },
-];
 
 type Acct = { id: string; name: string; segment: 'US Wholesale' | 'Distributors'; strategic?: boolean; invoiced: number; open: number; total: number; goal: number; vsGoal: number; yoy: number; priorYear: number; priorYtd: number };
 const ACCOUNTS: Acct[] = [
@@ -86,6 +79,7 @@ const ACCOUNTS: Acct[] = [
   { id: 'zumiez', name: 'Zumiez Services LLC', segment: 'US Wholesale', invoiced: 184_900, open: 142_600, total: 327_500, goal: 420_000, vsGoal: -22.0, yoy: -4.1, priorYear: 341_000, priorYtd: 192_000 },
 ];
 
+const TOP8 = [...ACCOUNTS].sort((a, b) => b.invoiced - a.invoiced).slice(0, 8);
 const initials = (name: string) => {
   const parts = name.replace(/[^A-Za-z ]/g, '').trim().split(/\s+/).filter(Boolean);
   return ((parts[0]?.[0] ?? name[0]) + (parts[1]?.[0] ?? '')).toUpperCase();
@@ -217,10 +211,16 @@ export default function DashboardPage({ onNavigate }: Props) {
           <Gauge pct={h.goalPct} pace={h.pace} />
           <div className="rv-goal-line"><strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong><span>of {compact(h.goalTarget)}</span></div>
           <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</em>
-          <ul className="rv-goal-mini">
-            <li><span>Remaining</span><b>{compact(h.goalTarget - h.goalCur)}</b></li>
-            <li><span><i />Pace target</span><b>{h.pace}%</b></li>
-          </ul>
+          <div className="rv-goal-split">
+            {SEGMENTS.map((sg) => (
+              <div className="rv-goal-split-row" key={sg.key} data-testid={`rv-segment-${sg.key}`}>
+                <span><i style={{ background: sg.color }} />{sg.name}</span>
+                <b>{compact(sg.invoiced)}</b>
+                <em>{sg.pct}%</em>
+                <div className="rv-goal-split-bar"><i style={{ width: `${sg.pct}%`, background: sg.color }} /><u style={{ left: `${h.pace}%` }} /></div>
+              </div>
+            ))}
+          </div>
         </aside>
       </section>
 
@@ -285,26 +285,13 @@ export default function DashboardPage({ onNavigate }: Props) {
         </section>
 
         <section className="rv-card rv-segs" data-testid="rv-segments-card">
-          <div className="rv-card-head"><h2>Segments</h2><span className="rv-muted">YTD pace</span></div>
-          <div className="rv-seg-list">
-            {SEGMENTS.map((s) => (
-              <div className="rv-seg-item" key={s.key} data-testid={`rv-segment-${s.key}`}>
-                <div className="rv-ring" style={{ background: `conic-gradient(${s.color} ${s.pct * 3.6}deg, #eef1ef 0)` }}><span>{s.pct}<em>%</em></span></div>
-                <div className="rv-seg-info">
-                  <div className="rv-seg-row1"><span className="rv-seg-name">{s.name}</span><em className={`rv-seg-pill ${s.pct >= h.pace ? 'ok' : 'behind'}`}>{s.share}% share</em></div>
-                  <div className="rv-seg-row2"><strong>{compact(s.invoiced)}</strong><span className="rv-muted">of {compact(s.goal)} goal</span><span className={`rv-seg-vs ${s.pct >= h.pace ? 'ok' : 'behind'}`}>{s.pct >= h.pace ? '+' : ''}{s.pct - h.pace} pts vs pace</span></div>
-                  <div className="rv-seg-bar"><i style={{ width: `${s.pct}%`, background: s.color }} /><b style={{ left: `${h.pace}%` }} /></div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="rv-card-head rv-top-head"><h2>Top accounts</h2><span className="rv-muted">by invoiced</span></div>
+          <div className="rv-card-head"><h2>Top accounts</h2><span className="rv-muted">by invoiced · YTD</span></div>
           <ul className="rv-top" data-testid="rv-top-accounts">
-            {TOP_ACCOUNTS.map((a) => (
-              <li key={a.rank} data-testid={`rv-top-account-${a.rank}`}>
-                <span className="rv-rank">{a.rank}</span>
-                <span className="rv-top-name">{a.name}</span>
-                <b className="rv-top-amt">{compact(a.amount)}</b>
+            {TOP8.map((a, i) => (
+              <li key={a.id} data-testid={`rv-top-account-${i + 1}`}>
+                <span className="rv-rank">{i + 1}</span>
+                <span className="rv-top-name">{a.name}<small>{a.segment}</small></span>
+                <b className="rv-top-amt">{compact(a.invoiced)}</b>
                 <TriDelta v={a.yoy} />
               </li>
             ))}
