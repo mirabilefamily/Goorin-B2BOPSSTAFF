@@ -83,3 +83,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Segments: replaced rings with '% of goal' pills, invoiced/goal text, pace marker on bar
 - Top accounts: ranked #1-5 with triangle YoY deltas
 - Chart: cursor line, active dots, larger tooltip, 'Open Orders' legend, conditional Sep reference line
+- Chart card and Segments card now equal height (grid stretch, chart fills, iteration_20 PASS)

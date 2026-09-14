@@ -254,7 +254,7 @@ export default function DashboardPage({ onNavigate }: Props) {
             </div>
           </div>
           <div className="rv-chart" data-testid="rv-chart">
-            <ResponsiveContainer width="100%" height={360}>
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={months} margin={{ top: 12, right: 8, left: 4, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3aa77e" /><stop offset="100%" stopColor="#0e6b4c" /></linearGradient>

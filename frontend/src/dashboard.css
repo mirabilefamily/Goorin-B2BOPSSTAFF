@@ -57,7 +57,9 @@
 
 /* ---- cards ---- */
 .rv-card { background: #fff; border: 1px solid #edf0ee; border-radius: 20px; padding: 24px 26px; box-shadow: 0 14px 40px -32px rgba(16, 35, 27, 0.5); }
-.rv-mid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: start; }
+.rv-mid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: stretch; }
+.rv-chart-card { display: flex; flex-direction: column; }
+.rv-chart-card .rv-chart { flex: 1; min-height: 360px; }
 .rv-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .rv-card-title { display: flex; align-items: center; gap: 14px; }
 .rv-head-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -189,6 +191,7 @@
 
 @media (max-width: 1180px) {
   .rv-mid { grid-template-columns: 1fr; }
+  .rv-chart-card .rv-chart { height: 360px; flex: none; }
   .rv-metrics { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 760px) {
