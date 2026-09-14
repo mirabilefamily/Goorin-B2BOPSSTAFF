@@ -238,9 +238,11 @@ export default function PreBookPage({ onNavigate }: Props) {
               {/* drop header */}
               <div className="pb-drop-head">
                 <div className="pb-drop-title">
-                  <span className="pb-live" /><strong>SS27 <span>/ Drop 3</span></strong>
-                  <span className="pb-deadline"><Calendar size={15} /> Deadline 9/21/2026</span>
-                  <em className="pb-open-pill">OPEN</em>
+                  <span className="pb-live" />
+                  <div className="pb-drop-idblock">
+                    <div className="pb-drop-idtop"><strong>SS27 <span>/ Drop 3</span></strong><em className="pb-open-pill">OPEN</em></div>
+                    <span className="pb-deadline"><Calendar size={14} /> Deadline 9/21/2026</span>
+                  </div>
                 </div>
                 <div className="pb-drop-actions">
                   <div className="pb-more-wrap">

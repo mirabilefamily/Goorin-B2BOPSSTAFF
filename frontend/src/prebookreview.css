@@ -14,21 +14,22 @@
 .pb-side-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 12px; }
 .pb-side-head span { font-size: 11px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #9aa39c; }
 .pb-side-add { border: none; background: #f2f5f3; color: #55605a; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; }
-.pb-season-head { display: flex; align-items: center; gap: 8px; padding: 8px 6px; color: #4a544e; }
+.pb-season { border: 1px solid #eef1ef; border-radius: 14px; padding: 8px; margin: 2px; }
+.pb-season-head { display: flex; align-items: center; gap: 8px; padding: 8px 8px 10px; color: #4a544e; }
 .pb-season-head strong { font-size: 14px; color: #16241d; font-weight: 700; }
 .pb-badge { font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; padding: 3px 7px; border-radius: 5px; margin-left: auto; }
 .pb-badge.closing { color: #d9930b; background: #fbf1dc; }
 .pb-badge.closed { color: #8a938d; background: #eef1ef; }
 .pb-badge.left { color: #d9930b; background: #fbf1dc; }
-.pb-drops { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-.pb-drop-item { display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: #4a544e; font-size: 13.5px; font-weight: 500; padding: 11px 12px; border-radius: 10px; cursor: pointer; text-align: left; transition: background .14s; }
-.pb-drop-item svg { color: #a7b0a9; }
-.pb-drop-item span { flex: 1; }
+.pb-drops { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
+.pb-drop-item { display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: #4a544e; font-size: 13.5px; font-weight: 500; padding: 10px 11px; border-radius: 10px; cursor: pointer; text-align: left; white-space: nowrap; transition: background .14s; }
+.pb-drop-item svg { color: #a7b0a9; flex-shrink: 0; }
+.pb-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pb-drop-item:hover { background: #f5f7f6; }
 .pb-drop-item.active { background: #0d1712; color: #fff; }
 .pb-drop-item.active svg { color: #6ee7b7; }
-.pb-drop-closed { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; color: #9aa39c; }
-.pb-drop-open { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; color: #b9c2bb; display: inline-flex; gap: 6px; align-items: center; }
+.pb-drop-closed { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; color: #9aa39c; flex-shrink: 0; }
+.pb-drop-open { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; color: #b9c2bb; display: inline-flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .pb-drop-open b { background: rgba(255,255,255,.16); color: #fff; padding: 2px 7px; border-radius: 6px; }
 .pb-coll { display: flex; align-items: center; gap: 9px; width: 100%; border: none; background: #eef4ff; color: #2952c8; font-size: 14px; font-weight: 600; padding: 12px; border-radius: 10px; cursor: pointer; }
 .pb-side-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid #eef1ef; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: #8a938d; }
@@ -39,13 +40,15 @@
 /* main */
 .pb-main { background: #fff; border: 1px solid #edf0ee; border-radius: 18px; padding: 22px 26px 26px; box-shadow: 0 14px 44px -34px rgba(16,35,27,.5); min-height: 520px; }
 
-.pb-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.pb-drop-title { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.pb-live { width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.16); }
-.pb-drop-title strong { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; color: #0f1a14; }
-.pb-drop-title strong span { color: #0f1a14; }
-.pb-deadline { display: inline-flex; align-items: center; gap: 7px; color: #8a938d; font-size: 13.5px; }
-.pb-open-pill { font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; color: #12a150; border: 1px solid #bce7cd; background: #edfaf1; padding: 4px 10px; border-radius: 7px; }
+.pb-drop-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid #f0f2f0; }
+.pb-drop-title { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; text-align: left; }
+.pb-live { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.16); flex-shrink: 0; }
+.pb-drop-idblock { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.pb-drop-idtop { display: flex; align-items: center; gap: 12px; }
+.pb-drop-title strong { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #0f1a14; white-space: nowrap; }
+.pb-drop-title strong span { color: #6b756e; font-weight: 700; }
+.pb-deadline { display: inline-flex; align-items: center; gap: 7px; color: #8a938d; font-size: 13px; }
+.pb-open-pill { font-size: 10px; font-weight: 800; letter-spacing: 0.07em; color: #12a150; border: 1px solid #bce7cd; background: #edfaf1; padding: 4px 11px; border-radius: 999px; }
 .pb-drop-actions { display: flex; align-items: center; gap: 10px; }
 .pb-more { width: 40px; height: 40px; border-radius: 11px; border: 1px solid #e6e9e7; background: #fff; color: #7a847d; display: grid; place-items: center; cursor: pointer; }
 .pb-actions-wrap { position: relative; }
