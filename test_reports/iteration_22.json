@@ -1,0 +1,35 @@
+{
+  "summary": "Frontend-only verification of full Dashboard relayout (all-light editorial). Login with empty fields → /#dashboard. All required rv-* testids present and functional at 1920x1080 and 1280 widths. Segment tabs, KPI band, chart (ranges + CSV export + tooltip), segments/top accounts trio, and Account detail (search/expand/empty state) all work. NO console errors. ONE visual bug found: the gauge inside rv-goal-card renders only '%' and 'of goal' — the numeric '67' is not visible.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Goal progress gauge (rv-goal-card)", "issue": "Numeric percent '67' is not rendered inside the SVG gauge. Only '%' and 'of goal' are visible in the gauge center. DOM textContent of .rv-gauge-num is '67%' but visually the '67' glyph is missing at all viewport widths.", "selector": ".rv-gauge-num", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix the '67' not rendering in Goal progress gauge. RCA: the source JSX at /app/frontend/src/DashboardPage.tsx:132 is `<text ...>{pct}%</text>`. At runtime the visual-editor instrumentation wraps the dynamic {pct} expression in an HTML `<span data-ve-dynamic style=\"display: contents\">67</span>` inside the SVG `<text>` element. Browsers do NOT render HTML `<span>` children of SVG `<text>` (only `<tspan>` is valid), so the number becomes invisible while the literal '%' after it still renders. Fix by wrapping the dynamic value in an SVG `<tspan>`: `<text ...><tspan>{pct}</tspan>%</text>`, OR replace the SVG text with an absolutely-positioned HTML overlay div showing `{pct}%`, OR precompute `const label = `${pct}%`` and place it as a static string so instrumentation does not inject a span child. Same pattern should be audited for any other JSX expressions embedded inside SVG `<text>`."
+  ],
+  "critical_code_review_comments": [
+    "SVG <text> children must be text nodes or <tspan>; never HTML <span>. Dev tooling that wraps dynamic JSX in <span> will silently break SVG text rendering (as observed for rv-gauge-num).",
+    "rv-gauge-cap 'of goal' renders fine because it is a static string — confirms the runtime instrumentation is the trigger."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "97% (1 visual bug)"},
+  "test_credentials": "Mock auth: click 'Log in' with empty fields (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None (all frontend data mocked).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "verification_details": {
+    "masthead": "rv-invoiced-ytd=$11,572,416; rv-invoiced-delta=14.7%. Segment tabs switch figure: All=$11,572,416, US=$6,412,880, Dist=$5,159,536.",
+    "kpi_band": "Annual goal dark cell shows 67% + 8 pts behind + $11.6M of $17.3M · pace 75%. rv-tile-open=$9.2M, rv-tile-total=$20.7M, rv-tile-forecast=$17.3M all present with delta/subtitle text.",
+    "chart": "rv-chart-card renders Recharts. Ranges rv-range-ytd/12m/q toggle. Tooltip appears on hover (class recharts-tooltip-wrapper) showing MAY Invoiced/Open Orders/Total/Forecast. rv-export-btn triggers download 'goorin-revenue-by-month.csv'.",
+    "trio": "rv-goal-card (gauge + 4 facts Invoiced/Target/Remaining/Pace 75%); rv-segment-us '72% of goal', rv-segment-dist '61% of goal'; rv-top-account-1..5 ranked 01–05 with names Lids/SASAtrend/Industrias Mercury, S.A./Nordstrom Accounts Payable/Buckle Inc., The.",
+    "account_detail": "rv-account-search filters rows. Typing 'lids' → rv-account-row-lids visible. Row expands to rv-account-expand-lids showing 5 metrics (OPEN PIPELINE, CONSERVATIVE LAND, FULL-YEAR FORECAST, ANNUAL GOAL, PRIOR YEAR) + rv-open-account-lids button. Gibberish query → rv-account-empty visible.",
+    "console": "No error/warning messages captured during flow.",
+    "responsive": "Screenshots taken at 1920x1080 and 1280 — no overlap/clipping other than the gauge numeric bug."
+  },
+  "context_for_next_testing_agent": "Only the rv-goal-card gauge number rendering (SVG <text> containing dynamic {pct} wrapped in HTML <span>) needs re-test after fix. Everything else in the relayout is functional."
+}
