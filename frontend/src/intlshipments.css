@@ -241,3 +241,18 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-check li i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid #cfd8d3; background: #fff; color: #fff; flex-shrink: 0; }
 .is-check li.ok { color: var(--ink); } .is-check li.ok i { background: var(--green); border-color: var(--green); }
 .is-next-card .is-btn { align-self: stretch; justify-content: center; margin-top: 2px; }
+/* open orders table cleanup */
+.is-potr { grid-template-columns: 1.7fr 1.5fr 1.4fr .95fr 1fr .7fr auto !important; gap: 18px !important; }
+.is-porow { padding: 12px 26px !important; }
+.is-po-id { flex-direction: row !important; align-items: center; gap: 10px !important; }
+.is-po-id > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.is-po-id small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-po-id .is-id { font-size: 13px; }
+.is-c2 strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.is-oo .is-fac { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.is-po-date { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.is-po-date .is-ship { margin: 0; } .is-po-date small { white-space: nowrap; }
+.is-rec { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.is-nomatch { color: #c3cbc6; font-size: 14px; }
+.is-po-cta { opacity: .55; transition: opacity .16s, background .16s, color .16s, border-color .16s; } .is-porow:hover .is-po-cta { opacity: 1; }
+.is-oo .is-c4.r strong { font-variant-numeric: tabular-nums; }

@@ -123,23 +123,23 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
       <section className="is-card is-pipeline">
         <div className="is-pipe-head"><h2>Open purchase orders <span className="is-muted">{rows.length} POs · {totalUnits.toLocaleString()} units remaining</span></h2></div>
         <div className="is-table is-oo-table">
-          <div className="is-tr is-potr is-th"><span>{sortBtn('po', 'Purchase order')}</span><span>{sortBtn('customer', 'Customer')}</span><span>{sortBtn('factory', 'Factory')}</span><span>{sortBtn('shipDate', 'PO ship date')}</span><span>Recommendation</span><span className="r">{sortBtn('units', 'SO scope')}</span><span /></div>
+          <div className="is-tr is-potr is-th"><span>{sortBtn('po', 'Purchase order')}</span><span>{sortBtn('customer', 'Customer')}</span><span>{sortBtn('factory', 'Factory')}</span><span>{sortBtn('shipDate', 'Ship date')}</span><span>Group with</span><span className="r">{sortBtn('units', 'Units')}</span><span /></div>
           {rows.length === 0 && <div className="is-empty">No open orders match these filters.</div>}
           {rows.map((p) => {
             const g = groupOf(p); const d = daysOut(p.shipDate); const isOpen = open.has(p.po);
             return (
               <div key={p.po} className={`is-po ${isOpen ? 'open' : ''}`} data-testid={`is-oo-row-${p.po}`}>
                 <div className="is-tr is-potr is-row is-porow" onClick={() => toggle(p.po)}>
-                  <span className="is-c1">
-                    <b className="is-id"><i className="is-chev-btn">{isOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}</i>{p.po}</b>
-                    <small>SO <u>{p.so}</u> · {p.soName} <span className="is-muted">({p.soRef})</span></small>
+                  <span className="is-c1 is-po-id">
+                    <i className="is-chev-btn">{isOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}</i>
+                    <span><b className="is-id">{p.po}</b><small title={`${p.so} · ${p.soName} (${p.soRef})`}><u>{p.so}</u> · {p.soName}</small></span>
                   </span>
                   <span className="is-c2"><strong>{p.customer}</strong></span>
                   <span className="is-c2"><span className="is-fac">{p.factory}</span></span>
-                  <span className="is-c4"><em className={`is-ship ${d < 0 ? 'late' : d <= 14 ? 'soon' : ''}`}>{p.shipDate}</em><small>{d < 0 ? `${Math.abs(d)}d overdue` : d === 0 ? 'Today' : `in ${d}d`}</small></span>
-                  <span>{g ? <em className="is-rec"><Sparkles size={12} /> Group with {g.pos.filter((x) => x !== p).map((x) => x.po).join(', ')}</em> : <span className="is-muted">No match</span>}</span>
-                  <span className="is-c4 r"><strong>{poUnits(p).toLocaleString()} units</strong><small>{p.lines.length} lines</small></span>
-                  <span className="r"><button className="is-btn sm" onClick={(e) => { e.stopPropagation(); onCreate(p); }} data-testid={`is-order-create-${p.po}`}><Plus size={14} /> Shipment</button></span>
+                  <span className="is-c4 is-po-date"><em className={`is-ship ${d < 0 ? 'late' : d <= 14 ? 'soon' : ''}`}>{p.shipDate}</em><small>{d < 0 ? `${Math.abs(d)}d overdue` : d === 0 ? 'Today' : `in ${d}d`}</small></span>
+                  <span>{g ? <em className="is-rec"><Sparkles size={12} /> {g.pos.filter((x) => x !== p).map((x) => x.po).join(', ')}</em> : <span className="is-muted is-nomatch">—</span>}</span>
+                  <span className="is-c4 r"><strong>{poUnits(p).toLocaleString()}</strong><small>{p.lines.length} lines</small></span>
+                  <span className="r"><button className="is-btn sm is-po-cta" onClick={(e) => { e.stopPropagation(); onCreate(p); }} data-testid={`is-order-create-${p.po}`}><Plus size={14} /> Shipment</button></span>
                 </div>
                 {isOpen && (
                   <div className="is-lines" data-testid={`is-oo-lines-${p.po}`}>
