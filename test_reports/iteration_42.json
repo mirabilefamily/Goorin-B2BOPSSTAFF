@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only verification of the overhauled Intl Shipments detail page (IS-0012). All 6 review checkpoints pass: hero card, 7-step stepper with 4 done + 'Released' current, next-step hint, is-advance advances status Prepaid→Shipped (stepper now 5 done, Activity badge 5→6), all five tabs render expected content (Overview lines total 2/$17 + 3 recent items, Booking $8.50 prepayment, Chat send via Enter adds msg and increments Conversation badge 3→4, Docs shows 2 documents, Activity lists 7 entries), is-more menu shows 4 items, is-back returns to list where IS-0012 now shows 'Shipped' and Shipping column contains 'FOB · Ocean'. New-shipment flow opens detail in Draft with 'Mark ready' CTA and empty lines placeholder. No page errors. Screenshots captured at 1920 and 1280.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Global (other pages)", "issues": ["Recharts prints repeated width(-1)/height(-1) console warnings on Dashboard/other pages — not on Intl Shipments, but visible in console during navigation. Consider giving chart containers a min width/height."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is a single ~322 line file which is fine, but the Detail sub-component is ~155 lines; consider splitting Detail into its own file for maintainability.",
+    "advance() uses STATUS_LABEL[x.status].toLowerCase() → STATUS_LABEL[next].toLowerCase() for the activity detail — cosmetic but 'Awaiting prepayment' becomes 'awaiting prepayment'. Fine as-is, just noting.",
+    "New shipment id generator `IS-${String(13 + list.length - SEED.length).padStart(4, '0')}` is order-dependent; if a user creates and then deletes, collisions could occur (no delete UI today so low risk)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Mocked auth — click Log in with empty fields (see /app/memory/test_credentials.md).",
+  "seed_data_creation": "None — used in-memory SEED shipments.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "IntlShipmentsPage Detail is now tab-based. Testids only exist for the active tab (is-lines/is-recent on overview, is-booking on booking, is-chat/is-msg/is-msg-input/is-msg-send on chat, is-docs on docs, is-activity on activity). is-more-menu appears only after clicking is-more; close via .is-backdrop.clear.",
+  "rca of the issue": "N/A — all specified behaviors verified passing."
+}

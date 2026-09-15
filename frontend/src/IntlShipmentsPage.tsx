@@ -140,7 +140,7 @@ export default function IntlShipmentsPage() {
                 <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
                 <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
               </span>
-              <span className="is-c4"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small><small>Ship {s.ship}</small></span>
+              <span className="is-c4"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><small>Ship {s.ship}</small></span>
             </button>
           ))}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match.</div>}
@@ -169,6 +169,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   const toast = useToast();
   const [msg, setMsg] = useState('');
   const [menu, setMenu] = useState(false);
+  const [dtab, setDtab] = useState<'overview' | 'booking' | 'chat' | 'docs' | 'activity'>('overview');
   const idx = stepIdx(s.status);
   const total = soTotal(s);
   const stamp = () => new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' });
@@ -183,51 +184,94 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
     setMsg('');
   };
   const cta = idx < STEPS.length - 1 ? (s.status === 'prepayment' ? 'Mark prepaid' : s.status === 'prepaid' ? 'Mark shipped' : s.status === 'shipped' ? 'Mark invoiced' : s.status === 'ready' ? 'Send instructions' : s.status === 'instructions' ? 'Request prepayment' : 'Mark ready') : null;
+  const nextLabel = idx < STEPS.length - 1 ? STEPS[idx + 1].label : null;
+  const tabs = [
+    { id: 'overview', label: 'Overview' }, { id: 'booking', label: 'Booking & payment' }, { id: 'chat', label: 'Conversation', n: s.msgs.length },
+    { id: 'docs', label: 'Documents', n: s.docs.length }, { id: 'activity', label: 'Activity', n: s.activity.length },
+  ] as const;
 
   return (
     <div className="is" data-testid="intl-shipment-detail">
       <button className="is-back" onClick={onBack} data-testid="is-back"><ArrowLeft size={16} /> Intl Shipments</button>
-      <section className="is-card is-dhead">
-        <div>
-          <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em></div>
-          <p className="is-muted">{s.customer} · Created {s.created}</p>
-        </div>
-        <div className="is-dactions">
-          {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance"><Folder size={15} /> {cta}</button>}
-          <div className="is-menu-wrap">
-            <button className="is-btn is-icon" onClick={() => setMenu((v) => !v)} aria-label="More" data-testid="is-more"><MoreHorizontal size={16} /></button>
-            {menu && (<><div className="is-backdrop clear" onClick={() => setMenu(false)} /><div className="is-menu" data-testid="is-more-menu">
-              <button onClick={() => { setMenu(false); toast('Exporting shipment…'); }}><Download size={15} /> Export shipment</button>
-              <button onClick={() => { setMenu(false); toast('Resent to customer'); }}><Send size={15} /> Resend latest to customer</button>
-              <button onClick={() => { setMenu(false); toast('Resent to factory'); }}><Send size={15} /> Resend latest to factory</button>
-              <button className="danger" onClick={() => { setMenu(false); toast('Shipment cancelled', 'error'); }}><X size={15} /> Cancel shipment</button>
-            </div></>)}
+
+      <section className="is-card is-dhero">
+        <div className="is-dhero-top">
+          <div className="is-dhero-id">
+            <p className="is-kicker">International shipment</p>
+            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em></div>
+            <div className="is-route"><span><small>Customer</small><strong>{s.customer}</strong></span><i /><span><small>Factory</small><strong>{s.factory}</strong></span></div>
+          </div>
+          <div className="is-dactions">
+            {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance"><Check size={15} /> {cta}</button>}
+            <div className="is-menu-wrap">
+              <button className="is-btn is-icon" onClick={() => setMenu((v) => !v)} aria-label="More" data-testid="is-more"><MoreHorizontal size={16} /></button>
+              {menu && (<><div className="is-backdrop clear" onClick={() => setMenu(false)} /><div className="is-menu" data-testid="is-more-menu">
+                <button onClick={() => { setMenu(false); toast('Exporting shipment…'); }}><Download size={15} /> Export shipment</button>
+                <button onClick={() => { setMenu(false); toast('Resent to customer'); }}><Send size={15} /> Resend latest to customer</button>
+                <button onClick={() => { setMenu(false); toast('Resent to factory'); }}><Send size={15} /> Resend latest to factory</button>
+                <button className="danger" onClick={() => { setMenu(false); toast('Shipment cancelled', 'error'); }}><X size={15} /> Cancel shipment</button>
+              </div></>)}
+            </div>
           </div>
         </div>
+        <div className="is-dfacts">
+          <div><small>Ship date</small><strong>{s.ship}</strong></div>
+          <div><small>Mode</small><strong>{s.booking.mode}</strong></div>
+          <div><small>Incoterms</small><strong>{s.incoterms} · {s.currency}</strong></div>
+          <div><small>Units</small><strong>{units(s).toLocaleString()}</strong></div>
+          <div><small>Declared value</small><strong>{money(total)}</strong></div>
+          <div><small>Prepayment</small><strong className={s.status === 'prepaid' || idx > stepIdx('prepaid') ? 'g' : ''}>{money(s.prepay)}</strong></div>
+        </div>
         <ol className="is-steps" data-testid="is-stepper">
-          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i />{st.label}</li>)}
+          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx && <Check size={10} strokeWidth={3} />}</i><span>{st.label}</span></li>)}
         </ol>
+        {nextLabel && <p className="is-next">Next step: <b>{nextLabel}</b> — {cta} when ready.</p>}
       </section>
 
-      <div className="is-grid">
-        <div className="is-col">
-          <section className="is-card is-facts">
-            <p className="is-kicker">Customer</p><strong>{s.customer}</strong><small>Buyer: {s.buyer}</small>
-            <p className="is-kicker">Factory</p><strong>{s.factory}</strong><small>{s.factoryEmail}</small>
-            <div className="is-facts-row"><div><p className="is-kicker">Currency</p><strong>{s.currency}</strong></div><div><p className="is-kicker">Incoterms</p><strong>{s.incoterms}</strong></div></div>
-            <p className="is-kicker">Declared value</p><strong>{money(total)}</strong>
-          </section>
+      <div className="is-dtabs" role="tablist">
+        {tabs.map((t) => <button key={t.id} role="tab" aria-selected={dtab === t.id} className={dtab === t.id ? 'active' : ''} onClick={() => setDtab(t.id)} data-testid={`is-dtab-${t.id}`}>{t.label}{'n' in t && t.n > 0 && <b>{t.n}</b>}</button>)}
+      </div>
 
+      {dtab === 'overview' && (
+        <div className="is-grid">
+          <section className="is-card is-lines" data-testid="is-lines">
+            <div className="is-card-head"><h2>Shipment lines</h2><small className="is-muted">From factory packing list · read-only</small></div>
+            <div className="is-ltable">
+              <div className="is-ltr is-lth"><span>SKU</span><span>SO #</span><span>PO #</span><span>Description</span><span className="r">Qty</span><span className="r">Unit value</span></div>
+              {s.lines.length === 0 && <div className="is-empty">No lines yet — upload a packing list.</div>}
+              {s.lines.map((l) => <div className="is-ltr" key={l.sku + l.so}><code>{l.sku}</code><a href="#so" onClick={(e) => { e.preventDefault(); toast(`Open ${l.so}`); }}>{l.so}</a><a href="#po" onClick={(e) => { e.preventDefault(); toast(`Open ${l.po}`); }}>{l.po}</a><span>{l.desc}</span><span className="r">{l.qty}</span><span className="r">{money(l.unit)}</span></div>)}
+              {s.lines.length > 0 && <div className="is-ltr is-ltotal"><span>Total</span><span /><span /><span /><span className="r">{units(s).toLocaleString()}</span><span className="r">{money(total)}</span></div>}
+            </div>
+          </section>
+          <div className="is-col">
+            <section className="is-card is-facts">
+              <h2>Parties</h2>
+              <p className="is-kicker">Customer</p><strong>{s.customer}</strong><small>Buyer · {s.buyer}</small>
+              <p className="is-kicker">Factory</p><strong>{s.factory}</strong><small>{s.factoryEmail}</small>
+              <p className="is-kicker">Packing list</p><button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing"><FileText size={15} /> {s.packing}<Download size={14} /></button>
+            </section>
+            <section className="is-card is-facts" data-testid="is-recent">
+              <div className="is-card-head"><h2>Recent activity</h2><button className="is-link" onClick={() => setDtab('activity')}>View all</button></div>
+              <ul className="is-recent">{s.activity.slice(0, 3).map((a, i) => <li key={i}><i /><div><strong>{a.title}</strong><small>{a.at} · {a.by}</small></div></li>)}</ul>
+            </section>
+          </div>
+        </div>
+      )}
+
+      {dtab === 'booking' && (
+        <div className="is-grid is-grid--even">
           <section className="is-card is-facts" data-testid="is-booking">
-            <div className="is-card-head"><p className="is-kicker">Customer booking & prepayment</p><button className="is-link" onClick={() => toast('Edit booking')}><Pencil size={13} /> Edit</button></div>
-            <p className="is-kicker">Booking method</p><strong>{s.booking.method}</strong>
+            <div className="is-card-head"><h2>Customer booking</h2><button className="is-link" onClick={() => toast('Edit booking')}><Pencil size={13} /> Edit</button></div>
+            <div className="is-facts-row"><div><p className="is-kicker">Booking method</p><strong>{s.booking.method}</strong></div><div><p className="is-kicker">Transport mode</p><strong>{s.booking.mode}</strong></div></div>
             <p className="is-kicker">Freight forwarder</p><strong>{s.booking.forwarder}</strong><small>{s.booking.contact}</small>
-            <div className="is-facts-row"><div><p className="is-kicker">Transport mode</p><strong>{s.booking.mode}</strong></div><div><p className="is-kicker">Submitted</p><strong>{s.booking.submitted}</strong></div></div>
+            <p className="is-kicker">Submitted</p><strong>{s.booking.submitted}</strong>
             <div className="is-divider" />
             <div className="is-card-head"><p className="is-kicker">Booking / forwarder documents</p><button className="is-btn sm" onClick={() => toast('Upload document')}><Upload size={14} /> Upload</button></div>
-            <small>PDF, PNG, or JPEG · maximum 10MB per file. Documents remain private.</small>
-            <div className="is-divider" />
-            <p className="is-kicker">Prepayment</p><strong>{money(s.prepay)} <small>(50% of invoice value on account terms — 50% Prepay, 50% Net 60)</small></strong>
+            <small>PDF, PNG, or JPEG · max 10MB per file. Documents remain private.</small>
+          </section>
+          <section className="is-card is-facts">
+            <h2>Prepayment</h2>
+            <div className="is-pay"><strong>{money(s.prepay)}</strong><span>50% of invoice value · terms 50% Prepay / 50% Net 60</span></div>
             <button className="is-btn sm" onClick={() => toast('Edit prepayment amount')}>Edit prepayment amount</button>
             <div className="is-note">
               Saving changes never sends an email. Resend only after the latest booking and payment details are correct.
@@ -235,47 +279,43 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
               <small>Customer recipient: {s.buyer}. Factory recipients: {s.factoryEmail}.</small>
             </div>
           </section>
+        </div>
+      )}
 
-          <section className="is-card is-chat" data-testid="is-chat">
-            <div className="is-chat-head"><span className="is-chip"><MessageSquare size={16} /></span><div><strong>Shipment conversation</strong><small>New-message notifications follow the admin setting.</small></div></div>
-            <div className="is-msgs">
-              {s.msgs.length === 0 && <span className="is-muted">No messages yet.</span>}
-              {s.msgs.map((m) => (
-                <div key={m.id} className={`is-msg ${m.me ? 'me' : ''}`} data-testid="is-msg"><small>{m.who} · {m.at}</small><p>{m.text}</p></div>
-              ))}
-            </div>
-            <div className="is-compose">
-              <textarea value={msg} onChange={(e) => setMsg(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder="Write a message…" data-testid="is-msg-input" />
-              <button className="is-btn dark" onClick={send} disabled={!msg.trim()} data-testid="is-msg-send"><Send size={15} /> Send</button>
-            </div>
-            <small className="is-muted">Enter to send · Shift + Enter for a new line</small>
-          </section>
+      {dtab === 'chat' && (
+        <section className="is-card is-chat" data-testid="is-chat">
+          <div className="is-chat-head"><span className="is-chip"><MessageSquare size={16} /></span><div><strong>Shipment conversation</strong><small>Visible to the customer · notifications follow the admin setting.</small></div></div>
+          <div className="is-msgs">
+            {s.msgs.length === 0 && <span className="is-muted">No messages yet.</span>}
+            {s.msgs.map((m) => <div key={m.id} className={`is-msg ${m.me ? 'me' : ''}`} data-testid="is-msg"><small>{m.who} · {m.at}</small><p>{m.text}</p></div>)}
+          </div>
+          <div className="is-compose">
+            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder="Write a message…" data-testid="is-msg-input" />
+            <button className="is-btn dark" onClick={send} disabled={!msg.trim()} data-testid="is-msg-send"><Send size={15} /> Send</button>
+          </div>
+          <small className="is-muted">Enter to send · Shift + Enter for a new line</small>
+        </section>
+      )}
 
+      {dtab === 'docs' && (
+        <div className="is-grid is-grid--even">
           <section className="is-card is-facts">
-            <div className="is-card-head"><p className="is-kicker">Factory packing list (source file)</p><button className="is-btn sm" onClick={() => toast('Downloading packing list')}><Download size={14} /> Download</button></div>
-            <strong>{s.packing}</strong>
+            <div className="is-card-head"><h2>Factory packing list</h2><span className="is-muted">source file</span></div>
+            <button className="is-docbtn" onClick={() => toast('Downloading packing list')}><FileText size={15} /> {s.packing}<Download size={14} /></button>
           </section>
-          <section className="is-card is-facts">
-            <p className="is-kicker">Generated documents</p>
-            <div className="is-docs">{s.docs.length === 0 && <small>No documents generated yet.</small>}{s.docs.map((d) => <button key={d} onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
+          <section className="is-card is-facts" data-testid="is-docs">
+            <h2>Generated documents</h2>
+            <div className="is-docs">{s.docs.length === 0 && <small>No documents generated yet.</small>}{s.docs.map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
           </section>
         </div>
+      )}
 
-        <div className="is-col">
-          <section className="is-card is-lines" data-testid="is-lines">
-            <div className="is-card-head"><p className="is-kicker">Shipment lines</p><small className="is-muted">Generated from the factory packing list — read-only</small></div>
-            <div className="is-ltable">
-              <div className="is-ltr is-lth"><span>SKU</span><span>SO #</span><span>PO #</span><span>Description</span><span className="r">Qty</span><span className="r">Unit value</span></div>
-              {s.lines.map((l) => <div className="is-ltr" key={l.sku + l.so}><code>{l.sku}</code><a href="#so" onClick={(e) => { e.preventDefault(); toast(`Open ${l.so}`); }}>{l.so}</a><a href="#po" onClick={(e) => { e.preventDefault(); toast(`Open ${l.po}`); }}>{l.po}</a><span>{l.desc}</span><span className="r">{l.qty}</span><span className="r">{money(l.unit)}</span></div>)}
-              <div className="is-ltr is-ltotal"><span>Total</span><span /><span /><span /><span className="r">{units(s).toLocaleString()}</span><span className="r">{money(total)}</span></div>
-            </div>
-          </section>
-          <section className="is-card is-activity" data-testid="is-activity">
-            <p className="is-kicker">Activity</p>
-            <ul>{s.activity.map((a, i) => <li key={i}><i /><div><strong>{a.title}</strong>{a.detail && <span> — {a.detail}</span>}<small>{a.at} · {a.by}</small></div></li>)}</ul>
-          </section>
-        </div>
-      </div>
+      {dtab === 'activity' && (
+        <section className="is-card is-activity" data-testid="is-activity">
+          <h2>Activity</h2>
+          <ul>{s.activity.map((a, i) => <li key={i}><i /><div><strong>{a.title}</strong>{a.detail && <span> — {a.detail}</span>}<small>{a.at} · {a.by}</small></div></li>)}</ul>
+        </section>
+      )}
     </div>
   );
 }
