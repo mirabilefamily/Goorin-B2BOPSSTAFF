@@ -434,14 +434,14 @@ function App() {
             <span className="top-divider" aria-hidden="true" />
             <div className="profile-menu-wrap">
               <button className={`user-profile ${userMenuOpen ? 'profile-open' : ''}`} onClick={() => { setUserMenuOpen(!userMenuOpen); setNotificationsOpen(false); }} aria-expanded={userMenuOpen} aria-haspopup="menu">
-                <div className="user-avatar">RM</div><div className="user-copy"><strong>Ryan M <i className="account-badge">AS</i></strong><span>Mirabile Distribution</span></div><ChevronDown className="profile-chevron" size={14} />
+                <div className="user-avatar">RM</div><div className="user-copy"><strong>Ryan M</strong><span>Goorin Bros. · Staff</span></div><ChevronDown className="profile-chevron" size={14} />
               </button>
               {userMenuOpen && <div className="profile-menu" role="menu">
                 <div className="profile-account" data-testid="profile-account-summary">
-                  <div className="profile-account-top"><div className="user-avatar profile-account-avatar">RM</div><div><strong>Ryan Mirabile</strong><span>ryan@mirabile.com</span></div></div>
+                  <div className="profile-account-top"><div className="user-avatar profile-account-avatar">RM</div><div><strong>Ryan Mirabile</strong><span>ryan@goorin.com</span></div></div>
                   <dl className="profile-account-meta">
-                    <div><dt>Company</dt><dd>Mirabile Distribution</dd></div>
-                    <div><dt>Sales rep</dt><dd><i className="account-badge">AS</i>Ally Stevens</dd></div>
+                    <div><dt>Role</dt><dd>Sales Operations · Admin</dd></div>
+                    <div><dt>Team</dt><dd>Wholesale · Goorin Bros.</dd></div>
                   </dl>
                 </div>
                 <div className="profile-menu-section"><button className="profile-menu-item" role="menuitem"><UserPlus size={21} /><span>Invite users</span></button><button className="profile-menu-item" role="menuitem" onClick={() => openSettings('users')}><Shield size={21} /><span>Access &amp; permissions</span></button><button className="profile-menu-item" role="menuitem" onClick={() => openSettings('workspace')}><Settings size={21} /><span>Workspace settings</span></button></div>
@@ -550,8 +550,8 @@ function App() {
               <div className="set-grid">
                 <aside className="set-side">
                   <div className="set-account">
-                    <span className="set-account-avatar">MD</span>
-                    <div><strong>Mirabile Distribution</strong><small>Wholesale account · Net 60</small></div>
+                    <span className="set-account-avatar">GB</span>
+                    <div><strong>Goorin Bros.</strong><small>Staff workspace · Wholesale ops</small></div>
                   </div>
                   <nav className="set-nav set-nav--v" aria-label="Settings sections">
                     {settingsTabs.map((tab) => (
