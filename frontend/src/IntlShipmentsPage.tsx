@@ -14,7 +14,7 @@ type Msg = { id: number; who: string; me?: boolean; text: string; at: string };
 type Shipment = {
   id: string; customer: string; buyer: string; factory: string; factoryEmail: string; status: Status; created: string; ship: string;
   currency: string; incoterms: string; lines: Line[]; booking: { method: string; forwarder: string; contact: string; mode: string; submitted: string };
-  prepay: number; activity: { title: string; detail?: string; at: string; by: string }[]; msgs: Msg[]; docs: string[]; packing: string;
+  prepay: number; bookingDocs?: string[]; activity: { title: string; detail?: string; at: string; by: string }[]; msgs: Msg[]; docs: string[]; packing: string;
 };
 const money = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
 
@@ -43,6 +43,16 @@ const SEED: Shipment[] = [
     msgs: [{ id: 1, who: 'Diego R', text: 'Container departed Ningbo. Thanks!', at: '09-02-2026, 8:05 AM' }], docs: ['Packing List (PDF)', 'Commercial Invoice (PDF)', 'Bill of Lading (PDF)'], packing: 'PL-PO1270-1.xlsx' },
 ];
 
+const OPEN_ORDERS = [
+  { so: 'SO58740', po: 'PO1301', customer: 'Lids', factory: 'ASI Global Limited (China)', units: 1200, value: 10_800, due: '11-20-2026' },
+  { so: 'SO58744', po: 'PO1303', customer: 'Buckle Inc., The', factory: 'Hangzhou Headwear Co. (China)', units: 640, value: 5_920, due: '12-02-2026' },
+  { so: 'SO58751', po: 'PO1307', customer: 'Grupo Gardea SA DE CV', factory: 'ASI Global Limited (China)', units: 380, value: 3_420, due: '12-18-2026' },
+];
+const FACTORIES = [
+  { name: 'ASI Global Limited (China)', contact: 'ops@asiglobal.cn', region: 'Ningbo, CN', incoterms: 'FOB', lead: '45 days' },
+  { name: 'Hangzhou Headwear Co. (China)', contact: 'export@hzhw.cn', region: 'Hangzhou, CN', incoterms: 'FOB', lead: '38 days' },
+  { name: 'Tan Son Apparel (Vietnam)', contact: 'sales@tanson.vn', region: 'Ho Chi Minh City, VN', incoterms: 'CIF', lead: '52 days' },
+];
 const soTotal = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty * l.unit, 0);
 const poTotal = (s: Shipment) => Math.round(soTotal(s) * 0.4076 * 100) / 100;
 const units = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty, 0);
@@ -66,6 +76,8 @@ export default function IntlShipmentsPage() {
   const [fCustomer, setFCustomer] = useState('all');
   const [fFactory, setFFactory] = useState('all');
   const [creating, setCreating] = useState(false);
+  const [factoriesOpen, setFactoriesOpen] = useState(false);
+  const startFromOrder = (o: typeof OPEN_ORDERS[number]) => { setForm({ customer: o.customer, factory: o.factory, so: o.so, po: o.po, ship: o.due }); setCreating(true); };
   const [form, setForm] = useState({ customer: '', factory: '', so: '', po: '', ship: '' });
 
   const rows = useMemo(() => list.filter((s) => {
@@ -86,7 +98,7 @@ export default function IntlShipmentsPage() {
     const id = `IS-${String(13 + list.length - SEED.length).padStart(4, '0')}`;
     const now = new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' });
     const s: Shipment = { id, customer: form.customer, buyer: '—', factory: form.factory, factoryEmail: '—', status: 'draft', created: now.split(',')[0], ship: form.ship || 'TBD', currency: 'USD', incoterms: 'FOB',
-      lines: form.so ? [{ sku: 'TBD', so: form.so, po: form.po || 'TBD', desc: 'Pending packing list', qty: 0, unit: 0 }] : [], booking: { method: '—', forwarder: '—', contact: '—', mode: '—', submitted: '—' }, prepay: 0,
+      lines: form.so ? [{ sku: 'TBD', so: form.so, po: form.po || 'TBD', desc: 'Pending packing list', qty: OPEN_ORDERS.find((o) => o.so === form.so)?.units ?? 0, unit: (() => { const o = OPEN_ORDERS.find((x) => x.so === form.so); return o ? Math.round((o.value / o.units) * 100) / 100 : 0; })() }] : [], booking: { method: '—', forwarder: '—', contact: '—', mode: '—', submitted: '—' }, prepay: 0,
       activity: [{ title: 'Shipment created', at: now, by: 'Ryan Mirabile' }], msgs: [], docs: [], packing: '—' };
     setList((l) => [s, ...l]); setCreating(false); setForm({ customer: '', factory: '', so: '', po: '', ship: '' }); toast(`${id} created`); setOpenId(id);
   };
@@ -101,10 +113,29 @@ export default function IntlShipmentsPage() {
       <div className="is-topbar">
         <div className="is-tabs" role="tablist">
           <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments</button>
-          <button className={tab === 'orders' ? 'active' : ''} onClick={() => { setTab('orders'); toast('Open Orders view coming soon', 'info'); }} data-testid="is-tab-orders">Open Orders</button>
+          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders</button>
         </div>
       </div>
 
+      {tab === 'orders' && (
+        <section className="is-card is-pipeline" data-testid="is-open-orders">
+          <div className="is-pipe-head"><h2>Open orders ready to ship <span className="is-muted">{OPEN_ORDERS.length} orders</span></h2><small className="is-muted">Orders with confirmed POs but no international shipment yet.</small></div>
+          <div className="is-table">
+            <div className="is-tr is-otr is-th"><span>Order</span><span>Customer & factory</span><span>Units & value</span><span>Due</span><span /></div>
+            {OPEN_ORDERS.map((o) => (
+              <div key={o.so} className="is-tr is-otr is-row is-orow" data-testid={`is-order-${o.so}`}>
+                <span className="is-c1"><b className="is-id"><FileText size={14} />{o.so}</b><small>{o.po}</small></span>
+                <span className="is-c2"><strong>{o.customer}</strong><small className="is-muted">{o.factory}</small></span>
+                <span className="is-c4"><strong>{o.units.toLocaleString()} units</strong><small>{money(o.value)}</small></span>
+                <span className="is-c4"><em className="is-ship">Due {o.due}</em></span>
+                <span><button className="is-btn sm dark" onClick={() => startFromOrder(o)} data-testid={`is-order-create-${o.so}`}><Plus size={14} /> Create shipment</button></span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {tab === 'shipments' && <>
       <section className="is-card is-strip" data-testid="is-priority-strip">
         <div className="is-priority">
           <p className="is-kicker"><i />Priority</p>
@@ -127,7 +158,7 @@ export default function IntlShipmentsPage() {
           <div className="is-tools">
             <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" /></label>
             <button className="is-btn" onClick={() => toast('Controls panel')}><SlidersHorizontal size={15} /> Controls</button>
-            <button className="is-btn" onClick={() => toast('Factories directory')}><Folder size={15} /> Factories</button>
+            <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
             <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
           </div>
         </div>
@@ -155,6 +186,24 @@ export default function IntlShipmentsPage() {
         </div>
         <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span>Units <b>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</b></span><span>SO total <b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b></span><span>PO total <b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b></span></div>
       </section>
+      </>}
+
+      {factoriesOpen && (
+        <>
+          <div className="is-backdrop" onClick={() => setFactoriesOpen(false)} />
+          <aside className="is-drawer" data-testid="is-factories-drawer">
+            <div className="is-modal-head"><h2>Factories</h2><button className="is-x" onClick={() => setFactoriesOpen(false)} aria-label="Close"><X size={16} /></button></div>
+            <small className="is-muted">Default partners for international shipments.</small>
+            {FACTORIES.map((f) => (
+              <div className="is-factory" key={f.name} data-testid="is-factory">
+                <div><strong>{f.name}</strong><small>{f.region} · {f.contact}</small></div>
+                <div className="is-factory-meta"><span>{f.incoterms}</span><span>Lead {f.lead}</span><span>{list.filter((x) => x.factory === f.name).length} shipments</span></div>
+                <button className="is-btn sm" onClick={() => { setFactoriesOpen(false); setForm({ ...form, factory: f.name }); setCreating(true); }}>New shipment here</button>
+              </div>
+            ))}
+          </aside>
+        </>
+      )}
 
       {creating && (
         <>
@@ -195,7 +244,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   const nextLabel = idx < STEPS.length - 1 ? STEPS[idx + 1].label : null;
   const tabs = [
     { id: 'overview', label: 'Overview' }, { id: 'booking', label: 'Booking & payment' }, { id: 'chat', label: 'Conversation', n: s.msgs.length },
-    { id: 'docs', label: 'Documents', n: s.docs.length }, { id: 'activity', label: 'Activity', n: s.activity.length },
+    { id: 'docs', label: 'Documents', n: s.docs.length + (s.bookingDocs?.length ?? 0) }, { id: 'activity', label: 'Activity', n: s.activity.length },
   ] as const;
 
   return (
@@ -274,8 +323,9 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
             <p className="is-kicker">Freight forwarder</p><strong>{s.booking.forwarder}</strong><small>{s.booking.contact}</small>
             <p className="is-kicker">Submitted</p><strong>{s.booking.submitted}</strong>
             <div className="is-divider" />
-            <div className="is-card-head"><p className="is-kicker">Booking / forwarder documents</p><button className="is-btn sm" onClick={() => toast('Upload document')}><Upload size={14} /> Upload</button></div>
+            <div className="is-card-head"><p className="is-kicker">Booking / forwarder documents</p><label className="is-btn sm" data-testid="is-upload"><Upload size={14} /> Upload<input type="file" accept=".pdf,.png,.jpg,.jpeg" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; if (f.size > 10 * 1024 * 1024) { toast('File exceeds 10MB', 'error'); return; } update((x) => ({ ...x, bookingDocs: [...(x.bookingDocs ?? []), f.name], activity: [{ title: 'Booking document uploaded', detail: f.name, at: stamp(), by: 'Ryan Mirabile' }, ...x.activity] })); toast(`${f.name} uploaded`); e.target.value = ''; }} /></label></div>
             <small>PDF, PNG, or JPEG · max 10MB per file. Documents remain private.</small>
+            <div className="is-docs" data-testid="is-booking-docs">{(s.bookingDocs ?? []).map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
           </section>
           <section className="is-card is-facts">
             <h2>Prepayment</h2>
@@ -313,7 +363,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
           </section>
           <section className="is-card is-facts" data-testid="is-docs">
             <h2>Generated documents</h2>
-            <div className="is-docs">{s.docs.length === 0 && <small>No documents generated yet.</small>}{s.docs.map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
+            <div className="is-docs">{s.docs.length === 0 && <small>No documents generated yet.</small>}{(s.bookingDocs ?? []).map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><Upload size={15} /> {d}<Download size={14} /></button>)}{s.docs.map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
           </section>
         </div>
       )}

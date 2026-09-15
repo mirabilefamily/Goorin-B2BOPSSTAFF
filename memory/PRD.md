@@ -110,3 +110,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Detail: stepper, advance-status CTA, more menu, customer/factory facts, booking & prepayment, conversation (send), packing list, documents, lines table, activity feed
 - Intl Shipments detail overhaul: hero (route, 6 facts, segmented progress, next-step hint) + tabs Overview / Booking & payment / Conversation / Documents / Activity. Summary rows show incoterms+mode. iteration_42.
 - Intl refinements: ship-date chips (soon/overdue/shipped) in list + hero, prepayment awaiting/received label, chat empty state, click-to-copy emails. iteration_43.
+- Intl next-level: Open Orders tab (create shipment prefilled from order), Factories drawer (contacts, incoterms, lead time, new shipment here), mock booking document upload (listed in Booking + Documents, logged in activity). iteration_44.

@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only testing of Intl Shipments 'next level' features: Open Orders tab (3 orders, create-shipment prefill + submit → IS-0013 Draft with SO58740/1200/$9 lines, first row on shipments tab), Factories drawer (3 cards, Tan Son prefill, close via X and backdrop), IS-0012 Booking upload (file added, badge 2→3, listed in Documents tab, activity logs 'Booking document uploaded'). Regression: search, advance status, chat send all working. No console errors (only unrelated Recharts width warnings on dashboard).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 379 lines; still manageable but nearing threshold — consider splitting Detail component into a separate file.",
+    "ID generation `IS-${13 + list.length - SEED.length}` works only if no shipments are removed; benign for mock but fragile."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty login (mock) → ryan@mirabile.com",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All next-level Intl Shipments features verified. Open Orders tab prefill+submit creates IS-0013 draft correctly; Factories drawer with 3 cards + prefill works; Booking upload increments Documents badge and appears in Docs tab + Activity top entry."
+}
