@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Check, Download, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Boxes, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
+import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './intlshipments.css';
 
 type Status = 'draft' | 'ready' | 'instructions' | 'prepayment' | 'prepaid' | 'shipped' | 'invoiced';
@@ -43,11 +44,7 @@ const SEED: Shipment[] = [
     msgs: [{ id: 1, who: 'Diego R', text: 'Container departed Ningbo. Thanks!', at: '09-02-2026, 8:05 AM' }], docs: ['Packing List (PDF)', 'Commercial Invoice (PDF)', 'Bill of Lading (PDF)'], packing: 'PL-PO1270-1.xlsx' },
 ];
 
-const OPEN_ORDERS = [
-  { so: 'SO58740', po: 'PO1301', customer: 'Lids', factory: 'ASI Global Limited (China)', units: 1200, value: 10_800, due: '11-20-2026' },
-  { so: 'SO58744', po: 'PO1303', customer: 'Buckle Inc., The', factory: 'Hangzhou Headwear Co. (China)', units: 640, value: 5_920, due: '12-02-2026' },
-  { so: 'SO58751', po: 'PO1307', customer: 'Grupo Gardea SA DE CV', factory: 'ASI Global Limited (China)', units: 380, value: 3_420, due: '12-18-2026' },
-];
+const OPEN_ORDERS = OPEN_POS.map((p) => ({ so: p.so, po: p.po, customer: p.customer, factory: p.factory, units: poUnits(p), value: poValue(p), due: p.shipDate }));
 const FACTORIES = [
   { name: 'ASI Global Limited (China)', contact: 'ops@asiglobal.cn', region: 'Ningbo, CN', incoterms: 'FOB', lead: '45 days' },
   { name: 'Hangzhou Headwear Co. (China)', contact: 'export@hzhw.cn', region: 'Hangzhou, CN', incoterms: 'FOB', lead: '38 days' },
@@ -118,38 +115,44 @@ export default function IntlShipmentsPage() {
       </div>
 
       {tab === 'orders' && (
-        <section className="is-card is-pipeline" data-testid="is-open-orders">
-          <div className="is-pipe-head"><h2>Open orders ready to ship <span className="is-muted">{OPEN_ORDERS.length} orders</span></h2><small className="is-muted">Orders with confirmed POs but no international shipment yet.</small></div>
-          <div className="is-table">
-            <div className="is-tr is-otr is-th"><span>Order</span><span>Customer & factory</span><span>Units & value</span><span>Due</span><span /></div>
-            {OPEN_ORDERS.map((o) => (
-              <div key={o.so} className="is-tr is-otr is-row is-orow" data-testid={`is-order-${o.so}`}>
-                <span className="is-c1"><b className="is-id"><FileText size={14} />{o.so}</b><small>{o.po}</small></span>
-                <span className="is-c2"><strong>{o.customer}</strong><small className="is-muted">{o.factory}</small></span>
-                <span className="is-c4"><strong>{o.units.toLocaleString()} units</strong><small>{money(o.value)}</small></span>
-                <span className="is-c4"><em className="is-ship">Due {o.due}</em></span>
-                <span><button className="is-btn sm dark" onClick={() => startFromOrder(o)} data-testid={`is-order-create-${o.so}`}><Plus size={14} /> Create shipment</button></span>
-              </div>
-            ))}
-          </div>
-        </section>
+        <IntlOpenOrders
+          onCreate={(p: PO) => startFromOrder(OPEN_ORDERS.find((o) => o.po === p.po)!)}
+          onCreateGroup={(g) => { const first = OPEN_ORDERS.find((o) => o.po === g.pos[0].po)!; setForm({ customer: g.customer, factory: g.factory, so: g.pos.map((p) => p.so).join(' + '), po: g.pos.map((p) => p.po).join(' + '), ship: first.due }); setCreating(true); toast(`Grouping ${g.pos.length} POs for ${g.customer}`); }}
+        />
       )}
 
       {tab === 'shipments' && <>
-      <section className="is-card is-strip" data-testid="is-priority-strip">
-        <div className="is-priority">
-          <p className="is-kicker"><i />Priority</p>
-          <strong>{attention.length} item{attention.length === 1 ? '' : 's'} need attention</strong>
-          <small>Resolve before the next factory release.</small>
+      <section className="is-strip" data-testid="is-priority-strip">
+        <div className={`is-card is-priority ${attention.length === 0 ? 'clear' : ''}`}>
+          <div className="is-priority-head">
+            <span className="is-priority-badge"><AlertTriangle size={14} /></span>
+            <div>
+              <p className="is-kicker">{attention.length === 0 ? 'All clear' : 'Needs attention'}</p>
+              <strong>{attention.length === 0 ? 'Nothing is blocking a release' : `${attention.length} shipment${attention.length === 1 ? '' : 's'} blocked before factory release`}</strong>
+            </div>
+          </div>
+          <div className="is-priority-list">
+            {attention.map((s) => (
+              <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
+                <b>{s.id}</b>
+                <span className="is-attn-who">{s.customer}<small>{s.factory}</small></span>
+                <em className={s.status === 'draft' ? 'draft' : ''}>{s.status === 'draft' ? 'Needs packing list' : 'Awaiting prepayment'}</em>
+                <ChevronRight size={15} />
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="is-priority-list">
-          {attention.length === 0 ? <span className="is-muted">Nothing currently needs attention.</span> : attention.map((s) => (
-            <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}><b>{s.id}</b> {s.customer} · <em>{s.status === 'draft' ? 'Needs packing list' : 'Awaiting prepayment'}</em></button>
-          ))}
+        <div className="is-card is-kpis">
+          <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+            <i className="is-kpi-ic"><Ship size={16} /></i><span>In pipeline</span><strong>{list.filter((s) => s.status !== 'invoiced').length}</strong><small>{fStatus === 'all' ? 'Showing all' : 'Show all'}</small>
+          </button>
+          <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+            <i className="is-kpi-ic g"><CheckCircle2 size={16} /></i><span>Released</span><strong className="g">{list.filter((s) => s.status === 'prepaid').length}</strong><small>{fStatus === 'prepaid' ? 'Filtering · clear' : 'To factory · filter'}</small>
+          </button>
+          <div className="is-kpi">
+            <i className="is-kpi-ic"><Boxes size={16} /></i><span>Units moving</span><strong>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>{money(rows.reduce((a, s) => a + s.lines.reduce((b, l) => b + l.qty * l.unit, 0), 0))} in view</small>
+          </div>
         </div>
-        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all"><span>In pipeline</span><strong>{list.filter((s) => s.status !== 'invoiced').length}</strong><small>shipments · show all</small></button>
-        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released"><span>Released</span><strong className="g">{list.filter((s) => s.status === 'prepaid').length}</strong><small>to factory · filter</small></button>
-        <div className="is-kpi"><span>Units moving</span><strong>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>in this view</small></div>
       </section>
 
       <section className="is-card is-pipeline">
