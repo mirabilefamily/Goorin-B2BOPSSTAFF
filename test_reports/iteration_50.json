@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only visual regression check for INTL Shipments → Open Orders table cleanup. All acceptance criteria verified via Playwright at 1920x800.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Pre-existing recharts console warnings: 'width(-1) and height(-1) of chart should be greater than 0'. Unrelated to this task but should be addressed (add minWidth/minHeight or aspect on ResponsiveContainer)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password → demo login (ryan@mirabile.com)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Open Orders table verified: header shows Purchase order, Customer, Factory, Ship date, Group with, Units. Row is-oo-row-P0159 and is-oo-row-P0181 have compact height ~68px (single line). SO subline 'S015625 · GRUPO FW26 01' present. Row expand (is-oo-lines-P0159), order create modal (is-order-create-P0159), and units sort (is-oo-sort-units) all functional. No console errors (only unrelated recharts width warnings).",
+  "verifications": {
+    "login_empty_fields": "PASS",
+    "sidebar_intl_shipments_open_orders_tab": "PASS (is-tab-orders visible/active)",
+    "table_headers": "PASS - Purchase order, Customer, Factory, Ship date, Group with, Units visible in screenshot",
+    "compact_row_height_at_1920": "PASS (~68px, single-line)",
+    "so_line_S015625_GRUPO_FW26_01": "PASS",
+    "row_expand_is-oo-lines-P0159": "PASS",
+    "order_create_modal_is-order-create-P0159": "PASS (modal opened)",
+    "sort_is-oo-sort-units": "PASS (toggled twice, no errors)",
+    "console_errors": "None (only pre-existing recharts warnings)"
+  }
+}
