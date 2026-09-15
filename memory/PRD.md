@@ -118,3 +118,8 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Shipments tab: page header + segmented switcher w/ counts, stage-filter chips (replaces status select), rows with monogram + 7-seg progress, Needs-attention card grouped by reason (top 3 + "show all") scaling to many blocked shipments.
 - Pre-Book Review: left sidebar season tree restored (collapsible seasons → drops, new drop, show archived in footer); Setup collections list restyled. Hero season pill/drop tabs removed.
 - Backlog: detail-view stepper polish + "next action" checklist card; real backend; prebook.css cleanup.
+
+## 2026-06 Cohesion pass (iteration_49 PASS)
+- Shared `ops.css` page chrome (kicker + h1 + subtitle, segmented switcher, pill buttons) applied to Dashboard, Pre-Book Review, INTL Shipments.
+- INTL detail: numbered 7-step stepper with Done/In progress/Upcoming; "Next action" checklist card with advance CTA.
+- Removed legacy pb-topbar/pb-tabs and is-topbar/is-tabs CSS.
