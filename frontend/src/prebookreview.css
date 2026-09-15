@@ -1,5 +1,5 @@
 /* ===== Pre-Book Review console ===== */
-.pb { --ui: 'Outfit', 'DM Sans', sans-serif; --sub: #f4f7f5; --line: #e6ebe8; --ink: #0f1f18; --ink-3: #66746d; --ink-4: #98a39d; --sh: 0 2px 4px rgba(15,31,24,.03), 0 18px 40px -28px rgba(15,31,24,.22); display: flex; flex-direction: column; gap: 20px; padding: 2px 0 48px; color: #16241d; }
+.pb { --ui: 'Outfit', 'DM Sans', sans-serif; --sub: #f4f7f5; --line: #e6ebe8; --ink: #0f1f18; --ink-3: #66746d; --ink-4: #98a39d; --sh: 0 2px 4px rgba(15,31,24,.03), 0 18px 40px -28px rgba(15,31,24,.22); display: flex; flex-direction: column; gap: 20px; padding: 4px 0 56px; color: #16241d; }
 .pb h2, .pb strong, .pb-setup-h { font-family: var(--ui); }
 
 .pb-body { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }

@@ -171,8 +171,8 @@ export default function DashboardPage({ onNavigate }: Props) {
     <div className="rv" data-testid="dashboard-page">
       <div className="ops-head">
         <div className="ops-head-l">
-          <p className="ops-kicker"><i />Analytics · Revenue</p>
-          <h1>Sales dashboard</h1>
+          <p className="ops-kicker"><i />Analytics</p>
+          <h1>Dashboard</h1>
           <small className="ops-sub">Invoiced revenue, open orders and goal pace across every channel.</small>
         </div>
         <div className="ops-head-r">

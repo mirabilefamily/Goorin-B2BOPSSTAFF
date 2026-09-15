@@ -219,7 +219,7 @@ export default function PreBookPage({ onNavigate }: Props) {
       {/* top bar */}
       <div className="ops-head">
         <div className="ops-head-l">
-          <p className="ops-kicker"><i />Marketplace · Pre-Book</p>
+          <p className="ops-kicker"><i />Tools</p>
           <h1>Pre-Book Review</h1>
           <small className="ops-sub">Track demand, MOQ health and orders for every season drop.</small>
         </div>

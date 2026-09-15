@@ -110,8 +110,8 @@ export default function IntlShipmentsPage() {
     <div className="is" data-testid="intl-shipments-page">
       <div className="ops-head">
         <div className="ops-head-l">
-          <p className="ops-kicker"><i />Marketplace · Logistics</p>
-          <h1>International shipments</h1>
+          <p className="ops-kicker"><i />Tools</p>
+          <h1>Intl Shipments</h1>
           <small className="ops-sub">Factory-direct shipments from purchase order to invoice.</small>
         </div>
         <div className="ops-head-r">

@@ -123,3 +123,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Shared `ops.css` page chrome (kicker + h1 + subtitle, segmented switcher, pill buttons) applied to Dashboard, Pre-Book Review, INTL Shipments.
 - INTL detail: numbered 7-step stepper with Done/In progress/Upcoming; "Next action" checklist card with advance CTA.
 - Removed legacy pb-topbar/pb-tabs and is-topbar/is-tabs CSS.
+- 2026-06 Header consistency: titles match sidebar labels (Dashboard / Pre-Book Review / Intl Shipments), kicker = sidebar group, 28px title enforced via `.ops-head .ops-head-l h1`; fixed mangled `.is h1` rule; page gap/padding unified (20px / 4px 0 56px).

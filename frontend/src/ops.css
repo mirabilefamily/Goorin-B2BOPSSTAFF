@@ -3,9 +3,9 @@
 .ops-head-l { display: flex; flex-direction: column; gap: 6px; }
 .ops-kicker { font-family: 'Outfit', 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #98a39d; display: inline-flex; align-items: center; gap: 8px; }
 .ops-kicker i { width: 7px; height: 7px; border-radius: 50%; background: #16a37a; box-shadow: 0 0 0 4px rgba(22,163,122,.16); }
-.ops-head h1 { font-family: 'Outfit', 'DM Sans', sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -.03em; color: #0f1f18; line-height: 1.05; margin: 0; }
+.ops-head .ops-head-l h1 { font-family: 'Outfit', 'DM Sans', sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -.03em; color: #0f1f18; line-height: 1.05; margin: 0; }
 .ops-sub { color: #98a39d; font-size: 13px; font-weight: 500; }
-.ops-head-r { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ops-head-r { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; align-self: center; margin-top: 18px; }
 .ops-seg { display: inline-flex; gap: 4px; padding: 4px; background: #e9eeeb; border-radius: 999px; }
 .ops-seg button { display: inline-flex; align-items: center; gap: 8px; border: none; background: transparent; color: #66746d; font-family: 'Outfit', 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: background .18s, color .18s, box-shadow .18s; }
 .ops-seg button b { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: rgba(15,31,24,.08); color: #66746d; }
