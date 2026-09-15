@@ -47,6 +47,14 @@ const soTotal = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty * l.unit, 0)
 const poTotal = (s: Shipment) => Math.round(soTotal(s) * 0.4076 * 100) / 100;
 const units = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty, 0);
 const stepIdx = (st: Status) => STEPS.findIndex((x) => x.id === st);
+const daysTo = (d: string) => { const [m, dd, y] = d.split('-').map(Number); if (!y) return null; return Math.ceil((new Date(y, m - 1, dd).getTime() - Date.now()) / 86_400_000); };
+function ShipChip({ s }: { s: Shipment }) {
+  if (s.status === 'shipped' || s.status === 'invoiced') return <em className="is-ship ok">Shipped {s.ship}</em>;
+  const d = daysTo(s.ship);
+  if (d === null) return <em className="is-ship">Ship date TBD</em>;
+  if (d < 0) return <em className="is-ship late">Overdue · {Math.abs(d)}d</em>;
+  return <em className={`is-ship ${d <= 14 ? 'soon' : ''}`}>Ships in {d}d · {s.ship}</em>;
+}
 
 export default function IntlShipmentsPage() {
   const toast = useToast();
@@ -140,7 +148,7 @@ export default function IntlShipmentsPage() {
                 <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
                 <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
               </span>
-              <span className="is-c4"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><small>Ship {s.ship}</small></span>
+              <span className="is-c4"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><ShipChip s={s} /></span>
             </button>
           ))}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match.</div>}
@@ -215,12 +223,12 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
           </div>
         </div>
         <div className="is-dfacts">
-          <div><small>Ship date</small><strong>{s.ship}</strong></div>
+          <div><small>Ship date</small><strong>{s.ship}</strong><ShipChip s={s} /></div>
           <div><small>Mode</small><strong>{s.booking.mode}</strong></div>
           <div><small>Incoterms</small><strong>{s.incoterms} · {s.currency}</strong></div>
           <div><small>Units</small><strong>{units(s).toLocaleString()}</strong></div>
           <div><small>Declared value</small><strong>{money(total)}</strong></div>
-          <div><small>Prepayment</small><strong className={s.status === 'prepaid' || idx > stepIdx('prepaid') ? 'g' : ''}>{money(s.prepay)}</strong></div>
+          <div><small>Prepayment{idx >= stepIdx('prepaid') ? ' · received' : idx === stepIdx('prepayment') ? ' · awaiting' : ''}</small><strong className={idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}>{money(s.prepay)}</strong></div>
         </div>
         <ol className="is-steps" data-testid="is-stepper">
           {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx && <Check size={10} strokeWidth={3} />}</i><span>{st.label}</span></li>)}
@@ -246,8 +254,8 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
           <div className="is-col">
             <section className="is-card is-facts">
               <h2>Parties</h2>
-              <p className="is-kicker">Customer</p><strong>{s.customer}</strong><small>Buyer · {s.buyer}</small>
-              <p className="is-kicker">Factory</p><strong>{s.factory}</strong><small>{s.factoryEmail}</small>
+              <p className="is-kicker">Customer</p><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button>
+              <p className="is-kicker">Factory</p><strong>{s.factory}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.factoryEmail); toast('Email copied'); }}>{s.factoryEmail}</button>
               <p className="is-kicker">Packing list</p><button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing"><FileText size={15} /> {s.packing}<Download size={14} /></button>
             </section>
             <section className="is-card is-facts" data-testid="is-recent">
@@ -286,7 +294,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
         <section className="is-card is-chat" data-testid="is-chat">
           <div className="is-chat-head"><span className="is-chip"><MessageSquare size={16} /></span><div><strong>Shipment conversation</strong><small>Visible to the customer · notifications follow the admin setting.</small></div></div>
           <div className="is-msgs">
-            {s.msgs.length === 0 && <span className="is-muted">No messages yet.</span>}
+            {s.msgs.length === 0 && <div className="is-chat-empty"><MessageSquare size={22} /><strong>No messages yet</strong><small>Start the conversation with {s.customer}. They'll see it in their portal.</small></div>}
             {s.msgs.map((m) => <div key={m.id} className={`is-msg ${m.me ? 'me' : ''}`} data-testid="is-msg"><small>{m.who} · {m.at}</small><p>{m.text}</p></div>)}
           </div>
           <div className="is-compose">

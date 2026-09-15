@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of Intl Shipments refinements. All requested features work: list ship chips (.is-ship), detail hero chip+prepayment label, empty chat state, click-to-copy buyer email with toast.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Global (dashboard charts pre-mount)", "issues": ["Recharts warns 'width(-1) and height(-1) of chart should be greater than 0' repeatedly — pre-existing, not blocking."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx factory email button lacks data-testid (only buyer has is-copy-buyer). Consider adding is-copy-factory for symmetric testability."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password → demo login (ryan@mirabile.com) per /app/memory/test_credentials.md",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "IS list shows: IS-0012 'Ships in 113d · 01-06-2027', IS-0011 'Ships in 88d · 12-12-2026', IS-0010 'Shipped 09-02-2026'. IS-0012 detail shows Prepayment · received (green). IS-0011 detail shows Prepayment · awaiting. Chat empty state 'No messages yet' appears on is-dtab-chat when msgs=[] and is replaced when a message is sent. is-copy-buyer button copies buyer email and shows 'Email copied' toast."
+}
