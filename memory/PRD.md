@@ -103,3 +103,8 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Pre-Book header unified: switcher band moved inside hero card (top band), Review/Setup as underline text tabs. iteration_38.
 - Polish: SKU Demand tab count pill, orders header alignment, dashboard expand spacing. iteration_39.
 - Multi-season support: SEASONS data (SS27, FW27, archived FW26/SS26), season picker menu on pill, drops/hero derive from active season; Show archived filters picker. iteration_40.
+
+## 2026-06 Intl Shipments page (NEW, MOCKED)
+- /app/frontend/src/IntlShipmentsPage.tsx + intlshipments.css (is-* prefix), wired in App.tsx for 'Intl Shipments'
+- List: priority strip, KPIs, search + status/customer/factory filters, pipeline table, footer totals, New Shipment modal (mock create)
+- Detail: stepper, advance-status CTA, more menu, customer/factory facts, booking & prepayment, conversation (send), packing list, documents, lines table, activity feed

@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only test of the new Intl Shipments page. All 7 requested flows passed: list rendering, priority strip + KPIs + footer values, search/filter/clear/empty, priority CTA -> detail advance for IS-0011 (status pill + activity + list reflection + strip cleared), IS-0012 detail (stepper Released current with 4 done, more-menu 4 items, chat Enter-send + activity log, lines total 2 / $17), New Shipment modal (empty submit -> 'Customer and factory are required' error toast, then successful create -> IS-0013 Draft with 'Mark ready' CTA, list shows IS-0013 first and priority strip counts it). Zero console errors captured. Screenshots taken at 1920 and 1280 widths — layout looks clean, no visual defects.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor: New shipment id generator `IS-${13 + list.length - SEED.length}` works only while creation is monotonic; if a shipment were removed it would collide. Not currently exercised.",
+    "Minor: Open Orders tab only shows an info toast and no view is rendered; UI still displays the same Shipments content. Acceptable if intentional per 'coming soon'.",
+    "Minor: 'is-strip' section shows Priority + attention chips only for draft/prepayment statuses; the KPI 'Released' counts only status==='prepaid'. Naming ('Released to factory' vs status 'Prepaid') could confuse operators but matches spec."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email + empty password -> Log in (mock).",
+  "seed_data_creation": "None (in-memory mocked seed).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Intl Shipments page is fully functional per spec. All data-testids are present and stable. Chat Enter key sends message; Shift+Enter for newline; more-menu closes via .is-backdrop.clear click. CSS text-transform uppercases KPI kickers — use case-insensitive assertions."
+}

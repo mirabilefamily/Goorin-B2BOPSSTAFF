@@ -73,6 +73,7 @@ import CheckoutPage from './CheckoutPage';
 import PreBookPage from './PreBookPage';
 import MyOrdersPage from './MyOrdersPage';
 import ShipmentsPage from './ShipmentsPage';
+import IntlShipmentsPage from './IntlShipmentsPage';
 import { ResourcesPage, StatementsPage, ProfilePage } from './AccountPages';
 import { TeamAccess } from './TeamAccess';
 import { SimpleSettings } from './SimpleSettings';
@@ -527,7 +528,7 @@ function App() {
           ) : view === 'dashboard' && activeNav === 'Open Orders' ? (
             <MyOrdersPage />
           ) : view === 'dashboard' && activeNav === 'Intl Shipments' ? (
-            <ShipmentsPage />
+            <IntlShipmentsPage />
           ) : view === 'dashboard' && activeNav === 'Marketing Assets' ? (
             <ResourcesPage />
           ) : view === 'dashboard' && activeNav === 'Invoices' ? (
