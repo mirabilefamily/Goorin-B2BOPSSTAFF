@@ -1,0 +1,42 @@
+{
+  "summary": "Frontend-only verification of Goorin Intl Shipments redesign: priority strip (attention + KPI tiles) on Shipments tab and new Open Orders (PO planner) tab. All major test flows PASS. No console/page errors detected.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_flows": [
+    "Login via empty form succeeds (mocked auth) and sidebar 'Intl Shipments' navigates to page.",
+    "is-priority-strip renders with 1 'Needs attention' row is-attn-IS-0011 (SASAtrend / Hangzhou Headwear / 'Awaiting prepayment').",
+    "KPI card shows 3 tiles (is-kpi-all, is-kpi-released, Units moving). Clicking is-kpi-released filters pipeline to 1 released shipment and adds 'on' class; second click clears filter.",
+    "Clicking is-attn-IS-0011 opens IS-0011 detail view.",
+    "is-tab-orders renders is-open-orders with filter bar: is-oo-search, is-oo-customer, is-oo-factory, is-oo-window input, is-oo-rec-toggle, is-oo-expand-all, is-oo-groups-toggle all present.",
+    "Table shows all 8 expected POs: P0159, P0162, P0164, P0166, P0171, P0173, P0178, P0181.",
+    "Row expand shows is-oo-lines-P0159 with SKU/Product/Ordered/Allocated/Shipped/Remaining and totals row.",
+    "Expand-all toggles to 'Collapse all' and expands all lines; collapses on second click.",
+    "Sort by customer asc → first row 'Buckle Inc., The'; desc → 'SASAtrend'. Sort-units toggles direction.",
+    "Search 'Owear' filters to 2 rows. Customer=Owear filter → 2 rows. Factory=Tan Son Apparel (Vietnam) → 1 row.",
+    "Groups toggle expands 'Recommended order groups' band showing groups with is-oo-group-0 and 'Create grouped shipment' button (is-oo-group-create-0).",
+    "Window days=3 reduces group count vs default 14. Recommended toggle filters table to only grouped POs and highlights.",
+    "is-order-create-P0159 opens New Shipment modal prefilled: customer 'Grupo Gardea SA DE CV', factory 'ASI Global Limited (China)', SO S015625, PO P0159, ship 06-10-2026.",
+    "is-oo-group-create-0 opens modal with combined SOs/POs prefill.",
+    "No console errors and no layout overlap observed at 1920x800."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlOpenOrders.tsx line 71: 'groups' is a dep of useMemo but eslint-disable used — acceptable but flag; groupOf closure captures groups, works because groups memo updates trigger rows memo.",
+    "OPEN_POS module-level const is duplicated data source with OPEN_ORDERS in IntlShipmentsPage.tsx (per line 120 OPEN_ORDERS.find). Consider centralising to avoid drift.",
+    "In group prefill (IntlShipmentsPage.tsx line 120), SO and PO are joined with ' + ' — verify downstream fields accept multi-value; UI showed no error but may exceed visual field length for large groups.",
+    "Number input (is-oo-window) has no aria-label; minor a11y.",
+    "Detail 'back' from IS-0011 (invoked before Open Orders test) navigated to a prior route (Feedback) — likely uses history.back rather than route to shipments list; consider explicit /intl-shipments route on back. Non-blocking."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend only)", "frontend": "100%"},
+  "test_credentials": "Empty email+password → demo user ryan@mirabile.com (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None — all data is frontend-mocked.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Open Orders tab and redesigned priority strip verified end-to-end at iteration 47. If retesting Shipments detail 'back' flow, note history.back may pop to prior sidebar route rather than shipments list."
+}

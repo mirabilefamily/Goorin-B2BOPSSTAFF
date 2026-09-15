@@ -153,12 +153,12 @@ export default function PreBookPage({ onNavigate }: Props) {
   const [orderQuery, setOrderQuery] = useState('');
   const [activeDrop, setActiveDrop] = useState('drop3');
   const [activeSeason, setActiveSeason] = useState('SS27');
-  const [seasonOpen, setSeasonOpen] = useState(false);
+  const [openSeasons, setOpenSeasons] = useState<Set<string>>(new Set(['SS27']));
+  const toggleSeason = (id: string) => setOpenSeasons((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const season = SEASONS.find((x) => x.id === activeSeason) ?? SEASONS[0];
   const seasonDrops = season.drops;
   const drop = seasonDrops.find((d) => d.id === activeDrop) ?? seasonDrops[seasonDrops.length - 1];
   const dropIndex = seasonDrops.indexOf(drop) + 1;
-  const pickSeason = (id: string) => { const sn = SEASONS.find((x) => x.id === id)!; setActiveSeason(id); setActiveDrop((sn.drops.find((d) => d.status === 'open') ?? sn.drops[sn.drops.length - 1]).id); setSeasonOpen(false); };
 
   // setup state
   const [setupDrops, setSetupDrops] = useState(initialSetupDrops);
@@ -226,33 +226,59 @@ export default function PreBookPage({ onNavigate }: Props) {
 
       <div className={`pb-body ${tab === 'review' ? 'pb-body--review' : ''}`}>
         {/* sidebar */}
-        <aside className={`pb-side ${tab === 'review' ? 'pb-side--hidden' : ''}`}>
+        <aside className="pb-side">
           <div className="pb-side-head"><span>{tab === 'setup' ? 'Pre-book Collections' : 'Seasons'}</span>{tab === 'review' && <button className="pb-side-add" aria-label="Add season" onClick={() => toast('New season')}><Plus size={15} /></button>}</div>
           {tab === 'review' ? (
-            <div className="pbx-season">
-              <div className="pbx-season-head"><ChevronDown size={15} /><strong>SS27</strong><em className="pb-badge closing">Closing</em></div>
-              <div className="pbx-season-prog" aria-hidden="true"><i style={{ width: '66%' }} /></div>
-              <p className="pbx-season-cap">2 of 3 drops closed</p>
-              <div className="pbx-drops">
-                {seasonDrops.map((d) => (
-                  <button key={d.id} className={`pb-drop-item ${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
-                    <FolderClosed size={15} />
-                    <span>{d.label}</span>
-                    {d.status === 'open' ? <em className="pb-drop-open">OPEN <b>{d.count}</b></em> : <em className="pb-drop-closed">CLOSED</em>}
-                  </button>
-                ))}
-              </div>
+            <div className="pbx-tree" data-testid="pb-drop-switcher">
+              {SEASONS.filter((x) => showArchived || !x.archived).map((sn) => {
+                const isOpen = openSeasons.has(sn.id); const openN = sn.drops.filter((d) => d.status === 'open').length; const closedN = sn.drops.length - openN;
+                return (
+                  <div key={sn.id} className={`pbx-season ${sn.id === season.id ? 'current' : ''} ${sn.archived ? 'archived' : ''}`} data-testid={`pb-season-${sn.id}`}>
+                    <button className="pbx-season-head" onClick={() => toggleSeason(sn.id)} aria-expanded={isOpen} data-testid={`pb-season-toggle-${sn.id}`}>
+                      <ChevronRight size={15} className={isOpen ? 'flip' : ''} />
+                      <strong>{sn.id}</strong>
+                      <em className={`pb-badge ${sn.archived ? 'archived' : sn.status}`}>{sn.archived ? 'Archived' : sn.status === 'closing' ? 'Closing' : sn.status === 'open' ? 'Open' : 'Closed'}</em>
+                    </button>
+                    {isOpen && (
+                      <>
+                        <div className="pbx-season-prog" aria-hidden="true"><i style={{ width: `${(closedN / sn.drops.length) * 100}%` }} /></div>
+                        <p className="pbx-season-cap">{closedN} of {sn.drops.length} drops closed · closes {sn.deadline}</p>
+                        <div className="pbx-drops">
+                          {sn.drops.map((d) => {
+                            const on = sn.id === season.id && activeDrop === d.id;
+                            return (
+                              <button key={d.id} className={`pb-drop-item ${on ? 'active' : ''} ${d.status}`} onClick={() => { setActiveSeason(sn.id); setActiveDrop(d.id); }} data-testid={`pb-drop-${sn.id}-${d.id}`}>
+                                <FolderClosed size={15} />
+                                <span>{d.label}</span>
+                                {d.status === 'open' ? <em className="pb-drop-open">OPEN <b>{d.count}</b></em> : <em className="pb-drop-closed">CLOSED</em>}
+                              </button>
+                            );
+                          })}
+                          <button className="pb-drop-item pb-drop-new" onClick={() => toast(`New drop in ${sn.id}`)} data-testid={`pb-drop-new-${sn.id}`}><Plus size={14} /><span>New drop</span></button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="pb-colls">
-              {collections.map((c) => (
-                <button key={c} className={`pb-coll ${activeColl === c ? 'active' : ''}`} onClick={() => setActiveColl(c)} data-testid={`pb-coll-${c}`}><Circle size={9} fill="currentColor" /> {c}</button>
-              ))}
+              {collections.map((c) => {
+                const sn = SEASONS.find((x) => x.id === c);
+                return (
+                  <button key={c} className={`pb-coll ${activeColl === c ? 'active' : ''}`} onClick={() => setActiveColl(c)} data-testid={`pb-coll-${c}`}>
+                    <span className={`pb-live ${sn?.status === 'closed' ? 'closed' : 'open'}`} />
+                    <span className="pb-coll-main"><strong>{c}</strong><small>{sn ? `${sn.drops.length} drops · ${sn.drops.filter((d) => d.status === 'open').length} open` : 'New · no drops yet'}</small></span>
+                    <ChevronRight size={14} />
+                  </button>
+                );
+              })}
             </div>
           )}
           <div className="pb-side-foot">
             {tab === 'review'
-              ? <span className="pb-mut">{setupDrops.length} drops</span>
+              ? <><label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label><span className="pb-mut">{SEASONS.filter((x) => showArchived || !x.archived).reduce((a, x) => a + x.drops.length, 0)} drops</span></>
               : <><button className="pb-foot-link" onClick={() => { const n = `SS${28 + collections.length - 1}`; setCollections((c) => [...c, n]); setActiveColl(n); toast(`Created ${n}`); }} data-testid="pb-new-prebook"><Plus size={14} /> New Pre-Book</button><button className="pb-foot-link muted" onClick={() => toast('Enable existing pre-book')}>Enable existing</button></>}
           </div>
         </aside>
@@ -263,36 +289,6 @@ export default function PreBookPage({ onNavigate }: Props) {
             <>
               {/* hero */}
               <div className="pbx-hero">
-              <div className="pbx-switch" data-testid="pb-drop-switcher">
-                <div className="pbx-season-wrap">
-                  <button className="pbx-season-pill" onClick={() => setSeasonOpen((v) => !v)} aria-expanded={seasonOpen} data-testid="pb-season-pill"><strong>{season.id}</strong><em className={`pb-badge ${season.status}`}>{season.status === 'closing' ? 'Closing' : season.status === 'open' ? 'Open' : 'Closed'}</em><ChevronDown size={14} className={seasonOpen ? 'flip' : ''} /></button>
-                  {seasonOpen && (
-                    <>
-                      <div className="pb-menu-backdrop" onClick={() => setSeasonOpen(false)} />
-                      <div className="pb-menu pbx-season-menu" role="listbox" data-testid="pb-season-menu">
-                        <p className="pb-menu-head">Seasons</p>
-                        {SEASONS.filter((x) => showArchived || !x.archived).map((x) => (
-                          <button key={x.id} role="option" aria-selected={x.id === season.id} className={`pb-menu-item pbx-season-item ${x.id === season.id ? 'active' : ''}`} onClick={() => pickSeason(x.id)} data-testid={`pb-season-${x.id}`}>
-                            <strong>{x.id}</strong><span>{x.drops.length} drops · {x.drops.filter((d) => d.status === 'open').length} open</span><em className={`pb-badge ${x.status}`}>{x.archived ? 'Archived' : x.status === 'closing' ? 'Closing' : x.status === 'open' ? 'Open' : 'Closed'}</em>
-                          </button>
-                        ))}
-                        {!showArchived && <p className="pbx-season-hint">{SEASONS.filter((x) => x.archived).length} archived hidden · enable “Show archived”</p>}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="pbx-drop-tabs" role="tablist">
-                  {seasonDrops.map((d) => (
-                    <button key={d.id} role="tab" aria-selected={activeDrop === d.id} className={`${activeDrop === d.id ? 'active' : ''} ${d.status}`} onClick={() => setActiveDrop(d.id)} data-testid={`pb-drop-${d.id}`}>
-                      <span>{d.label}</span>
-                      {d.status === 'open' ? <em className="pbx-tab-open">Open · {d.count}</em> : <em className="pbx-tab-closed">Closed</em>}
-                    </button>
-                  ))}
-                  <button className="pbx-drop-add" aria-label="Add drop" onClick={() => toast('New drop')}><Plus size={14} /></button>
-                </div>
-                <label className="pb-archive" data-testid="pb-show-archived"><input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} /><span className="pb-check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span> Show archived</label>
-              </div>
-
               <div className="pbx-hero-body">
                 <div className="pbx-hero-main">
                   <p className="pbx-kicker"><span className={`pb-live ${drop.status}`} />Season {season.id} · Drop {dropIndex} of {seasonDrops.length}{drop.status === 'open' && <> · <b>{daysLeft} days left</b></>}</p>

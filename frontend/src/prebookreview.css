@@ -473,3 +473,27 @@
   .pb-drow-edit { grid-template-columns: 1fr; }
   .pb-sku-breakdown { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* season tree sidebar */
+.pb-body--review { grid-template-columns: 250px 1fr; }
+.pb-side--hidden { display: flex; }
+.pbx-tree { display: flex; flex-direction: column; gap: 6px; }
+.pbx-season { border: 1px solid #eef1ef; border-radius: 16px; padding: 6px; margin: 0; background: #fff; transition: border-color .16s, background .16s; }
+.pbx-season.current { border-color: #d7e2dc; background: #fbfcfb; }
+.pbx-season.archived { opacity: .7; }
+.pbx-season-head { display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: transparent; padding: 8px 8px; border-radius: 10px; cursor: pointer; text-align: left; color: #4a544e; font: inherit; }
+.pbx-season-head:hover { background: #f5f7f6; }
+.pbx-season-head svg { color: #a7b0a9; transition: transform .2s; flex-shrink: 0; } .pbx-season-head svg.flip { transform: rotate(90deg); }
+.pbx-season-head strong { flex: 1; font-family: var(--ui); font-size: 14px; font-weight: 700; color: #16241d; }
+.pbx-season-head .pb-badge { font-size: 9.5px; }
+.pb-badge.archived { color: #8a938d; background: #eef1ef; }
+.pbx-season-prog { margin: 6px 10px 0; } .pbx-season-cap { margin: 6px 10px 6px; }
+.pb-drop-new { color: #8a938d !important; font-weight: 600 !important; border: 1px dashed #dfe5e1 !important; margin-top: 2px; }
+.pb-drop-new:hover { color: #16241d !important; border-color: #b9c2bb !important; background: #fff !important; }
+.pb-drop-new svg { color: inherit !important; }
+.pb-side-foot .pb-archive { font-size: 12.5px; color: #4a544e; font-weight: 600; }
+.pb-coll { padding: 10px 12px; gap: 10px; }
+.pb-coll .pb-live { flex-shrink: 0; }
+.pb-coll-main { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; min-width: 0; }
+.pb-coll-main strong { font-family: var(--ui); font-size: 14px; font-weight: 700; color: #16241d; } .pb-coll-main small { font-size: 11.5px; color: #8a938d; font-weight: 500; }
+.pb-coll > svg { color: #b9c2bb; } .pb-coll.active .pb-coll-main strong { color: #2952c8; } .pb-coll.active > svg { color: #2952c8; }

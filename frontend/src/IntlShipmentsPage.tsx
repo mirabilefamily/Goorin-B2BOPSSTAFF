@@ -107,10 +107,18 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <div className="is-topbar">
-        <div className="is-tabs" role="tablist">
-          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments</button>
-          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders</button>
+      <div className="is-head">
+        <div className="is-head-l">
+          <p className="is-kicker">Marketplace · Logistics</p>
+          <h1>International shipments</h1>
+          <small className="is-muted">Factory-direct shipments from purchase order to invoice.</small>
+        </div>
+        <div className="is-head-r">
+          <div className="is-seg" role="tablist">
+            <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>
+            <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
+          </div>
+          <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
       </div>
 
@@ -132,14 +140,21 @@ export default function IntlShipmentsPage() {
             </div>
           </div>
           <div className="is-priority-list">
-            {attention.map((s) => (
+            {[{ id: 'prepayment', label: 'Awaiting prepayment' }, { id: 'draft', label: 'Needs packing list' }].map((g) => { const n = attention.filter((s) => s.status === g.id).length; return n > 0 && (
+              <button key={g.id} className={`is-attn-group ${fStatus === g.id ? 'on' : ''}`} onClick={() => setFStatus(fStatus === g.id ? 'all' : g.id)} data-testid={`is-attn-group-${g.id}`}><b>{n}</b> {g.label}<ChevronRight size={14} /></button>
+            ); })}
+          </div>
+          <div className="is-priority-list">
+            {attention.slice().sort((a, b) => (daysTo(a.ship) ?? 9e9) - (daysTo(b.ship) ?? 9e9)).slice(0, 3).map((s) => (
               <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
                 <b>{s.id}</b>
                 <span className="is-attn-who">{s.customer}<small>{s.factory}</small></span>
+                <ShipChip s={s} />
                 <em className={s.status === 'draft' ? 'draft' : ''}>{s.status === 'draft' ? 'Needs packing list' : 'Awaiting prepayment'}</em>
                 <ChevronRight size={15} />
               </button>
             ))}
+            {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFStatus('prepayment')} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
           </div>
         </div>
         <div className="is-card is-kpis">
@@ -162,27 +177,32 @@ export default function IntlShipmentsPage() {
             <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
             <button className="is-btn" onClick={() => toast('Controls panel')}><SlidersHorizontal size={15} /> Controls</button>
             <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
-            <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
           </div>
+        </div>
+        <div className="is-stages" data-testid="is-stages">
+          <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all"><span>All</span><b>{list.length}</b></button>
+          {STEPS.map((st) => { const n = list.filter((s) => s.status === st.id).length; return (
+            <button key={st.id} className={`is-stage ${fStatus === st.id ? 'on' : ''} ${n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === st.id ? 'all' : st.id)} data-testid={`is-stage-${st.id}`}><span>{STATUS_LABEL[st.id]}</span><b>{n}</b></button>
+          ); })}
         </div>
         <div className="is-filters">
           <span className="is-flabel"><Filter size={13} /> Filters</span>
-          <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} data-testid="is-filter-status"><option value="all">All statuses</option>{STEPS.map((x) => <option key={x.id} value={x.id}>{STATUS_LABEL[x.id]}</option>)}</select>
           <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
           <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
           {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
         </div>
         <div className="is-table" role="table">
-          <div className="is-tr is-th"><span>Shipment</span><span>Status & factory</span><span>Orders & value</span><span>Shipping</span></div>
+          <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory</span><span>Orders & value</span><span>Shipping</span></div>
           {rows.map((s) => (
             <button key={s.id} className="is-tr is-row" onClick={() => setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
-              <span className="is-c1"><b className="is-id"><FileText size={14} />{s.id}</b><strong>{s.customer}</strong><small>Created {s.created}</small></span>
-              <span className="is-c2"><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em><strong>{s.factory}</strong></span>
+              <span className="is-c1 is-who"><i className="is-mono-av">{s.customer.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}</i><span><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b> · Created {s.created}</small></span></span>
+              <span className="is-c2"><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em><i className="is-prog">{STEPS.map((st, i) => <b key={st.id} className={i < stepIdx(s.status) ? 'd' : i === stepIdx(s.status) ? 'n' : ''} />)}</i></span>
+              <span className="is-c2"><strong className="is-fac">{s.factory}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
               <span className="is-c3">
                 <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
                 <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
               </span>
-              <span className="is-c4 is-c4--last"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><ShipChip s={s} /></span>
+              <span className="is-c4 is-c4--last"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small><ShipChip s={s} /></span>
             </button>
           ))}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match.</div>}
