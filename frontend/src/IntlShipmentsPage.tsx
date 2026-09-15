@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Boxes, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
+import './ops.css';
 import './intlshipments.css';
 
 type Status = 'draft' | 'ready' | 'instructions' | 'prepayment' | 'prepaid' | 'shipped' | 'invoiced';
@@ -107,18 +108,18 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <div className="is-head">
-        <div className="is-head-l">
-          <p className="is-kicker">Marketplace · Logistics</p>
+      <div className="ops-head">
+        <div className="ops-head-l">
+          <p className="ops-kicker"><i />Marketplace · Logistics</p>
           <h1>International shipments</h1>
-          <small className="is-muted">Factory-direct shipments from purchase order to invoice.</small>
+          <small className="ops-sub">Factory-direct shipments from purchase order to invoice.</small>
         </div>
-        <div className="is-head-r">
-          <div className="is-seg" role="tablist">
+        <div className="ops-head-r">
+          <div className="ops-seg" role="tablist">
             <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>
             <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
           </div>
-          <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
+          <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
       </div>
 
@@ -303,7 +304,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
           <div><small>Prepayment{idx >= stepIdx('prepaid') ? ' · received' : idx === stepIdx('prepayment') ? ' · awaiting' : ''}</small><strong className={idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}>{money(s.prepay)}</strong></div>
         </div>
         <ol className="is-steps" data-testid="is-stepper">
-          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx && <Check size={10} strokeWidth={3} />}</i><span>{st.label}</span></li>)}
+          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx ? <Check size={11} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{i < idx ? 'Done' : i === idx ? 'In progress' : 'Upcoming'}</small></li>)}
         </ol>
         {nextLabel && <p className="is-next">Next step: <b>{nextLabel}</b> — {cta} when ready.</p>}
       </section>
@@ -324,6 +325,20 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
             </div>
           </section>
           <div className="is-col">
+            <section className="is-card is-facts is-next-card" data-testid="is-next-card">
+              <div className="is-card-head"><h2>Next action</h2>{nextLabel && <em className="is-status ready">→ {nextLabel}</em>}</div>
+              <ul className="is-check">
+                {[
+                  { l: 'Packing list uploaded', ok: s.packing !== '—' && s.lines.length > 0 },
+                  { l: 'Shipping instructions sent', ok: idx >= stepIdx('prepayment') },
+                  { l: 'Customer booking submitted', ok: s.booking.submitted !== '—' },
+                  { l: `Prepayment received · ${money(s.prepay)}`, ok: idx >= stepIdx('prepaid') },
+                  { l: 'Released to factory', ok: idx >= stepIdx('prepaid') },
+                  { l: 'Shipped & invoiced', ok: idx >= stepIdx('invoiced') },
+                ].map((c) => <li key={c.l} className={c.ok ? 'ok' : ''}><i>{c.ok && <Check size={11} strokeWidth={3} />}</i>{c.l}</li>)}
+              </ul>
+              {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance-card"><Check size={15} /> {cta}</button>}
+            </section>
             <section className="is-card is-facts">
               <h2>Parties</h2>
               <p className="is-kicker">Customer</p><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button>

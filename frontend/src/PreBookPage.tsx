@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { money } from '@/lib/money';
+import './ops.css';
 import './prebookreview.css';
 
 type Props = { onNavigate: (label: string) => void };
@@ -216,12 +217,19 @@ export default function PreBookPage({ onNavigate }: Props) {
   return (
     <div className="pb" data-testid="prebook-page">
       {/* top bar */}
-      <div className="pb-topbar">
-        <div className="pb-tabs" role="tablist">
-          <button role="tab" aria-selected={tab === 'review'} className={tab === 'review' ? 'active' : ''} onClick={() => setTab('review')} data-testid="pb-tab-review">Review</button>
-          <button role="tab" aria-selected={tab === 'setup'} className={tab === 'setup' ? 'active' : ''} onClick={() => setTab('setup')} data-testid="pb-tab-setup">Setup</button>
+      <div className="ops-head">
+        <div className="ops-head-l">
+          <p className="ops-kicker"><i />Marketplace · Pre-Book</p>
+          <h1>Pre-Book Review</h1>
+          <small className="ops-sub">Track demand, MOQ health and orders for every season drop.</small>
         </div>
-        <button className="pb-ghost-btn" onClick={() => toast('Exporting all drops…')} data-testid="pb-export-all"><Download size={15} /> Export all drops</button>
+        <div className="ops-head-r">
+          <div className="ops-seg" role="tablist">
+            <button role="tab" aria-selected={tab === 'review'} className={tab === 'review' ? 'active' : ''} onClick={() => setTab('review')} data-testid="pb-tab-review">Review <b>{SEASONS.filter((x) => !x.archived).reduce((a, x) => a + x.drops.filter((d) => d.status === 'open').length, 0)}</b></button>
+            <button role="tab" aria-selected={tab === 'setup'} className={tab === 'setup' ? 'active' : ''} onClick={() => setTab('setup')} data-testid="pb-tab-setup">Setup</button>
+          </div>
+          <button className="ops-btn" onClick={() => toast('Exporting all drops…')} data-testid="pb-export-all"><Download size={15} /> Export all drops</button>
+        </div>
       </div>
 
       <div className={`pb-body ${tab === 'review' ? 'pb-body--review' : ''}`}>

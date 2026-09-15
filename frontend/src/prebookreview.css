@@ -1,15 +1,6 @@
 /* ===== Pre-Book Review console ===== */
 .pb { --ui: 'Outfit', 'DM Sans', sans-serif; --sub: #f4f7f5; --line: #e6ebe8; --ink: #0f1f18; --ink-3: #66746d; --ink-4: #98a39d; --sh: 0 2px 4px rgba(15,31,24,.03), 0 18px 40px -28px rgba(15,31,24,.22); display: flex; flex-direction: column; gap: 20px; padding: 2px 0 48px; color: #16241d; }
 .pb h2, .pb strong, .pb-setup-h { font-family: var(--ui); }
-.pb-topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.pb-tabs { display: inline-flex; gap: 18px; background: transparent; border-radius: 0; padding: 0; }
-.pb-tabs button { border: none; background: transparent; color: #8a938d; font-family: var(--ui); font-size: 15px; font-weight: 600; padding: 6px 0 10px; border-radius: 0; cursor: pointer; position: relative; transition: color .16s; }
-.pb-tabs button::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: #0f1f18; transform: scaleX(0); transition: transform .22s cubic-bezier(.16,1,.3,1); }
-.pb-tabs button.active { background: transparent; color: #0f1f18; }
-.pb-tabs button.active::after { transform: scaleX(1); }
-.pb-topbar { padding: 0 4px; }
-.pb-ghost-btn { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: #fff; color: #0f1f18; font-family: var(--ui); font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: background .16s, color .16s, border-color .16s; }
-.pb-ghost-btn:hover { background: #0f1f18; color: #fff; border-color: #0f1f18; }
 
 .pb-body { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
 
