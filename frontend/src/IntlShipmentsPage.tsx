@@ -144,11 +144,11 @@ export default function IntlShipmentsPage() {
         </div>
         <div className="is-priority-list">
           {attention.length === 0 ? <span className="is-muted">Nothing currently needs attention.</span> : attention.map((s) => (
-            <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}><b>{s.id}</b> {s.customer} · <em>{STATUS_LABEL[s.status]}</em></button>
+            <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}><b>{s.id}</b> {s.customer} · <em>{s.status === 'draft' ? 'Needs packing list' : 'Awaiting prepayment'}</em></button>
           ))}
         </div>
-        <div className="is-kpi"><span>In pipeline</span><strong>{list.filter((s) => s.status !== 'invoiced').length}</strong><small>shipments</small></div>
-        <div className="is-kpi"><span>Released</span><strong className="g">{list.filter((s) => s.status === 'prepaid').length}</strong><small>to factory</small></div>
+        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all"><span>In pipeline</span><strong>{list.filter((s) => s.status !== 'invoiced').length}</strong><small>shipments · show all</small></button>
+        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released"><span>Released</span><strong className="g">{list.filter((s) => s.status === 'prepaid').length}</strong><small>to factory · filter</small></button>
         <div className="is-kpi"><span>Units moving</span><strong>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>in this view</small></div>
       </section>
 
@@ -156,7 +156,7 @@ export default function IntlShipmentsPage() {
         <div className="is-pipe-head">
           <h2>Shipment pipeline <span className="is-muted">{rows.length} shown</span></h2>
           <div className="is-tools">
-            <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" /></label>
+            <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
             <button className="is-btn" onClick={() => toast('Controls panel')}><SlidersHorizontal size={15} /> Controls</button>
             <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
             <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
@@ -179,7 +179,7 @@ export default function IntlShipmentsPage() {
                 <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
                 <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
               </span>
-              <span className="is-c4"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><ShipChip s={s} /></span>
+              <span className="is-c4 is-c4--last"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'} · {s.incoterms}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small><ShipChip s={s} /></span>
             </button>
           ))}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match.</div>}

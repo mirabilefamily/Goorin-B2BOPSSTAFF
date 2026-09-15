@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only regression test for Intl Shipments polish features. Login (empty fields) and navigation to Intl Shipments work fine. Attention chip for IS-0011 correctly reads 'Awaiting prepayment' and no console errors occur. However, the majority of the requested polish features are NOT implemented in /app/frontend/src/IntlShipmentsPage.tsx — KPI cells are still non-interactive <div>s, the search has no clear (X) button, drafts do not use the custom 'Needs packing list' chip label, and there is no chevron-on-hover for rows.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "IntlShipmentsPage KPI strip", "issue": "KPI cells are <div class='is-kpi'> (not buttons). Missing data-testid='is-kpi-all' and data-testid='is-kpi-released'. No onClick handler to filter by status; no '.on' active class toggling. Clicking 'Released' KPI does not filter to Prepaid.", "selector": ".is-kpi", "priority": "HIGH"},
+      {"component": "Search input clear button", "issue": "No inline clear (X) button appears inside .is-search when text is present. data-testid='is-search-clear' does not exist. A separate 'is-clear-filters' pill exists in the filter row, but the request is specifically for a clear icon inside the search field.", "selector": "[data-testid='is-search']", "priority": "MEDIUM"},
+      {"component": "Attention chip for draft shipments", "issue": "Draft rows render 'Draft' via STATUS_LABEL. Spec requires the attention chip to read 'Needs packing list' for drafts (and 'Awaiting prepayment' for prepayment — which is already correct).", "selector": "[data-testid^='is-attn-']", "priority": "MEDIUM"},
+      {"component": "Shipment row chevron on hover", "issue": "No chevron pseudo-element on hover. There is no .is-c4--last class in the DOM (row uses .is-c4) and no ::after rule targeting it in intlshipments.css. Computed opacity of ::after on hover returns 'none' (no content).", "selector": ".is-tr.is-row .is-c4--last::after", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_45.json"],
+  "action_items": [
+    "Convert the two KPI cells (In pipeline / Released) into <button> elements. Add data-testid='is-kpi-all' on the pipeline KPI (or an explicit 'All' cell) that resets fStatus to 'all', and data-testid='is-kpi-released' on the Released KPI. Toggle a '.on' class when active and set fStatus='prepaid' when engaged; second click clears back to 'all'.",
+    "Inside .is-search, render an X button with data-testid='is-search-clear' when q.trim() is non-empty; on click it should setQ('').",
+    "In the attention chip (button.is-attn), replace <em>{STATUS_LABEL[s.status]}</em> with 'Needs packing list' when s.status === 'draft' (keep 'Awaiting prepayment' otherwise).",
+    "Add a chevron via a ::after pseudo-element on the last row cell. Rename the trailing <span className='is-c4'> to className='is-c4 is-c4--last' (or add a dedicated class) and add the CSS rule so opacity is 0 by default and 1 on .is-tr.is-row:hover .is-c4--last::after."
+  ],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 380 lines with two large components in one file — consider splitting Detail into its own module and extracting inline styles for maintainability.",
+    "Row uses a native <button> that contains block-level flex children — accessible but ensure keyboard focus states remain visible (currently only hover chevron requested).",
+    "The 'is-clear-filters' button already exists but is separate from the search field; the requested inline X should be additional, not replace it."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "25% (1 of 4 polish features present; core regression flows still pass)"},
+  "test_credentials": "Login with empty email+password to sign in as demo (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None. All data is in-memory client seed.",
+  "retest_needed": true,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "The polish features listed in review_request are not yet in code. After E1 implements them, re-run: (1) click is-kpi-released → only IS-0012 visible and is-filter-status='prepaid'; (2) click is-kpi-all → 3 rows; (3) type in is-search → is-search-clear visible → click clears; (4) create draft via is-new-shipment (customer 'A', factory 'B') → verify is-attn-<newId> text contains 'Needs packing list'; (5) hover is-row-IS-0012 → computed opacity of .is-c4--last::after == '1'.",
+  "rca of the issue": "E1 announced polish features but did not commit corresponding changes to IntlShipmentsPage.tsx or intlshipments.css. KPI cells remain <div>s (lines 150-152), search has no inline clear button (line 159), attention chip uses STATUS_LABEL directly (line 147) so drafts render 'Draft', and CSS has no .is-c4--last::after rule."
+}

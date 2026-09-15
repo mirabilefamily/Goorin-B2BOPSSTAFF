@@ -1,0 +1,23 @@
+{
+  "summary": "Retest of Goorin Intl Shipments polish features against fresh bundle. All 5 requested behaviors now PASS end-to-end in the browser: (1) is-kpi-released is a <button>, click filters to only IS-0012 with is-filter-status='prepaid' and class 'is-kpi on'; second click restores 3 rows. (2) New shipment created with customer 'A', factory 'B' produces IS-0013 with attention chip text 'IS-0013 A · Needs packing list', and IS-0011 chip reads '... Awaiting prepayment'. (3) Typing 'SASA' in is-search reveals .is-search-x; clicking clears the input and restores 3 rows. (4) Hovering is-row-IS-0012, getComputedStyle(row.querySelector('.is-c4--last'), '::after').opacity === '1'. (5) No page errors; only pre-existing benign Recharts width/height warnings observed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_46.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor: benign Recharts 'width(-1) height(-1)' console warnings appear on dashboard mount — consider adding minWidth/minHeight to ResponsiveContainer parents (not in Intl Shipments scope).",
+    "IntlShipmentsPage.tsx is now ~380+ lines; consider splitting Detail/Create modal into separate modules for maintainability."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100% (5/5 polish scenarios pass)"},
+  "test_credentials": "Login with empty email+password → demo (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "Created IS-0013 (customer 'A', factory 'B') via UI during test; in-memory only.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All polish features from iteration_45 action items are now implemented and verified. is-kpi-released/is-kpi-all buttons, is-search-x clear button, 'Needs packing list' chip for drafts, and .is-c4--last::after chevron on hover all work as specified. No further work required on this scope.",
+  "rca of the issue": "Previous iteration_45 saw stale bundle. Current served bundle contains all polish features and they work correctly."
+}

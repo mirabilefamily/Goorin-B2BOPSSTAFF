@@ -152,3 +152,9 @@
 .is-factory-meta { display: flex; gap: 8px; flex-wrap: wrap; } .is-factory-meta span { font-size: 11.5px; font-weight: 700; color: var(--ink-3); background: var(--sub); padding: 3px 9px; border-radius: 999px; }
 .is-factory .is-btn { align-self: flex-start; }
 label.is-btn { cursor: pointer; }
+button.is-kpi { border: none; background: transparent; text-align: left; cursor: pointer; font: inherit; color: inherit; transition: background .16s; }
+button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: var(--green-l); } button.is-kpi.on span { color: var(--green); }
+.is-search-x { border: none; background: transparent; color: var(--ink-4); display: grid; place-items: center; cursor: pointer; padding: 0; } .is-search-x:hover { color: var(--ink); }
+.is-c4--last { position: relative; padding-right: 22px; }
+.is-c4--last::after { content: ''; position: absolute; right: 2px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--ink-4); border-top: 2px solid var(--ink-4); transform: translateY(-50%) rotate(45deg); opacity: 0; transition: opacity .16s, transform .16s; }
+.is-row:hover .is-c4--last::after { opacity: 1; transform: translate(3px, -50%) rotate(45deg); }
