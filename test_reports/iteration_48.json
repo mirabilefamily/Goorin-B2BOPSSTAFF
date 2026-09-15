@@ -1,0 +1,35 @@
+{
+  "summary": "Frontend-only verification of INTL Shipments page redesign + Pre-Book Review sidebar season tree redesign. All requested flows PASS. No console errors, no layout overlap at 1920x800.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verified_flows": [
+    "Login via empty form works (mocked auth).",
+    "Sidebar → Intl Shipments navigates to is-shipments-page.",
+    "Header: 'International shipments' title, segmented switcher shows is-tab-shipments (count 3) / is-tab-orders (count 8); is-new-shipment opens is-create-modal.",
+    "Needs-attention card (is-priority-strip) shows is-attn-group-prepayment chip with count 1; click filters pipeline to IS-0011 and adds 'on' class; second click clears filter; is-attn-IS-0011 opens detail; is-back returns.",
+    "Stage chips: is-stage-all + 7 stages all rendered. Clicking is-stage-shipped filters to IS-0010 only. Stage badge counts correct: prepaid=1, prepayment=1, shipped=1, draft/ready/instructions/invoiced=0. is-clear-filters appears and resets to 3 rows.",
+    "Rows: is-row-IS-0012 shows monogram 'MD' (Mirabile Distribution), 7-segment progress (i.is-prog b × 7), and clicking row opens detail view.",
+    "Open Orders tab: is-oo-row-P0159 expands to is-oo-lines-P0159; is-oo-groups-toggle present; is-order-create-P0159 opens create modal prefilled (customer 'Grupo Gardea SA DE CV', factory 'ASI Global Limited (China)', SO S015625).",
+    "Pre-Book Review sidebar: pb-drop-switcher visible; pb-season-SS27 (Closing) expanded showing pb-drop-SS27-drop1/drop2/drop3; pb-season-FW27 collapsed (drops not rendered) then pb-season-toggle-FW27 expands it; clicking pb-drop-FW27-drop1 switches hero to 'FW27 / Drop 1'.",
+    "pb-show-archived toggles reveal of pb-season-FW26 and pb-season-SS26 with 'Archived' badges.",
+    "pb-drop-new-SS27 triggers toast 'New drop in SS27'.",
+    "Pre-Book Setup tab: pb-coll-SS27 lists collection with drop counts; pb-new-prebook adds new collection (count increased); pb-new-drop button present in main setup content.",
+    "1920x800 layout: sidebar (x=338 w=250) and main (x=608) do not overlap; no console errors observed (only benign recharts width warning from a different page)."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx line 157: `openSeasons.has(id) ? n.delete(id) : n.add(id)` — using ternary for side effects works but ESLint `no-unused-expressions` may flag; consider explicit if.",
+    "IntlShipmentsPage.tsx: `attention` filter (line 89) mixes 'prepayment' and 'draft', but Needs-attention header text says 'blocked before factory release'. Currently only prepayment is used (no draft seeded); acceptable but ensure labels stay accurate as more statuses added.",
+    "PreBookPage `pb-show-archived` uses a visually-hidden native checkbox; while tests can still click the label, `Locator.check()` fails because input is display:none. Consider adding a wrapper role='checkbox' or making input opacity:0 (still 'visible') for testability.",
+    "SEASONS/skus/orders are module-level consts — safe for now but should move to a shared data file if reused elsewhere.",
+    "IntlShipmentsPage.tsx line 47: OPEN_ORDERS is re-derived at module load from OPEN_POS; ensure this remains in sync when OPEN_POS is edited (single source of truth already—good)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend only)", "frontend": "100%"},
+  "test_credentials": "Empty email+password → demo user ryan@mirabile.com (per /app/memory/test_credentials.md).",
+  "seed_data_creation": "None — all data frontend-mocked.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 48 verified INTL header/segmented switcher, Needs-attention card grouping, stage chips replacing status select, redesigned rows with monogram + progress, and Pre-Book Review sidebar season tree. Removed testids (is-filter-status, pb-season-pill, pb-drop-drop3) were confirmed absent — Do not test them. Note pb-show-archived's native input is display:none; use label click (force=True) or check its span."
+}

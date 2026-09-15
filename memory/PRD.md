@@ -112,3 +112,9 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Intl refinements: ship-date chips (soon/overdue/shipped) in list + hero, prepayment awaiting/received label, chat empty state, click-to-copy emails. iteration_43.
 - Intl next-level: Open Orders tab (create shipment prefilled from order), Factories drawer (contacts, incoterms, lead time, new shipment here), mock booking document upload (listed in Booking + Documents, logged in activity). iteration_44.
 - Intl polish: KPI cells act as quick filters, attention chips show reason, search clear button, row hover chevron. iteration_45.
+
+## 2026-06 INTL Shipments + Pre-Book sidebar pass (iteration_47/48 PASS)
+- Open Orders tab rebuilt as PO-level planner (`IntlOpenOrders.tsx`): filters, "Within N days" window, Recommended order groups band, sortable table, expandable SKU lines (Ordered/Allocated/Shipped/Remaining), create shipment per PO / per group.
+- Shipments tab: page header + segmented switcher w/ counts, stage-filter chips (replaces status select), rows with monogram + 7-seg progress, Needs-attention card grouped by reason (top 3 + "show all") scaling to many blocked shipments.
+- Pre-Book Review: left sidebar season tree restored (collapsible seasons → drops, new drop, show archived in footer); Setup collections list restyled. Hero season pill/drop tabs removed.
+- Backlog: detail-view stepper polish + "next action" checklist card; real backend; prebook.css cleanup.
