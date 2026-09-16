@@ -88,8 +88,7 @@ export default function LinesheetPage() {
 
   return (
     <div className="ls" data-testid="linesheet-page">
-      <div className="ops-head">
-        <div className="ops-head-l"><p className="ops-kicker"><i />Tools</p><h1>Linesheet</h1><small className="ops-sub">Select styles, set the pricing context, then preview, print or share.</small></div>
+      <div className="ops-head ls-head-slim">
         <div className="ops-head-r">
           <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
           <button className="ops-btn dark" onClick={startNew} data-testid="ls-new-top"><FilePlus2 size={15} /> New Linesheet</button>
