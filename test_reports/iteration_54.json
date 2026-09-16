@@ -1,0 +1,18 @@
+{
+  "summary": "Tested Linesheet save/share drafts feature end-to-end. All 8 backend pytest cases pass (POST/GET/PUT/duplicate/share-view-increment/share-404/DELETE). Frontend: login, navigate to Linesheet, ctx dropdown has ONLY Customer + Price list (no generic), Customer branch shows ls-customer-search/list, Price list branch shows ls-pricelist select. Selected 2 items, picked customer c1, set title, save -> badge 'Saved just now'; edit title -> 'Unsaved changes'; save changes -> 'Saved just now'; ls-save-as-new creates duplicate (drawer entries increased). ls-copy-link copied /share/<token> URL to clipboard. ls-open-saved shows drawer with entries; ls-saved-open restores title and selection. Duplicate via drawer creates 3rd entry. Delete via drawer removes entry. ls-new resets to 'New draft'. Preview shows ls-preview-share and ls-doc. Fresh incognito context loaded /share/<token> -> share-page + ls-doc + share-print/share-download rendered; invalid token -> share-error. No non-chart console errors. Cleaned up 3 TEST_ linesheets via API.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_linesheets.py", "/app/test_reports/pytest/linesheets.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py update_linesheet uses updatedAt bump only server-side (good). Consider setting server-side createdBy from auth once real auth exists.",
+    "Chart resize console warnings are pre-existing on Dashboard (unrelated to linesheet feature) — E1 may want to set explicit width/height on ResponsiveContainer parents to silence them."
+  ],
+  "updated_files": ["/app/backend/tests/test_linesheets.py"],
+  "success_rate": {"backend": "100% (8/8)", "frontend": "100% of tested flows"},
+  "test_credentials": "Empty email + empty password -> demo login (ryan@mirabile.com), per /app/memory/test_credentials.md",
+  "seed_data_creation": "Created + cleaned up 3 TEST_ linesheets during testing.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet drafts CRUD + share links fully working. If drawer auto-closes after some actions (open/duplicate) this is expected UI. Tests in /app/backend/tests/test_linesheets.py can be reused as regression."
+}
