@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
@@ -268,6 +268,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   };
   const cta = idx < STEPS.length - 1 ? (s.status === 'prepayment' ? 'Mark prepaid' : s.status === 'prepaid' ? 'Mark shipped' : s.status === 'shipped' ? 'Mark invoiced' : s.status === 'ready' ? 'Send instructions' : s.status === 'instructions' ? 'Request prepayment' : 'Mark ready') : null;
   const nextLabel = idx < STEPS.length - 1 ? STEPS[idx + 1].label : null;
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && !menu) onBack(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onBack, menu]);
   const tabs = [
     { id: 'overview', label: 'Overview' }, { id: 'booking', label: 'Booking & payment' }, { id: 'chat', label: 'Conversation', n: s.msgs.length },
     { id: 'docs', label: 'Documents', n: s.docs.length + (s.bookingDocs?.length ?? 0) }, { id: 'activity', label: 'Activity', n: s.activity.length },
@@ -276,8 +277,9 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   return (
     <div className="is" data-testid="intl-shipment-detail">
       <nav className="is-crumbs" aria-label="Breadcrumb">
-        <button className="is-back" onClick={onBack} data-testid="is-back"><ArrowLeft size={15} /> Intl Shipments</button>
-        <ChevronRight size={14} /><span>{s.id}</span>
+        <button className="is-back" onClick={onBack} data-testid="is-back" title="Back to Intl Shipments (Esc)"><i><ArrowLeft size={15} /></i><span>All shipments</span></button>
+        <span className="is-crumb-sep" />
+        <span className="is-crumb-path">Intl Shipments <ChevronRight size={13} /> <b>{s.id}</b></span>
       </nav>
 
       <section className="is-card is-dhero">

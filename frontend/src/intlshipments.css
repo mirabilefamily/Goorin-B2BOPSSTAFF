@@ -307,3 +307,13 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-route .is-route-line { width: 96px; height: 2px; background: linear-gradient(90deg, #c9d3ce, var(--green)); }
 .is-route .is-route-line::after { display: none; }
 .is-route .is-mono-av { background: linear-gradient(145deg, #eef4f1, #dfe9e4); } .is-route .is-mono-av::after { display: none; } .is-route .is-mono-av.fac { background: linear-gradient(145deg, #eef1fb, #dfe4f5); }
+/* back button v2 */
+.is-crumbs { gap: 14px; min-height: 36px; }
+.is-crumbs .is-back { display: inline-flex; align-items: center; gap: 10px; padding: 4px 14px 4px 4px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-family: var(--ui); font-size: 13px; font-weight: 600; transition: border-color .18s, box-shadow .18s, transform .18s; }
+.is-crumbs .is-back i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; transition: transform .22s cubic-bezier(.16,1,.3,1), background .18s; }
+.is-crumbs .is-back:hover { border-color: var(--ink); background: #fff; box-shadow: 0 6px 16px -10px rgba(15,31,24,.35); }
+.is-crumbs .is-back:hover i { transform: translateX(-3px); background: var(--green); }
+.is-crumbs .is-back:active { transform: scale(.98); }
+.is-crumbs .is-back:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.is-crumb-sep { width: 1px; height: 18px; background: var(--line); }
+.is-crumb-path { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-4); font-weight: 500; } .is-crumb-path b { color: var(--ink); font-weight: 700; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }

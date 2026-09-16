@@ -126,3 +126,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Header consistency: titles match sidebar labels (Dashboard / Pre-Book Review / Intl Shipments), kicker = sidebar group, 28px title enforced via `.ops-head .ops-head-l h1`; fixed mangled `.is h1` rule; page gap/padding unified (20px / 4px 0 56px).
 - 2026-06 Staff identity: profile menu shows Role/Team (not Company/Sales rep); topbar "Goorin Bros. · Staff"; settings account block = Goorin Bros. Login still mocked (empty fields → demo).
 - 2026-06 Shipment detail v3 (iteration_51): breadcrumb, hero avatars + route line, 5 fact tiles, segmented tabs, Parties card w/ actions, Prepayment progress bar, richer activity timeline.
+- 2026-06 Detail back button v2: pill w/ animated arrow, breadcrumb path, Esc key returns to list.
