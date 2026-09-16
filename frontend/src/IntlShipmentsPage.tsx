@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Boxes, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -246,6 +246,8 @@ export default function IntlShipmentsPage() {
   );
 }
 
+const mono = (n: string) => { const w = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); return (w.length > 1 ? w.slice(0, 2).map((x) => x[0]).join('') : (w[0] ?? '?').slice(0, 2)).toUpperCase(); };
+
 function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update: (fn: (s: Shipment) => Shipment) => void }) {
   const toast = useToast();
   const [msg, setMsg] = useState('');
@@ -273,16 +275,24 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
 
   return (
     <div className="is" data-testid="intl-shipment-detail">
-      <button className="is-back" onClick={onBack} data-testid="is-back"><ArrowLeft size={16} /> Intl Shipments</button>
+      <nav className="is-crumbs" aria-label="Breadcrumb">
+        <button className="is-back" onClick={onBack} data-testid="is-back"><ArrowLeft size={15} /> Intl Shipments</button>
+        <ChevronRight size={14} /><span>{s.id}</span>
+      </nav>
 
       <section className="is-card is-dhero">
         <div className="is-dhero-top">
           <div className="is-dhero-id">
-            <p className="is-kicker">International shipment</p>
-            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em></div>
-            <div className="is-route"><span><small>Customer</small><strong>{s.customer}</strong></span><i /><span><small>Factory</small><strong>{s.factory}</strong></span></div>
+            <p className="is-kicker"><i className="is-dot" />International shipment · Created {s.created}</p>
+            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em>{idx < stepIdx('prepaid') && idx >= stepIdx('prepayment') && <em className="is-status prepayment">Blocked on payment</em>}</div>
+            <div className="is-route">
+              <span><i className="is-mono-av">{mono(s.customer)}</i><span><small>Customer</small><strong>{s.customer}</strong></span></span>
+              <i className="is-route-line"><Ship size={13} /></i>
+              <span><i className="is-mono-av fac">{mono(s.factory)}</i><span><small>Factory</small><strong>{s.factory}</strong></span></span>
+            </div>
           </div>
           <div className="is-dactions">
+            <button className="is-btn" onClick={() => setDtab('chat')} data-testid="is-hero-message"><MessageSquare size={15} /> Message</button>
             {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance"><Check size={15} /> {cta}</button>}
             <div className="is-menu-wrap">
               <button className="is-btn is-icon" onClick={() => setMenu((v) => !v)} aria-label="More" data-testid="is-more"><MoreHorizontal size={16} /></button>
@@ -296,27 +306,25 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
           </div>
         </div>
         <div className="is-dfacts">
-          <div><small>Ship date</small><strong>{s.ship}</strong><ShipChip s={s} /></div>
-          <div><small>Mode</small><strong>{s.booking.mode}</strong></div>
-          <div><small>Incoterms</small><strong>{s.incoterms} · {s.currency}</strong></div>
-          <div><small>Units</small><strong>{units(s).toLocaleString()}</strong></div>
-          <div><small>Declared value</small><strong>{money(total)}</strong></div>
-          <div><small>Prepayment{idx >= stepIdx('prepaid') ? ' · received' : idx === stepIdx('prepayment') ? ' · awaiting' : ''}</small><strong className={idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}>{money(s.prepay)}</strong></div>
+          <div><i className="is-fact-ic"><CalendarDays size={15} /></i><small>Ship date</small><strong>{s.ship}</strong><ShipChip s={s} /></div>
+          <div><i className="is-fact-ic"><Ship size={15} /></i><small>Mode · Incoterms</small><strong>{s.booking.mode}</strong><span className="is-fact-sub">{s.incoterms} · {s.currency}</span></div>
+          <div><i className="is-fact-ic"><Boxes size={15} /></i><small>Units</small><strong>{units(s).toLocaleString()}</strong><span className="is-fact-sub">{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</span></div>
+          <div><i className="is-fact-ic"><FileText size={15} /></i><small>Declared value</small><strong>{money(total)}</strong><span className="is-fact-sub">SO {money(total)} · PO {money(poTotal(s))}</span></div>
+          <div className={idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}><i className="is-fact-ic"><CheckCircle2 size={15} /></i><small>Prepayment{idx >= stepIdx('prepaid') ? ' · received' : idx === stepIdx('prepayment') ? ' · awaiting' : ''}</small><strong>{money(s.prepay)}</strong><span className="is-fact-sub">{total ? Math.round((s.prepay / total) * 100) : 0}% of value</span></div>
         </div>
         <ol className="is-steps" data-testid="is-stepper">
           {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx ? <Check size={11} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{i < idx ? 'Done' : i === idx ? 'In progress' : 'Upcoming'}</small></li>)}
         </ol>
-        {nextLabel && <p className="is-next">Next step: <b>{nextLabel}</b> — {cta} when ready.</p>}
       </section>
 
-      <div className="is-dtabs" role="tablist">
+      <div className="ops-seg is-dseg" role="tablist">
         {tabs.map((t) => <button key={t.id} role="tab" aria-selected={dtab === t.id} className={dtab === t.id ? 'active' : ''} onClick={() => setDtab(t.id)} data-testid={`is-dtab-${t.id}`}>{t.label}{'n' in t && t.n > 0 && <b>{t.n}</b>}</button>)}
       </div>
 
       {dtab === 'overview' && (
         <div className="is-grid">
           <section className="is-card is-lines" data-testid="is-lines">
-            <div className="is-card-head"><h2>Shipment lines</h2><small className="is-muted">From factory packing list · read-only</small></div>
+            <div className="is-card-head"><h2>Shipment lines</h2><div className="is-line-sum"><span><b>{s.lines.length}</b> lines</span><span><b>{units(s).toLocaleString()}</b> units</span><span><b>{money(total)}</b> value</span><small className="is-muted">· from packing list</small></div></div>
             <div className="is-ltable">
               <div className="is-ltr is-lth"><span>SKU</span><span>SO #</span><span>PO #</span><span>Description</span><span className="r">Qty</span><span className="r">Unit value</span></div>
               {s.lines.length === 0 && <div className="is-empty">No lines yet — upload a packing list.</div>}
@@ -339,10 +347,11 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
               </ul>
               {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance-card"><Check size={15} /> {cta}</button>}
             </section>
-            <section className="is-card is-facts">
+            <section className="is-card is-facts is-parties">
               <h2>Parties</h2>
-              <p className="is-kicker">Customer</p><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button>
-              <p className="is-kicker">Factory</p><strong>{s.factory}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.factoryEmail); toast('Email copied'); }}>{s.factoryEmail}</button>
+              <div className="is-party"><i className="is-mono-av">{mono(s.customer)}</i><div><small>Customer</small><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button></div><button className="is-btn is-icon sm" onClick={() => { setDtab('chat'); }} aria-label="Message customer"><MessageSquare size={14} /></button></div>
+              <div className="is-party"><i className="is-mono-av fac">{mono(s.factory)}</i><div><small>Factory</small><strong>{s.factory}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.factoryEmail); toast('Email copied'); }}>{s.factoryEmail}</button></div><button className="is-btn is-icon sm" onClick={() => toast('Resent to factory')} aria-label="Email factory"><Send size={14} /></button></div>
+              <div className="is-divider" />
               <p className="is-kicker">Packing list</p><button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing"><FileText size={15} /> {s.packing}<Download size={14} /></button>
             </section>
             <section className="is-card is-facts" data-testid="is-recent">
@@ -366,8 +375,10 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
             <div className="is-docs" data-testid="is-booking-docs">{(s.bookingDocs ?? []).map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
           </section>
           <section className="is-card is-facts">
-            <h2>Prepayment</h2>
+            <div className="is-card-head"><h2>Prepayment</h2><em className={`is-status ${idx >= stepIdx('prepaid') ? 'prepaid' : idx === stepIdx('prepayment') ? 'prepayment' : 'draft'}`}>{idx >= stepIdx('prepaid') ? 'Received' : idx === stepIdx('prepayment') ? 'Awaiting' : 'Not requested'}</em></div>
             <div className="is-pay"><strong>{money(s.prepay)}</strong><span>50% of invoice value · terms 50% Prepay / 50% Net 60</span></div>
+            <div className="is-paybar" aria-hidden="true"><i style={{ width: idx >= stepIdx('invoiced') ? '100%' : idx >= stepIdx('prepaid') ? '50%' : '0%' }} /></div>
+            <div className="is-paylegend"><span><b>{money(idx >= stepIdx('prepaid') ? s.prepay : 0)}</b> paid</span><span><b>{money(total - (idx >= stepIdx('prepaid') ? s.prepay : 0))}</b> outstanding</span></div>
             <button className="is-btn sm" onClick={() => toast('Edit prepayment amount')}>Edit prepayment amount</button>
             <div className="is-note">
               Saving changes never sends an email. Resend only after the latest booking and payment details are correct.
@@ -408,8 +419,8 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
 
       {dtab === 'activity' && (
         <section className="is-card is-activity" data-testid="is-activity">
-          <h2>Activity</h2>
-          <ul>{s.activity.map((a, i) => <li key={i}><i /><div><strong>{a.title}</strong>{a.detail && <span> — {a.detail}</span>}<small>{a.at} · {a.by}</small></div></li>)}</ul>
+          <div className="is-card-head"><h2>Activity</h2><small className="is-muted">{s.activity.length} events · newest first</small></div>
+          <ul>{s.activity.map((a, i) => <li key={i}><i className={a.title.startsWith('Status') ? 'st' : a.title.includes('message') || a.title.includes('Message') ? 'msg' : a.title.includes('upload') ? 'doc' : ''} /><div><div className="is-act-row"><strong>{a.title}</strong><small>{a.at}</small></div>{a.detail && <span>{a.detail}</span>}<small className="is-act-by"><b className="is-mono-av xs">{mono(a.by)}</b>{a.by}</small></div></li>)}</ul>
         </section>
       )}
     </div>
