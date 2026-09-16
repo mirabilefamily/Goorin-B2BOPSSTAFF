@@ -143,3 +143,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 ## 2026-06 Linesheet: Save drafts + Share links (REAL backend, Mongo `linesheets`)
 - API: GET/POST /api/linesheets, GET/PUT/DELETE /api/linesheets/{id}, POST /api/linesheets/{id}/duplicate, public GET /api/share/linesheets/{token} (increments views).
 - Frontend: `lib/linesheetApi.ts`, `LinesheetDoc.tsx` (shared doc renderer), `SharedLinesheetPage.tsx` (public /share/:token, rendered before auth gate in App.tsx). Builder: Save draft / Save changes / Save as new, Unsaved-changes badge, Copy share link, "Saved" drawer (open, duplicate, copy link, delete, views count). Pricing context reduced to Customer | Price list.
+- 2026-06 Linesheet v3 cohesion: season as ops-seg pills w/ counts in toolbar, system green selected state + price chips on cards, sub-bar with selected count, rail inputs on sub bg, stats strip + dashed empty state.
