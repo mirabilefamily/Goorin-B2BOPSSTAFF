@@ -80,3 +80,43 @@
   .ls-doc-img { background: #f3f3f1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .no-print { display: none !important; }
 }
+
+/* v2 — reference-inspired */
+.ls-body { grid-template-columns: 1fr 400px; }
+.ls-toolbar.sub { padding: 12px 20px; border-bottom: 1px solid var(--line); }
+.ls-toolbar .ls-search { flex: 1; } .ls-toolbar .ls-search input { width: 100%; }
+.ls-found { font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.ls-link.danger { color: #c62828; } .ls-link.danger:hover { background: #fdecec; color: #b71c1c; }
+.ls-grid { grid-template-columns: repeat(6, 1fr); gap: 16px; }
+.ls-item { border-radius: 14px; padding: 0; gap: 0; overflow: hidden; border-width: 1.5px; }
+.ls-item.on { border-color: #2e9e6b; box-shadow: 0 0 0 3px rgba(46,158,107,.12); }
+.ls-item .ls-thumb { border-radius: 0; background: #e7e4dc; }
+.ls-check { top: 10px; left: auto; right: 10px; width: 26px; height: 26px; border-radius: 50%; border-color: transparent; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); color: #fff; }
+.ls-item.on .ls-check { background: #2e9e6b; border-color: #2e9e6b; }
+.ls-item-body { padding: 12px 14px 14px; gap: 4px; }
+.ls-season { font-style: normal; font-size: 11px; letter-spacing: .06em; color: var(--ink-4); font-weight: 600; }
+.ls-item-body strong { font-size: 14px; line-height: 1.3; } .ls-item-body > small { font-size: 11.5px; }
+.ls-pager { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 18px 20px 24px; font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.ls-pager .ops-btn:disabled { opacity: .4; cursor: not-allowed; }
+.ls-builder { padding: 0; max-height: calc(100vh - 140px); display: flex; flex-direction: column; gap: 0; overflow: hidden; }
+.ls-builder-scroll { flex: 1; overflow-y: auto; padding: 22px 22px 12px; display: flex; flex-direction: column; gap: 14px; }
+.ls-builder h2 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+.ls-hint { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-4); } .ls-hint b { font-weight: 500; }
+.ls-search.block { display: flex; border-radius: 12px; background: #fff; }
+.ls-cust-list { list-style: none; margin: 0; padding: 4px; border: 1px solid var(--line); border-radius: 12px; max-height: 210px; overflow-y: auto; }
+.ls-cust-list li button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: none; background: transparent; text-align: left; font: inherit; font-size: 14px; color: var(--ink); padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.ls-cust-list li button:hover { background: var(--sub); } .ls-cust-list li button small { color: var(--ink-4); font-size: 12px; }
+.ls-cust-sel { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid #cfe9dc; background: var(--green-l); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--ink-3); }
+.ls-cust-sel b { color: var(--ink); font-weight: 600; } .ls-cust-sel button { border: none; background: transparent; color: var(--ink-3); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; } .ls-cust-sel button:hover { color: var(--ink); }
+.ls-muted { color: var(--ink-4); font-size: 13px; padding: 6px 4px; }
+.ls-sel-head { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); } .ls-sel-head h2 { font-size: 17px; } .ls-sel-head h2 span { color: var(--ink-4); font-weight: 500; }
+.ls-spin { color: var(--ink-4); animation: ls-rot 1s linear infinite; } @keyframes ls-rot { to { transform: rotate(360deg); } }
+.ls-picked { max-height: none; overflow: visible; gap: 8px; }
+.ls-picked li { grid-template-columns: auto 1fr auto auto; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; } .ls-picked li:hover { background: #fff; border-color: #c9d3ce; }
+.ls-picked li strong { font-family: var(--ui); font-size: 13px; font-weight: 600; line-height: 1.3; }
+.ls-picked b.pending { color: var(--ink-4); font-weight: 500; font-size: 12px; }
+.ls-thumb.xs { width: 44px; height: 44px; border-radius: 8px; background: #e7e4dc; }
+.ls-actions { padding: 14px 22px 6px; border-top: 1px solid var(--line); }
+.ls-foot-hint { display: block; text-align: center; font-size: 12px; color: var(--ink-4); padding: 0 22px 16px; }
+@media (max-width: 1500px) { .ls-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1280px) { .ls-builder { max-height: none; } }
