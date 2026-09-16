@@ -130,3 +130,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Dashboard goal card v3: minimal (big number, single progress bar w/ pace tick, one meta line, 2 segment rows); gauge removed. Dashboard header block removed.
 - 2026-06 Goal card v4: stacked segment bar (US + Dist) w/ pace tick, 67% pill in header, single status line, compact breakdown rows (no per-row bars).
 - 2026-06 Detail nav: icon tabs in grey tray (is-dnav) w/ counts replacing segmented pills.
+- 2026-06 Needs-attention v3: adds "Customer communication" reason (last message from customer, unanswered) with per-row Ignore (dismiss alert, e.g. a "thanks"); chips filter pipeline (message chip toggles fMsg); rows show multiple reason tags. State in-memory (MOCKED).

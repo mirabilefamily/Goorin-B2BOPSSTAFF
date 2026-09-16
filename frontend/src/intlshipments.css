@@ -320,3 +320,11 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-dnav button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(15,31,24,.08), 0 6px 14px -8px rgba(15,31,24,.25); } .is-dnav button.active svg { color: var(--ink); }
 .is-dnav button b { font-size: 11.5px; font-weight: 700; min-width: 22px; height: 22px; display: inline-grid; place-items: center; padding: 0 6px; border-radius: 999px; background: rgba(15,31,24,.08); color: var(--ink-3); }
 .is-dnav button.active b { background: var(--ink); color: #fff; }
+/* attention rows v3 */
+.is-attn { grid-template-columns: auto 1fr auto auto auto; padding: 10px 12px 10px 14px; }
+.is-attn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.is-attn-tags { display: inline-flex; align-items: center; gap: 6px; }
+.is-attn-tags em { display: inline-flex; align-items: center; gap: 5px; }
+.is-attn-tags em.message { background: #eef1fb; color: #2952c8; }
+.is-attn-ignore { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); background: #fff; color: var(--ink-3); font-family: var(--ui); font-size: 11.5px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 999px; cursor: pointer; transition: background .16s, color .16s, border-color .16s; }
+.is-attn-ignore:hover { background: var(--ink); color: #fff; border-color: var(--ink); }

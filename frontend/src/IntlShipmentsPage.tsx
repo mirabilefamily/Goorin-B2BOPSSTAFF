@@ -77,17 +77,28 @@ export default function IntlShipmentsPage() {
   const [factoriesOpen, setFactoriesOpen] = useState(false);
   const startFromOrder = (o: typeof OPEN_ORDERS[number]) => { setForm({ customer: o.customer, factory: o.factory, so: o.so, po: o.po, ship: o.due }); setCreating(true); };
   const [form, setForm] = useState({ customer: '', factory: '', so: '', po: '', ship: '' });
+  const [ignored, setIgnored] = useState<Set<string>>(new Set());
+  const [fMsg, setFMsg] = useState(false);
+  const unanswered = (s: Shipment) => { const m = s.msgs[s.msgs.length - 1]; return !!m && !m.me && !ignored.has(`${s.id}:${m.id}`); };
 
   const rows = useMemo(() => list.filter((s) => {
     const t = q.trim().toLowerCase();
     if (t && ![s.id, s.customer, s.factory, ...s.lines.map((l) => l.so + l.po + l.sku)].join(' ').toLowerCase().includes(t)) return false;
     if (fStatus !== 'all' && s.status !== fStatus) return false;
+    if (fMsg && !unanswered(s)) return false;
     if (fCustomer !== 'all' && s.customer !== fCustomer) return false;
     if (fFactory !== 'all' && s.factory !== fFactory) return false;
     return true;
-  }), [list, q, fStatus, fCustomer, fFactory]);
+  }), [list, q, fStatus, fCustomer, fFactory, fMsg, ignored]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const attention = list.filter((s) => s.status === 'prepayment' || s.status === 'draft');
+  const reasons = (s: Shipment) => [
+    ...(s.status === 'prepayment' ? [{ id: 'prepayment', label: 'Awaiting prepayment' }] : []),
+    ...(s.status === 'draft' ? [{ id: 'draft', label: 'Needs packing list' }] : []),
+    ...(unanswered(s) ? [{ id: 'message', label: 'Customer message' }] : []),
+  ];
+  const attention = list.filter((s) => s.status !== 'invoiced' && reasons(s).length > 0);
+  const ignoreMsg = (s: Shipment) => { const m = s.msgs[s.msgs.length - 1]; setIgnored((x) => new Set(x).add(`${s.id}:${m.id}`)); toast(`Message alert dismissed for ${s.id}`); };
+  const REASON_GROUPS = [{ id: 'prepayment', label: 'Awaiting prepayment' }, { id: 'draft', label: 'Needs packing list' }, { id: 'message', label: 'Customer communication' }];
   const open = list.find((s) => s.id === openId);
   const update = (id: string, fn: (s: Shipment) => Shipment) => setList((l) => l.map((s) => (s.id === id ? fn(s) : s)));
 
@@ -137,23 +148,26 @@ export default function IntlShipmentsPage() {
             <span className="is-priority-badge"><AlertTriangle size={14} /></span>
             <div>
               <p className="is-kicker">{attention.length === 0 ? 'All clear' : 'Needs attention'}</p>
-              <strong>{attention.length === 0 ? 'Nothing is blocking a release' : `${attention.length} shipment${attention.length === 1 ? '' : 's'} blocked before factory release`}</strong>
+              <strong>{attention.length === 0 ? 'Nothing needs your attention right now' : `${attention.length} shipment${attention.length === 1 ? '' : 's'} need${attention.length === 1 ? 's' : ''} attention`}</strong>
             </div>
           </div>
           <div className="is-priority-list">
-            {[{ id: 'prepayment', label: 'Awaiting prepayment' }, { id: 'draft', label: 'Needs packing list' }].map((g) => { const n = attention.filter((s) => s.status === g.id).length; return n > 0 && (
-              <button key={g.id} className={`is-attn-group ${fStatus === g.id ? 'on' : ''}`} onClick={() => setFStatus(fStatus === g.id ? 'all' : g.id)} data-testid={`is-attn-group-${g.id}`}><b>{n}</b> {g.label}<ChevronRight size={14} /></button>
+            {REASON_GROUPS.map((g) => { const n = attention.filter((s) => reasons(s).some((r) => r.id === g.id)).length; const on = g.id === 'message' ? fMsg : fStatus === g.id; return n > 0 && (
+              <button key={g.id} className={`is-attn-group ${on ? 'on' : ''}`} onClick={() => g.id === 'message' ? setFMsg((v) => !v) : setFStatus(fStatus === g.id ? 'all' : g.id)} data-testid={`is-attn-group-${g.id}`}><b>{n}</b> {g.label}<ChevronRight size={14} /></button>
             ); })}
           </div>
           <div className="is-priority-list">
             {attention.slice().sort((a, b) => (daysTo(a.ship) ?? 9e9) - (daysTo(b.ship) ?? 9e9)).slice(0, 3).map((s) => (
-              <button key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
+              <div key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
                 <b>{s.id}</b>
                 <span className="is-attn-who">{s.customer}<small>{s.factory}</small></span>
                 <ShipChip s={s} />
-                <em className={s.status === 'draft' ? 'draft' : ''}>{s.status === 'draft' ? 'Needs packing list' : 'Awaiting prepayment'}</em>
+                <span className="is-attn-tags">
+                  {reasons(s).map((r) => <em key={r.id} className={r.id}>{r.id === 'message' && <MessageSquare size={11} />}{r.label}</em>)}
+                  {unanswered(s) && <button className="is-attn-ignore" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title={`"${s.msgs[s.msgs.length - 1].text}"`} data-testid={`is-attn-ignore-${s.id}`}><Check size={12} /> Ignore</button>}
+                </span>
                 <ChevronRight size={15} />
-              </button>
+              </div>
             ))}
             {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFStatus('prepayment')} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
           </div>
@@ -190,7 +204,7 @@ export default function IntlShipmentsPage() {
           <span className="is-flabel"><Filter size={13} /> Filters</span>
           <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
           <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
-          {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
+          {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
         </div>
         <div className="is-table" role="table">
           <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory</span><span>Orders & value</span><span>Shipping</span></div>
