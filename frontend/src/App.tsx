@@ -72,6 +72,7 @@ import MarketplacePage from './MarketplacePage';
 import CheckoutPage from './CheckoutPage';
 import PreBookPage from './PreBookPage';
 import LinesheetPage from './LinesheetPage';
+import SharedLinesheetPage from './SharedLinesheetPage';
 import MyOrdersPage from './MyOrdersPage';
 import ShipmentsPage from './ShipmentsPage';
 import IntlShipmentsPage from './IntlShipmentsPage';
@@ -201,6 +202,12 @@ const rolePermissions: { label: string; admin: boolean; user: boolean }[] = [
 ];
 
 function App() {
+  const shareMatch = window.location.pathname.match(/^\/share\/([A-Za-z0-9]+)/);
+  if (shareMatch) return <SharedLinesheetPage token={shareMatch[1]} />;
+  return <StaffApp />;
+}
+
+function StaffApp() {
   const toast = useToast();
   const cart = useCart();
   const [session, setSession] = useState<Session | null>(null);

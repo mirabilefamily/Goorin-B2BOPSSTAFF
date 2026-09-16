@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -65,6 +65,75 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# ---- Linesheets ----
+class LinesheetIn(BaseModel):
+    title: str
+    ctx: str
+    customerId: str = ""
+    priceListId: str = "usw"
+    notes: str = ""
+    showMsrp: bool = True
+    showMoq: bool = False
+    itemIds: List[str]
+    season: str = "all"
+
+class Linesheet(LinesheetIn):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    shareToken: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
+    createdBy: str = "Ryan Mirabile"
+    createdAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updatedAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    views: int = 0
+
+@api_router.get("/linesheets", response_model=List[Linesheet])
+async def list_linesheets():
+    return await db.linesheets.find({}, {"_id": 0}).sort("updatedAt", -1).to_list(500)
+
+@api_router.post("/linesheets", response_model=Linesheet, status_code=201)
+async def create_linesheet(body: LinesheetIn):
+    ls = Linesheet(**body.model_dump())
+    await db.linesheets.insert_one(ls.model_dump())
+    return ls
+
+@api_router.get("/linesheets/{ls_id}", response_model=Linesheet)
+async def get_linesheet(ls_id: str):
+    doc = await db.linesheets.find_one({"id": ls_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(404, "Linesheet not found")
+    return doc
+
+@api_router.put("/linesheets/{ls_id}", response_model=Linesheet)
+async def update_linesheet(ls_id: str, body: LinesheetIn):
+    upd = {**body.model_dump(), "updatedAt": datetime.now(timezone.utc).isoformat()}
+    res = await db.linesheets.find_one_and_update({"id": ls_id}, {"$set": upd}, projection={"_id": 0}, return_document=True)
+    if not res:
+        raise HTTPException(404, "Linesheet not found")
+    return res
+
+@api_router.post("/linesheets/{ls_id}/duplicate", response_model=Linesheet, status_code=201)
+async def duplicate_linesheet(ls_id: str):
+    doc = await db.linesheets.find_one({"id": ls_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(404, "Linesheet not found")
+    src = LinesheetIn(**doc)
+    copy = Linesheet(**{**src.model_dump(), "title": f"{src.title} (copy)"})
+    await db.linesheets.insert_one(copy.model_dump())
+    return copy
+
+@api_router.delete("/linesheets/{ls_id}", status_code=204)
+async def delete_linesheet(ls_id: str):
+    res = await db.linesheets.delete_one({"id": ls_id})
+    if not res.deleted_count:
+        raise HTTPException(404, "Linesheet not found")
+
+@api_router.get("/share/linesheets/{token}", response_model=Linesheet)
+async def shared_linesheet(token: str):
+    doc = await db.linesheets.find_one_and_update({"shareToken": token}, {"$inc": {"views": 1}}, projection={"_id": 0}, return_document=True)
+    if not doc:
+        raise HTTPException(404, "This link is no longer valid")
+    return doc
 
 # Include the router in the main app
 app.include_router(api_router)
