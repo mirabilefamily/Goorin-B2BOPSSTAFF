@@ -4,6 +4,7 @@ import { useToast } from '@/lib/toast';
 import { CATALOG, LS_CUSTOMERS, PRICE_LISTS, SEASONS, fmt, priceFor, type PriceList } from './lib/linesheet';
 import { linesheetApi, shareUrl, type LinesheetInput, type SavedLinesheet } from './lib/linesheetApi';
 import { LinesheetDoc } from './LinesheetDoc';
+import { MultiSelect } from './MultiSelect';
 import './ops.css';
 import './linesheet.css';
 
@@ -15,8 +16,8 @@ const rel = (iso: string) => { const m = Math.round((Date.now() - Date.parse(iso
 
 export default function LinesheetPage() {
   const toast = useToast();
-  const [season, setSeason] = useState('SS27');
-  const [coll, setColl] = useState('all');
+  const [seasons, setSeasons] = useState<Set<string>>(new Set(['SS27']));
+  const [colls, setColls] = useState<Set<string>>(new Set());
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [sel, setSel] = useState<Set<string>>(new Set());
@@ -30,7 +31,8 @@ export default function LinesheetPage() {
   const [saving, setSaving] = useState(false);
 
   const collections = Array.from(new Set(CATALOG.map((i) => i.collection)));
-  const items = useMemo(() => CATALOG.filter((i) => (season === 'all' || i.season === season) && (coll === 'all' || i.collection === coll) && (!q || `${i.name} ${i.color} ${i.sku}`.toLowerCase().includes(q.toLowerCase()))), [season, coll, q]);
+  const items = useMemo(() => CATALOG.filter((i) => (seasons.size === 0 || seasons.has(i.season)) && (colls.size === 0 || colls.has(i.collection)) && (!q || `${i.name} ${i.color} ${i.sku}`.toLowerCase().includes(q.toLowerCase()))), [seasons, colls, q]);
+  const season = seasons.size === 0 ? 'all' : Array.from(seasons).join(',');
   const pages = Math.max(1, Math.ceil(items.length / PAGE));
   const visible = items.slice((page - 1) * PAGE, page * PAGE);
   const chosen = CATALOG.filter((i) => sel.has(i.id));
@@ -43,7 +45,7 @@ export default function LinesheetPage() {
 
   const refresh = () => linesheetApi.list().then(setSaved).catch(() => toast('Could not load saved linesheets', 'error'));
   useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { setPage(1); }, [season, coll, q]);
+  useEffect(() => { setPage(1); }, [seasons, colls, q]);
   useEffect(() => { if (!priced) return; setResolving(true); const t = setTimeout(() => setResolving(false), 650); return () => clearTimeout(t); }, [doc.ctx, doc.customerId, doc.priceListId, priced]);
 
   const toggle = (id: string) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else if (n.size >= MAX_SEL) { toast(`Limit of ${MAX_SEL} styles per linesheet`, 'error'); return s; } else n.add(id); return n; });
@@ -65,7 +67,7 @@ export default function LinesheetPage() {
       setCurrent(res); await refresh(); toast(current && !asNew ? 'Linesheet saved' : `Saved “${res.title}”`);
     } catch (e: any) { toast(e.message ?? 'Save failed', 'error'); } finally { setSaving(false); }
   };
-  const open = (ls: SavedLinesheet) => { setCurrent(ls); setDoc({ title: ls.title, ctx: ls.ctx === 'list' ? 'list' : 'customer', customerId: ls.customerId, priceListId: ls.priceListId, notes: ls.notes, showMsrp: ls.showMsrp, showMoq: ls.showMoq }); setSel(new Set(ls.itemIds)); setSeason(ls.season || 'all'); setDrawer(false); toast(`Opened “${ls.title}”`); };
+  const open = (ls: SavedLinesheet) => { setCurrent(ls); setDoc({ title: ls.title, ctx: ls.ctx === 'list' ? 'list' : 'customer', customerId: ls.customerId, priceListId: ls.priceListId, notes: ls.notes, showMsrp: ls.showMsrp, showMoq: ls.showMoq }); setSel(new Set(ls.itemIds)); setSeasons(new Set(!ls.season || ls.season === 'all' ? [] : ls.season.split(','))); setDrawer(false); toast(`Opened “${ls.title}”`); };
   const duplicate = async (ls: SavedLinesheet) => { const c = await linesheetApi.duplicate(ls.id); await refresh(); open(c); };
   const remove = async (ls: SavedLinesheet) => { await linesheetApi.remove(ls.id); if (current?.id === ls.id) setCurrent(null); await refresh(); toast('Linesheet deleted'); };
   const copyLink = async (ls: SavedLinesheet) => { await navigator.clipboard?.writeText(shareUrl(ls.shareToken)); toast('Share link copied — customers can open it without logging in'); };
@@ -86,13 +88,20 @@ export default function LinesheetPage() {
 
   return (
     <div className="ls" data-testid="linesheet-page">
+      <div className="ops-head">
+        <div className="ops-head-l"><p className="ops-kicker"><i />Tools</p><h1>Linesheet</h1><small className="ops-sub">Select styles, set the pricing context, then preview, print or share.</small></div>
+        <div className="ops-head-r">
+          <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
+          <button className="ops-btn dark" onClick={startNew} data-testid="ls-new-top"><FilePlus2 size={15} /> New Linesheet</button>
+        </div>
+      </div>
       <div className="ls-body">
         <section className="ls-card ls-catalog">
+          <div className="ls-pipe-head"><h2>Catalog <span className="ls-muted">{items.length} shown{sel.size > 0 ? ` · ${sel.size} selected` : ''}</span></h2></div>
           <div className="ls-toolbar">
-            <div className="ops-seg ls-seasons" role="tablist" data-testid="ls-season-seg">{['all', ...SEASONS].map((s) => <button key={s} className={season === s ? 'active' : ''} onClick={() => setSeason(s)} data-testid={`ls-season-${s}`}>{s === 'all' ? 'All' : s} <b>{CATALOG.filter((i) => s === 'all' || i.season === s).length}</b></button>)}</div>
+            <MultiSelect label="Seasons" testId="ls-season" value={seasons} onChange={setSeasons} options={SEASONS.map((s) => ({ value: s, label: s, count: CATALOG.filter((i) => i.season === s).length }))} />
             <label className="ls-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search product code or name…" data-testid="ls-search" />{q && <button onClick={() => setQ('')} aria-label="Clear"><X size={13} /></button>}</label>
-            <select className="ls-select" value={coll} onChange={(e) => setColl(e.target.value)} data-testid="ls-filter-collection"><option value="all">All collections</option>{collections.map((c) => <option key={c}>{c}</option>)}</select>
-            <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
+            <MultiSelect label="Collections" testId="ls-filter-collection" value={colls} onChange={setColls} options={collections.map((c) => ({ value: c, label: c, count: CATALOG.filter((i) => i.collection === c).length }))} />
           </div>
           <div className="ls-toolbar sub">
             <span className="ls-found" data-testid="ls-found"><b>{items.length}</b> products found{sel.size > 0 && <em> · {sel.size} selected</em>}</span>
@@ -108,8 +117,9 @@ export default function LinesheetPage() {
                 <span className="ls-check">{on && <Check size={14} strokeWidth={3} />}</span>
                 <span className="ls-thumb">{i.image ? <img src={i.image} alt="" loading="lazy" /> : <ImageOff size={26} strokeWidth={1.5} />}</span>
                 <span className="ls-item-body">
-                  <span className="ls-item-row"><em className="ls-season">{i.season}</em>{priced && !resolving && <b className="ls-price-chip">{fmt(priceFor(i, list))}{doc.showMsrp && <small>MSRP {fmt(i.msrp)}</small>}</b>}</span>
+                  <em className="ls-season">{i.season} · {i.collection}</em>
                   <strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small>
+                  {priced && !resolving && <span className="ls-item-price"><b>{fmt(priceFor(i, list))}</b>{doc.showMsrp && <small>MSRP {fmt(i.msrp)}</small>}</span>}
                 </span>
               </button>
             ); })}
@@ -198,7 +208,7 @@ export default function LinesheetPage() {
                   <div className="ls-saved-thumbs">{CATALOG.filter((i) => ls.itemIds.includes(i.id)).slice(0, 3).map((i) => <span key={i.id} className="ls-thumb xs">{i.image ? <img src={i.image} alt="" /> : <Box size={12} />}</span>)}</div>
                   <div className="ls-saved-main">
                     <strong>{ls.title}</strong>
-                    <small>{ls.itemIds.length} styles · {ls.ctx === 'customer' ? c?.name ?? 'No customer' : PRICE_LISTS.find((p) => p.id === ls.priceListId)?.name} · {ls.season === 'all' ? 'All seasons' : ls.season}</small>
+                    <small>{ls.itemIds.length} styles · {ls.ctx === 'customer' ? c?.name ?? 'No customer' : PRICE_LISTS.find((p) => p.id === ls.priceListId)?.name} · {!ls.season || ls.season === 'all' ? 'All seasons' : ls.season.replace(/,/g, ' · ')}</small>
                     <small className="ls-muted">Updated {rel(ls.updatedAt)} · {ls.views} view{ls.views === 1 ? '' : 's'}</small>
                   </div>
                   <div className="ls-saved-actions">

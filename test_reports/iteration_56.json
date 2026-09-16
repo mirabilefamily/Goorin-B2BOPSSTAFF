@@ -1,0 +1,45 @@
+{
+  "summary": "Frontend UI testing for Goorin Linesheet page after refactor (segmented pricing context toggle, Select all N, Show MSRP switch, MOQ removed). All target behaviors verified. Show MSRP switch works correctly on product cards, Selected list, and Preview doc. ls-ctx defaults to 'Price list' (active/aria-selected=true) with ls-pricelist visible. Select all correctly reflects filter (26 in SS27), toggles to 'Deselect all 26', and updates ls-found to '26 products found · 26 selected'. No 'Show MOQ' toggle present. No console errors observed on Linesheet page.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_evidence": {
+    "msrp_toggle": {
+      "default_checked": true,
+      "cards_with_MSRP_small_ON": 18,
+      "cards_with_MSRP_small_OFF": 0,
+      "cards_with_MSRP_small_toggled_back_ON": 18,
+      "selected_ls_msrp_count_ON": 26,
+      "selected_ls_msrp_count_OFF": 0,
+      "preview_ls_doc_contains_MSRP_when_ON": true
+    },
+    "ls_ctx": {
+      "ls_ctx_list_aria_selected_default": "true",
+      "ls_pricelist_visible_when_list": true
+    },
+    "select_all": {
+      "SS27_before": "Select all 26",
+      "SS27_after": "Deselect all 26",
+      "ls_found_after": "26 products found · 26 selected"
+    },
+    "show_moq_present": false,
+    "console_errors": "none on Linesheet page (Recharts width warnings only, from Dashboard route)"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "LinesheetPage.tsx has some very long lines (line 111, 172) making the JSX hard to maintain; consider extracting the Selected list row and product card price chip into small sub-components.",
+    "Preview route replaces the builder view — there is no easy in-app 'Escape' close; only 'Back to builder' button. Consider also closing on Escape."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password click 'Log in' → demo login (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet uses hash routing (#linesheet). Login is one-click with empty fields. MSRP switch is inside a label.ls-switch — click the label rather than the hidden checkbox to avoid 'outside viewport' errors. Preview replaces the builder view (Back to builder button); Escape does not close.",
+  "rca of the issue": "User-reported 'Show MSRP not working' — could NOT reproduce. Toggle correctly updates React state (doc.showMsrp) which drives both the .ls-price-chip <small>MSRP …</small> on cards, .ls-msrp small under the price in the Selected list rows, and 'MSRP …' in the ls-doc preview. Verified by direct DOM count assertions (18→0→18 chips, 26→0 .ls-msrp in selected)."
+}
