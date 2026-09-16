@@ -328,3 +328,20 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-attn-tags em.message { background: #eef1fb; color: #2952c8; }
 .is-attn-ignore { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); background: #fff; color: var(--ink-3); font-family: var(--ui); font-size: 11.5px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 999px; cursor: pointer; transition: background .16s, color .16s, border-color .16s; }
 .is-attn-ignore:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+/* customer messages inbox */
+.is-priority { background: linear-gradient(135deg, #f3f5fd 0%, #fff 55%); border-color: #dde3f5; }
+.is-priority .is-priority-badge { background: #e3e9fa; color: #2952c8; } .is-priority .is-kicker { color: #2952c8; }
+.is-priority-head { justify-content: space-between; } .is-priority-head > div { flex: 1; }
+.is-priority-head .is-attn-group { border-color: #d5dcf2; color: #2952c8; background: #fff; } .is-priority-head .is-attn-group svg { color: #8ea0dc; }
+.is-priority-head .is-attn-group.on { background: #2952c8; border-color: #2952c8; color: #fff; } .is-priority-head .is-attn-group.on svg { color: #fff; }
+.is-attn-msg { grid-template-columns: auto 1fr auto; align-items: flex-start; border-color: #e3e8f6; padding: 12px 14px; }
+.is-attn-msg:hover { border-color: #b9c6ee; box-shadow: 0 8px 20px -16px rgba(41,82,200,.45); }
+.is-attn-msg .is-mono-av { width: 34px; height: 34px; border-radius: 10px; font-size: 11.5px; background: linear-gradient(145deg, #eef1fb, #dfe4f5); color: #2952c8; }
+.is-attn-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.is-attn-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.is-attn-top strong { font-size: 13.5px; font-weight: 600; } .is-attn-top small { color: var(--ink-4); font-size: 12px; } .is-attn-top small .is-id { font-size: 11.5px; }
+.is-attn-top time { margin-left: auto; font-size: 11.5px; color: var(--ink-4); white-space: nowrap; }
+.is-attn-body q { quotes: none; display: block; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.is-attn-actions { display: inline-flex; gap: 6px; align-self: center; }
+.is-attn-reply { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #2952c8; background: #2952c8; color: #fff; font-family: var(--ui); font-size: 11.5px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 999px; cursor: pointer; transition: background .16s; }
+.is-attn-reply:hover { background: #1e3f9e; }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -69,6 +69,7 @@ export default function IntlShipmentsPage() {
   const [list, setList] = useState<Shipment[]>(SEED);
   const [tab, setTab] = useState<'shipments' | 'orders'>('shipments');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openTab, setOpenTab] = useState<DTab>('overview');
   const [q, setQ] = useState('');
   const [fStatus, setFStatus] = useState('all');
   const [fCustomer, setFCustomer] = useState('all');
@@ -91,14 +92,8 @@ export default function IntlShipmentsPage() {
     return true;
   }), [list, q, fStatus, fCustomer, fFactory, fMsg, ignored]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const reasons = (s: Shipment) => [
-    ...(s.status === 'prepayment' ? [{ id: 'prepayment', label: 'Awaiting prepayment' }] : []),
-    ...(s.status === 'draft' ? [{ id: 'draft', label: 'Needs packing list' }] : []),
-    ...(unanswered(s) ? [{ id: 'message', label: 'Customer message' }] : []),
-  ];
-  const attention = list.filter((s) => s.status !== 'invoiced' && reasons(s).length > 0);
+  const attention = list.filter((s) => unanswered(s)).sort((a, b) => Date.parse(b.msgs[b.msgs.length - 1].at) - Date.parse(a.msgs[a.msgs.length - 1].at));
   const ignoreMsg = (s: Shipment) => { const m = s.msgs[s.msgs.length - 1]; setIgnored((x) => new Set(x).add(`${s.id}:${m.id}`)); toast(`Message alert dismissed for ${s.id}`); };
-  const REASON_GROUPS = [{ id: 'prepayment', label: 'Awaiting prepayment' }, { id: 'draft', label: 'Needs packing list' }, { id: 'message', label: 'Customer communication' }];
   const open = list.find((s) => s.id === openId);
   const update = (id: string, fn: (s: Shipment) => Shipment) => setList((l) => l.map((s) => (s.id === id ? fn(s) : s)));
 
@@ -112,7 +107,7 @@ export default function IntlShipmentsPage() {
     setList((l) => [s, ...l]); setCreating(false); setForm({ customer: '', factory: '', so: '', po: '', ship: '' }); toast(`${id} created`); setOpenId(id);
   };
 
-  if (open) return <Detail s={open} onBack={() => setOpenId(null)} update={(fn) => update(open.id, fn)} />;
+  if (open) return <Detail key={`${open.id}-${openTab}`} s={open} initialTab={openTab} onBack={() => { setOpenId(null); setOpenTab('overview'); }} update={(fn) => update(open.id, fn)} />;
 
   const customers = Array.from(new Set(list.map((s) => s.customer)));
   const factories = Array.from(new Set(list.map((s) => s.factory)));
@@ -145,31 +140,28 @@ export default function IntlShipmentsPage() {
       <section className="is-strip" data-testid="is-priority-strip">
         <div className={`is-card is-priority ${attention.length === 0 ? 'clear' : ''}`}>
           <div className="is-priority-head">
-            <span className="is-priority-badge"><AlertTriangle size={14} /></span>
+            <span className="is-priority-badge"><MessageSquare size={14} /></span>
             <div>
-              <p className="is-kicker">{attention.length === 0 ? 'All clear' : 'Needs attention'}</p>
-              <strong>{attention.length === 0 ? 'Nothing needs your attention right now' : `${attention.length} shipment${attention.length === 1 ? '' : 's'} need${attention.length === 1 ? 's' : ''} attention`}</strong>
+              <p className="is-kicker">{attention.length === 0 ? 'Inbox clear' : 'Customer messages'}</p>
+              <strong>{attention.length === 0 ? 'Every customer message has been answered' : `${attention.length} unanswered message${attention.length === 1 ? '' : 's'}`}</strong>
             </div>
+            {attention.length > 0 && <button className={`is-attn-group ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message">{fMsg ? 'Showing in pipeline' : 'Filter pipeline'}<ChevronRight size={14} /></button>}
           </div>
           <div className="is-priority-list">
-            {REASON_GROUPS.map((g) => { const n = attention.filter((s) => reasons(s).some((r) => r.id === g.id)).length; const on = g.id === 'message' ? fMsg : fStatus === g.id; return n > 0 && (
-              <button key={g.id} className={`is-attn-group ${on ? 'on' : ''}`} onClick={() => g.id === 'message' ? setFMsg((v) => !v) : setFStatus(fStatus === g.id ? 'all' : g.id)} data-testid={`is-attn-group-${g.id}`}><b>{n}</b> {g.label}<ChevronRight size={14} /></button>
-            ); })}
-          </div>
-          <div className="is-priority-list">
-            {attention.slice().sort((a, b) => (daysTo(a.ship) ?? 9e9) - (daysTo(b.ship) ?? 9e9)).slice(0, 3).map((s) => (
-              <div key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
-                <b>{s.id}</b>
-                <span className="is-attn-who">{s.customer}<small>{s.factory}</small></span>
-                <ShipChip s={s} />
-                <span className="is-attn-tags">
-                  {reasons(s).map((r) => <em key={r.id} className={r.id}>{r.id === 'message' && <MessageSquare size={11} />}{r.label}</em>)}
-                  {unanswered(s) && <button className="is-attn-ignore" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title={`"${s.msgs[s.msgs.length - 1].text}"`} data-testid={`is-attn-ignore-${s.id}`}><Check size={12} /> Ignore</button>}
+            {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return (
+              <div key={s.id} className="is-attn is-attn-msg" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
+                <i className="is-mono-av">{mono(m.who)}</i>
+                <span className="is-attn-body">
+                  <span className="is-attn-top"><strong>{m.who}</strong><small>{s.customer} · <b className="is-id">{s.id}</b></small><time>{m.at}</time></span>
+                  <q>{m.text}</q>
                 </span>
-                <ChevronRight size={15} />
+                <span className="is-attn-actions">
+                  <button className="is-attn-reply" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}><MessageSquare size={12} /> Reply</button>
+                  <button className="is-attn-ignore" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={12} /> Ignore</button>
+                </span>
               </div>
-            ))}
-            {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFStatus('prepayment')} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
+            ); })}
+            {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFMsg(true)} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
           </div>
         </div>
         <div className="is-card is-kpis">
@@ -262,11 +254,12 @@ export default function IntlShipmentsPage() {
 
 const mono = (n: string) => { const w = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); return (w.length > 1 ? w.slice(0, 2).map((x) => x[0]).join('') : (w[0] ?? '?').slice(0, 2)).toUpperCase(); };
 
-function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update: (fn: (s: Shipment) => Shipment) => void }) {
+type DTab = 'overview' | 'booking' | 'chat' | 'docs' | 'activity';
+function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; onBack: () => void; update: (fn: (s: Shipment) => Shipment) => void; initialTab?: DTab }) {
   const toast = useToast();
   const [msg, setMsg] = useState('');
   const [menu, setMenu] = useState(false);
-  const [dtab, setDtab] = useState<'overview' | 'booking' | 'chat' | 'docs' | 'activity'>('overview');
+  const [dtab, setDtab] = useState<DTab>(initialTab);
   const idx = stepIdx(s.status);
   const total = soTotal(s);
   const stamp = () => new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' });
