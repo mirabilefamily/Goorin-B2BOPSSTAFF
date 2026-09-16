@@ -116,12 +116,7 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <div className="ops-head">
-        <div className="ops-head-l">
-          <p className="ops-kicker"><i />Tools</p>
-          <h1>Intl Shipments</h1>
-          <small className="ops-sub">Factory-direct shipments from purchase order to invoice.</small>
-        </div>
+      <div className="ops-head ops-head-slim">
         <div className="ops-head-r">
           <div className="ops-seg" role="tablist">
             <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>

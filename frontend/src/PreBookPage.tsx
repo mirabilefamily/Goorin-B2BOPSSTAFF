@@ -217,12 +217,7 @@ export default function PreBookPage({ onNavigate }: Props) {
   return (
     <div className="pb" data-testid="prebook-page">
       {/* top bar */}
-      <div className="ops-head">
-        <div className="ops-head-l">
-          <p className="ops-kicker"><i />Tools</p>
-          <h1>Pre-Book Review</h1>
-          <small className="ops-sub">Track demand, MOQ health and orders for every season drop.</small>
-        </div>
+      <div className="ops-head ops-head-slim">
         <div className="ops-head-r">
           <div className="ops-seg" role="tablist">
             <button role="tab" aria-selected={tab === 'review'} className={tab === 'review' ? 'active' : ''} onClick={() => setTab('review')} data-testid="pb-tab-review">Review <b>{SEASONS.filter((x) => !x.archived).reduce((a, x) => a + x.drops.filter((d) => d.status === 'open').length, 0)}</b></button>
