@@ -304,3 +304,6 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-route-line { width: 96px; }
 .is-activity li span { display: block; margin-top: 2px; }
 .is-crumbs { min-height: 28px; }
+.is-route .is-route-line { width: 96px; height: 2px; background: linear-gradient(90deg, #c9d3ce, var(--green)); }
+.is-route .is-route-line::after { display: none; }
+.is-route .is-mono-av { background: linear-gradient(145deg, #eef4f1, #dfe9e4); } .is-route .is-mono-av::after { display: none; } .is-route .is-mono-av.fac { background: linear-gradient(145deg, #eef1fb, #dfe4f5); }

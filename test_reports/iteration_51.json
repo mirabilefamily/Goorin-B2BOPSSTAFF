@@ -1,0 +1,26 @@
+{
+  "summary": "Frontend-only regression of Intl Shipments detail view (IS-0011/0012/0010). All specified detail-view features work: breadcrumb + is-back navigation, hero with monogram avatars (SA / HH) and route line, 5 fact tiles (Ship date+chip, Mode·Incoterms Air/FOB·USD, Units 700 · 2 lines, Declared $6,370, Prepayment $3,182.50 50% of value), numbered 7-step stepper, segmented ops-seg tabs, Parties card with copy-to-clipboard and icon buttons, Prepayment card with progress bar + paid/outstanding legend, activity timeline with title/timestamp/detail/avatar+author. is-hero-message switches to Conversation tab. is-advance ('Mark prepaid') correctly advances: chips collapse to 'Prepaid', 'Blocked on payment' chip disappears, step 5 becomes 'now/In progress', prepayment fact tile switches class 'a'→'g' with '· received' label. Booking tab shows Received chip, 50% progress bar, legend $3,182.50 paid / $3,187.50 outstanding. IS-0012 (Prepaid) and IS-0010 (Shipped) detail pages open cleanly. No horizontal overflow at 1920x800. No console errors when clipboard permission granted.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Parties → Copy buyer email", "issue": "navigator.clipboard.writeText() promise rejection is unhandled when browser denies clipboard permission (e.g., insecure/iframe context). This surfaces CRA 'Uncaught runtime error' overlay covering the UI. The toast still fires but the overlay blocks further interaction until dismissed. Wrap with .catch() or try/catch and toast an error instead.", "affected_selectors": ["[data-testid='is-copy-buyer']", ".is-party .is-copy"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Add .catch() to both navigator.clipboard?.writeText(...) calls in Detail() (is-copy-buyer and factory email copy) to prevent unhandled promise rejection surfacing as a runtime error overlay when clipboard access is denied. Example: navigator.clipboard?.writeText(s.buyer).then(() => toast('Email copied')).catch(() => toast('Copy failed','error'));"
+  ],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 429 lines and contains both list and Detail components; consider splitting Detail into its own file for maintainability.",
+    "Clipboard writes are fire-and-forget without error handling — will crash dev overlay in restricted contexts."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "95%"},
+  "test_credentials": "Empty email + empty password (demo login as ryan@mirabile.com) per /app/memory/test_credentials.md",
+  "seed_data_creation": "None; used mocked SEED shipments IS-0010/0011/0012.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Detail view iteration_51 passed all functional checks. Only minor: clipboard unhandled rejection causes dev overlay. Rows verified: IS-0012 (prepaid), IS-0011 (prepayment), IS-0010 (shipped). Tests were run with browser clipboard permission granted; without it, CRA error overlay appears after copy click."
+}
