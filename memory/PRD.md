@@ -128,3 +128,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Shipment detail v3 (iteration_51): breadcrumb, hero avatars + route line, 5 fact tiles, segmented tabs, Parties card w/ actions, Prepayment progress bar, richer activity timeline.
 - 2026-06 Detail back button v2: pill w/ animated arrow, breadcrumb path, Esc key returns to list.
 - 2026-06 Dashboard goal card v3: minimal (big number, single progress bar w/ pace tick, one meta line, 2 segment rows); gauge removed. Dashboard header block removed.
+- 2026-06 Goal card v4: stacked segment bar (US + Dist) w/ pace tick, 67% pill in header, single status line, compact breakdown rows (no per-row bars).

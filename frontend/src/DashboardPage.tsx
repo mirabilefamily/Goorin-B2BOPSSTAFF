@@ -180,20 +180,22 @@ export default function DashboardPage({ onNavigate }: Props) {
         </div>
 
         <aside className="rv-hero-goal" data-testid="rv-goal-card">
-          <p className="rv-eyebrow">Annual goal</p>
+          <div className="rv-goal-head"><p className="rv-eyebrow">Annual goal</p><span className="rv-goal-pct-big" data-testid="rv-goal-pct">{h.goalPct}%</span></div>
           <div className="rv-goal-nums">
-            <strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong>
-            <span>of {compact(h.goalTarget)}</span>
+            <strong>{compact(h.goalCur)}</strong>
+            <span>of {compact(h.goalTarget)} · {compact(h.goalTarget - h.goalCur)} to go</span>
           </div>
-          <div className="rv-goal-bar" aria-hidden="true"><i style={{ width: `${h.goalPct}%` }} /><u style={{ left: `${h.pace}%` }}><span>Pace {h.pace}%</span></u></div>
-          <div className="rv-goal-meta"><span><b>{h.goalPct}%</b> of goal</span><em className={gap >= 0 ? 'ok' : 'behind'}>{gap >= 0 ? `${gap} pts ahead` : `${Math.abs(gap)} pts behind`}</em></div>
+          <div className="rv-goal-stack" aria-hidden="true">
+            {SEGMENTS.map((sg) => <i key={sg.key} style={{ width: `${(sg.invoiced / h.goalTarget) * 100}%`, background: sg.color }} />)}
+            <u style={{ left: `${h.pace}%` }}><span>Pace {h.pace}%</span></u>
+          </div>
+          <p className={`rv-goal-status ${gap >= 0 ? 'ok' : 'behind'}`}><i />{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</p>
           <div className="rv-goal-split">
             {SEGMENTS.map((sg) => (
               <div className="rv-goal-split-row" key={sg.key} data-testid={`rv-segment-${sg.key}`}>
                 <span><i style={{ background: sg.color }} />{sg.name}</span>
                 <b>{compact(sg.invoiced)}</b>
-                <em>{sg.pct}%</em>
-                <div className="rv-goal-split-bar"><i style={{ width: `${sg.pct}%`, background: sg.color }} /><u style={{ left: `${h.pace}%` }} /></div>
+                <em>{sg.pct}%<small>of goal</small></em>
               </div>
             ))}
           </div>
