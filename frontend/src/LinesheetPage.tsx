@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, Copy, Download, Eye, FilePlus2, FolderOpen, ImageOff, Link2, Loader2, Printer, Save, Search, Trash2, X, Box, Files } from 'lucide-react';
+import { ArrowLeft, Check, CheckSquare, ChevronLeft, ChevronRight, Copy, Download, Eye, FilePlus2, FolderOpen, ImageOff, Link2, Loader2, Printer, Save, Search, Square, Trash2, X, Box, Files } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { CATALOG, LS_CUSTOMERS, PRICE_LISTS, SEASONS, fmt, priceFor, type PriceList } from './lib/linesheet';
 import { linesheetApi, shareUrl, type LinesheetInput, type SavedLinesheet } from './lib/linesheetApi';
@@ -82,16 +82,16 @@ export default function LinesheetPage() {
       <div className="ls-body">
         <section className="ls-card ls-catalog">
           <div className="ls-toolbar">
+            <div className="ops-seg ls-seasons" role="tablist" data-testid="ls-season-seg">{['all', ...SEASONS].map((s) => <button key={s} className={season === s ? 'active' : ''} onClick={() => setSeason(s)} data-testid={`ls-season-${s}`}>{s === 'all' ? 'All' : s} <b>{CATALOG.filter((i) => s === 'all' || i.season === s).length}</b></button>)}</div>
             <label className="ls-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search product code or name…" data-testid="ls-search" />{q && <button onClick={() => setQ('')} aria-label="Clear"><X size={13} /></button>}</label>
-            <select className="ls-select" value={season} onChange={(e) => setSeason(e.target.value)} data-testid="ls-season"><option value="all">All seasons</option>{SEASONS.map((s) => <option key={s}>{s}</option>)}</select>
             <select className="ls-select" value={coll} onChange={(e) => setColl(e.target.value)} data-testid="ls-filter-collection"><option value="all">All collections</option>{collections.map((c) => <option key={c}>{c}</option>)}</select>
             <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
           </div>
           <div className="ls-toolbar sub">
-            <span className="ls-found" data-testid="ls-found">{items.length} products found</span>
+            <span className="ls-found" data-testid="ls-found"><b>{items.length}</b> products found{sel.size > 0 && <em> · {sel.size} selected</em>}</span>
             <span className="ls-spacer" />
-            <button className="ops-btn" onClick={selectPage} data-testid="ls-select-page">{pageAllOn ? 'Deselect visible page' : 'Select visible page'}</button>
-            {sel.size > 0 && <button className="ls-link danger" onClick={() => setSel(new Set())} data-testid="ls-clear">Clear selection</button>}
+            <button className="ls-link" onClick={selectPage} data-testid="ls-select-page">{pageAllOn ? <CheckSquare size={15} /> : <Square size={15} />} {pageAllOn ? 'Deselect visible page' : 'Select visible page'}</button>
+            {sel.size > 0 && <button className="ls-link danger" onClick={() => setSel(new Set())} data-testid="ls-clear"><X size={14} /> Clear selection</button>}
           </div>
           {items.length === 0 && <p className="ls-empty">No styles match these filters.</p>}
           <div className="ls-grid">
@@ -99,7 +99,10 @@ export default function LinesheetPage() {
               <button key={i.id} className={`ls-item ${on ? 'on' : ''}`} onClick={() => toggle(i.id)} aria-pressed={on} data-testid={`ls-item-${i.id}`}>
                 <span className="ls-check">{on && <Check size={14} strokeWidth={3} />}</span>
                 <span className="ls-thumb">{i.image ? <img src={i.image} alt="" loading="lazy" /> : <ImageOff size={26} strokeWidth={1.5} />}</span>
-                <span className="ls-item-body"><em className="ls-season">{i.season}</em><strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small></span>
+                <span className="ls-item-body">
+                  <span className="ls-item-row"><em className="ls-season">{i.season}</em>{priced && !resolving && <b className="ls-price-chip">{fmt(priceFor(i, list))}</b>}</span>
+                  <strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small>
+                </span>
               </button>
             ); })}
           </div>
@@ -147,7 +150,14 @@ export default function LinesheetPage() {
             <label className="ls-field"><span>Notes for customer</span><textarea rows={2} value={doc.notes} onChange={(e) => setDoc({ ...doc, notes: e.target.value })} placeholder="Terms, delivery window, contact…" data-testid="ls-notes" /></label>
 
             <div className="ls-sel-head"><h2>Selected <span data-testid="ls-selected-count">({chosen.length}/{MAX_SEL})</span></h2>{resolving && <Loader2 size={15} className="ls-spin" />}</div>
-            {chosen.length === 0 && <p className="ls-muted">Select styles from the catalog to build the linesheet.</p>}
+            {chosen.length > 0 && (
+              <div className="ls-stats">
+                <div><small>Styles</small><strong>{chosen.length}</strong></div>
+                <div><small>Avg wholesale</small><strong>{priced && !resolving ? fmt(chosen.reduce((a, i) => a + priceFor(i, list), 0) / chosen.length) : '—'}</strong></div>
+                <div><small>Seasons</small><strong>{Array.from(new Set(chosen.map((i) => i.season))).join(' · ')}</strong></div>
+              </div>
+            )}
+            {chosen.length === 0 && <div className="ls-empty-sel"><ImageOff size={20} strokeWidth={1.5} /><p>No styles yet</p><small>Click product cards in the catalog to add them here.</small></div>}
             <ul className="ls-picked" data-testid="ls-picked">
               {chosen.map((i) => <li key={i.id}><span className="ls-thumb xs">{i.image ? <img src={i.image} alt="" /> : <Box size={12} />}</span><span><strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small></span><b className={priced && !resolving ? '' : 'pending'}>{!priced ? 'Select customer' : resolving ? 'Price pending' : fmt(priceFor(i, list))}</b><button onClick={() => toggle(i.id)} aria-label={`Remove ${i.name}`} data-testid={`ls-remove-${i.id}`}><Trash2 size={14} /></button></li>)}
             </ul>
