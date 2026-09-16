@@ -10,7 +10,7 @@ import './linesheet.css';
 type Ctx = 'customer' | 'list';
 type Doc = { title: string; ctx: Ctx; customerId: string; priceListId: string; notes: string; showMsrp: boolean; showMoq: boolean };
 const PAGE = 18; const MAX_SEL = 120;
-const EMPTY: Doc = { title: 'Linesheet', ctx: 'customer', customerId: '', priceListId: 'usw', notes: '', showMsrp: true, showMoq: false };
+const EMPTY: Doc = { title: 'Linesheet', ctx: 'list', customerId: '', priceListId: 'usw', notes: '', showMsrp: true, showMoq: false };
 const rel = (iso: string) => { const m = Math.round((Date.now() - Date.parse(iso)) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.round(m / 60)}h ago` : `${Math.round(m / 1440)}d ago`; };
 
 export default function LinesheetPage() {
@@ -49,6 +49,13 @@ export default function LinesheetPage() {
   const toggle = (id: string) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else if (n.size >= MAX_SEL) { toast(`Limit of ${MAX_SEL} styles per linesheet`, 'error'); return s; } else n.add(id); return n; });
   const pageAllOn = visible.length > 0 && visible.every((i) => sel.has(i.id));
   const selectPage = () => setSel((s) => { const n = new Set(s); visible.forEach((i) => (pageAllOn ? n.delete(i.id) : n.add(i.id))); return n; });
+  const allOn = items.length > 0 && items.every((i) => sel.has(i.id));
+  const selectAll = () => setSel((s) => {
+    const n = new Set(s);
+    if (allOn) { items.forEach((i) => n.delete(i.id)); return n; }
+    for (const i of items) { if (n.size >= MAX_SEL) { toast(`Selected the first ${MAX_SEL} — limit per linesheet`, 'error'); break; } n.add(i.id); }
+    return n;
+  });
 
   const save = async (asNew = false) => {
     if (!chosen.length) return toast('Select at least one style first', 'error');
@@ -91,6 +98,7 @@ export default function LinesheetPage() {
             <span className="ls-found" data-testid="ls-found"><b>{items.length}</b> products found{sel.size > 0 && <em> · {sel.size} selected</em>}</span>
             <span className="ls-spacer" />
             <button className="ls-link" onClick={selectPage} data-testid="ls-select-page">{pageAllOn ? <CheckSquare size={15} /> : <Square size={15} />} {pageAllOn ? 'Deselect visible page' : 'Select visible page'}</button>
+            <button className="ls-link" onClick={selectAll} data-testid="ls-select-all" disabled={items.length === 0}>{allOn ? <CheckSquare size={15} /> : <Square size={15} />} {allOn ? `Deselect all ${items.length}` : `Select all ${items.length}`}</button>
             {sel.size > 0 && <button className="ls-link danger" onClick={() => setSel(new Set())} data-testid="ls-clear"><X size={14} /> Clear selection</button>}
           </div>
           {items.length === 0 && <p className="ls-empty">No styles match these filters.</p>}
@@ -100,7 +108,7 @@ export default function LinesheetPage() {
                 <span className="ls-check">{on && <Check size={14} strokeWidth={3} />}</span>
                 <span className="ls-thumb">{i.image ? <img src={i.image} alt="" loading="lazy" /> : <ImageOff size={26} strokeWidth={1.5} />}</span>
                 <span className="ls-item-body">
-                  <span className="ls-item-row"><em className="ls-season">{i.season}</em>{priced && !resolving && <b className="ls-price-chip">{fmt(priceFor(i, list))}</b>}</span>
+                  <span className="ls-item-row"><em className="ls-season">{i.season}</em>{priced && !resolving && <b className="ls-price-chip">{fmt(priceFor(i, list))}{doc.showMsrp && <small>MSRP {fmt(i.msrp)}</small>}</b>}</span>
                   <strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small>
                 </span>
               </button>
@@ -122,9 +130,12 @@ export default function LinesheetPage() {
               {current ? <span className="ls-draft" data-testid="ls-draft-badge"><Save size={12} /> {dirty ? 'Unsaved changes' : `Saved ${rel(current.updatedAt)}`}</span> : <span className="ls-draft muted">New draft</span>}
             </div>
             <label className="ls-field"><span>Document title</span><input maxLength={200} value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} data-testid="ls-title" /><small className="ls-hint">Up to 200 characters<b>{doc.title.length}/200</b></small></label>
-            <label className="ls-field"><span>Pricing context</span>
-              <select value={doc.ctx} onChange={(e) => setDoc({ ...doc, ctx: e.target.value as Ctx })} data-testid="ls-ctx"><option value="customer">Customer</option><option value="list">Price list</option></select>
-            </label>
+            <div className="ls-field"><span>Pricing context</span>
+              <div className="ops-seg ls-ctx-seg" role="tablist" data-testid="ls-ctx">
+                <button role="tab" aria-selected={doc.ctx === 'list'} className={doc.ctx === 'list' ? 'active' : ''} onClick={() => setDoc({ ...doc, ctx: 'list' })} data-testid="ls-ctx-list">Price list</button>
+                <button role="tab" aria-selected={doc.ctx === 'customer'} className={doc.ctx === 'customer' ? 'active' : ''} onClick={() => setDoc({ ...doc, ctx: 'customer' })} data-testid="ls-ctx-customer">Customer</button>
+              </div>
+            </div>
             {doc.ctx === 'customer' ? (
               <div className="ls-field">
                 <span>Customer</span>
@@ -144,8 +155,7 @@ export default function LinesheetPage() {
               </label>
             )}
             <div className="ls-toggles">
-              <label><input type="checkbox" checked={doc.showMsrp} onChange={(e) => setDoc({ ...doc, showMsrp: e.target.checked })} data-testid="ls-toggle-msrp" /><span className="ls-box"><Check size={11} strokeWidth={3} /></span> Show MSRP</label>
-              <label><input type="checkbox" checked={doc.showMoq} onChange={(e) => setDoc({ ...doc, showMoq: e.target.checked })} data-testid="ls-toggle-moq" /><span className="ls-box"><Check size={11} strokeWidth={3} /></span> Show MOQ & delivery</label>
+              <label className="ls-switch"><span>Show MSRP<small>Retail price next to wholesale on cards and the PDF</small></span><input type="checkbox" checked={doc.showMsrp} onChange={(e) => setDoc({ ...doc, showMsrp: e.target.checked })} data-testid="ls-toggle-msrp" /><i className="ls-track" /></label>
             </div>
             <label className="ls-field"><span>Notes for customer</span><textarea rows={2} value={doc.notes} onChange={(e) => setDoc({ ...doc, notes: e.target.value })} placeholder="Terms, delivery window, contact…" data-testid="ls-notes" /></label>
 
@@ -159,7 +169,7 @@ export default function LinesheetPage() {
             )}
             {chosen.length === 0 && <div className="ls-empty-sel"><ImageOff size={20} strokeWidth={1.5} /><p>No styles yet</p><small>Click product cards in the catalog to add them here.</small></div>}
             <ul className="ls-picked" data-testid="ls-picked">
-              {chosen.map((i) => <li key={i.id}><span className="ls-thumb xs">{i.image ? <img src={i.image} alt="" /> : <Box size={12} />}</span><span><strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small></span><b className={priced && !resolving ? '' : 'pending'}>{!priced ? 'Select customer' : resolving ? 'Price pending' : fmt(priceFor(i, list))}</b><button onClick={() => toggle(i.id)} aria-label={`Remove ${i.name}`} data-testid={`ls-remove-${i.id}`}><Trash2 size={14} /></button></li>)}
+              {chosen.map((i) => <li key={i.id}><span className="ls-thumb xs">{i.image ? <img src={i.image} alt="" /> : <Box size={12} />}</span><span><strong>{i.name} | {i.color} | {i.size}</strong><small>{i.sku}</small></span><b className={priced && !resolving ? '' : 'pending'}>{!priced ? 'Select customer' : resolving ? 'Price pending' : <>{fmt(priceFor(i, list))}{doc.showMsrp && <small className="ls-msrp">MSRP {fmt(i.msrp)}</small>}</>}</b><button onClick={() => toggle(i.id)} aria-label={`Remove ${i.name}`} data-testid={`ls-remove-${i.id}`}><Trash2 size={14} /></button></li>)}
             </ul>
           </div>
           <div className="ls-actions ls-actions-save">
