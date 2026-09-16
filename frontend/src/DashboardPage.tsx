@@ -111,23 +111,6 @@ function RevTooltip({ active, payload, label }: any) {
   );
 }
 
-function Gauge({ pct, pace }: { pct: number; pace: number }) {
-  const r = 54; const c = 2 * Math.PI * r;
-  const a = (pace / 100) * 360 - 90;
-  const px = 64 + 61 * Math.cos((a * Math.PI) / 180); const py = 64 + 61 * Math.sin((a * Math.PI) / 180);
-  return (
-    <div className="rv-gauge-wrap">
-      <svg className="rv-gauge" viewBox="0 0 128 128" aria-hidden="true">
-        <defs><linearGradient id="gGauge" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#34b98f" /><stop offset="100%" stopColor="#0b6e50" /></linearGradient></defs>
-        <circle cx="64" cy="64" r={r} fill="none" stroke="#eef1ef" strokeWidth="11" />
-        <circle cx="64" cy="64" r={r} fill="none" stroke="url(#gGauge)" strokeWidth="11" strokeLinecap="round" strokeDasharray={`${(pct / 100) * c} ${c}`} transform="rotate(-90 64 64)" className="rv-gauge-arc" />
-        <line x1={64 + 46 * Math.cos((a * Math.PI) / 180)} y1={64 + 46 * Math.sin((a * Math.PI) / 180)} x2={px} y2={py} stroke="#e39a1c" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-      <div className="rv-gauge-label"><strong className="rv-gauge-num">{pct}%</strong><small className="rv-gauge-cap">of goal</small></div>
-    </div>
-  );
-}
-
 const RANGES: { id: 'ytd' | '12m' | 'q'; label: string }[] = [
   { id: 'ytd', label: 'YTD' },
   { id: '12m', label: '12M' },
@@ -198,9 +181,12 @@ export default function DashboardPage({ onNavigate }: Props) {
 
         <aside className="rv-hero-goal" data-testid="rv-goal-card">
           <p className="rv-eyebrow">Annual goal</p>
-          <Gauge pct={h.goalPct} pace={h.pace} />
-          <div className="rv-goal-line"><strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong><span>of {compact(h.goalTarget)}</span></div>
-          <em className={`rv-pace-badge ${gap >= 0 ? 'ok' : 'behind'}`}>{gap >= 0 ? `${gap} pts ahead of pace` : `${Math.abs(gap)} pts behind pace`}</em>
+          <div className="rv-goal-nums">
+            <strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong>
+            <span>of {compact(h.goalTarget)}</span>
+          </div>
+          <div className="rv-goal-bar" aria-hidden="true"><i style={{ width: `${h.goalPct}%` }} /><u style={{ left: `${h.pace}%` }} /></div>
+          <div className="rv-goal-meta"><span><b>{h.goalPct}%</b> of goal</span><span className={gap >= 0 ? 'ok' : 'behind'}>{gap >= 0 ? `${gap} pts ahead` : `${Math.abs(gap)} pts behind`} · pace {h.pace}%</span></div>
           <div className="rv-goal-split">
             {SEGMENTS.map((sg) => (
               <div className="rv-goal-split-row" key={sg.key} data-testid={`rv-segment-${sg.key}`}>
