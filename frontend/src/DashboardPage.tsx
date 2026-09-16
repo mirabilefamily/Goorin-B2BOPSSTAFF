@@ -185,8 +185,8 @@ export default function DashboardPage({ onNavigate }: Props) {
             <strong data-testid="rv-goal-pct">{compact(h.goalCur)}</strong>
             <span>of {compact(h.goalTarget)}</span>
           </div>
-          <div className="rv-goal-bar" aria-hidden="true"><i style={{ width: `${h.goalPct}%` }} /><u style={{ left: `${h.pace}%` }} /></div>
-          <div className="rv-goal-meta"><span><b>{h.goalPct}%</b> of goal</span><span className={gap >= 0 ? 'ok' : 'behind'}>{gap >= 0 ? `${gap} pts ahead` : `${Math.abs(gap)} pts behind`} · pace {h.pace}%</span></div>
+          <div className="rv-goal-bar" aria-hidden="true"><i style={{ width: `${h.goalPct}%` }} /><u style={{ left: `${h.pace}%` }}><span>Pace {h.pace}%</span></u></div>
+          <div className="rv-goal-meta"><span><b>{h.goalPct}%</b> of goal</span><em className={gap >= 0 ? 'ok' : 'behind'}>{gap >= 0 ? `${gap} pts ahead` : `${Math.abs(gap)} pts behind`}</em></div>
           <div className="rv-goal-split">
             {SEGMENTS.map((sg) => (
               <div className="rv-goal-split-row" key={sg.key} data-testid={`rv-segment-${sg.key}`}>
