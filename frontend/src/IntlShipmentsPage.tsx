@@ -55,6 +55,8 @@ const soTotal = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty * l.unit, 0)
 const poTotal = (s: Shipment) => Math.round(soTotal(s) * 0.4076 * 100) / 100;
 const units = (s: Shipment) => s.lines.reduce((a, l) => a + l.qty, 0);
 const stepIdx = (st: Status) => STEPS.findIndex((x) => x.id === st);
+const DSTEPS = [{ id: 'draft', label: 'Draft' }, { id: 'ready', label: 'Ready' }, { id: 'booking', label: 'Booking & payment' }, { id: 'prepaid', label: 'Released' }, { id: 'shipped', label: 'Shipped' }, { id: 'invoiced', label: 'Invoiced' }];
+const dStepIdx = (st: Status) => DSTEPS.findIndex((x) => x.id === (st === 'instructions' || st === 'prepayment' ? 'booking' : st));
 const daysTo = (d: string) => { const [m, dd, y] = d.split('-').map(Number); if (!y) return null; return Math.ceil((new Date(y, m - 1, dd).getTime() - Date.now()) / 86_400_000); };
 function ShipChip({ s }: { s: Shipment }) {
   if (s.status === 'shipped' || s.status === 'invoiced') return <em className="is-ship ok">Shipped {s.ship}</em>;
@@ -275,6 +277,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
   };
   const cta = idx < STEPS.length - 1 ? (s.status === 'prepayment' ? 'Mark prepaid' : s.status === 'prepaid' ? 'Mark shipped' : s.status === 'shipped' ? 'Mark invoiced' : s.status === 'ready' ? 'Send instructions' : s.status === 'instructions' ? 'Request prepayment' : 'Mark ready') : null;
   const nextLabel = idx < STEPS.length - 1 ? STEPS[idx + 1].label : null;
+  const didx = dStepIdx(s.status);
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && !menu) onBack(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onBack, menu]);
   const tabs = [
     { id: 'overview', label: 'Overview', Icon: LayoutGrid }, { id: 'booking', label: 'Booking & payment', Icon: Truck }, { id: 'chat', label: 'Conversation', Icon: MessageSquare, n: s.msgs.length },
@@ -316,12 +319,16 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
           <div><small>Declared value</small><strong>{money(total)}</strong><span className="is-fact-sub">Commercial invoice</span></div>
           <div><small>Prepayment</small><strong>{money(s.prepay)}</strong><span className={`is-fact-sub ${idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}`}>{idx >= stepIdx('prepaid') ? 'Received · 50%' : idx === stepIdx('prepayment') ? 'Due · 50%' : 'Not yet due · 50%'}</span></div>
         </div>
-        <ol className="is-steps is-steps--flat" data-testid="is-stepper">
-          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx ? <Check size={12} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{i < idx ? 'Done' : i === idx ? (st.id === 'prepayment' ? 'Payment due' : 'In progress') : 'Upcoming'}</small></li>)}
+        <ol className="is-steps is-steps--flat is-steps--6" data-testid="is-stepper">
+          {DSTEPS.map((st, i) => {
+            const cls = i < didx ? 'done' : i === didx ? 'now' : '';
+            const sub = i < didx ? 'Done' : i > didx ? 'Upcoming' : st.id === 'booking' ? (s.status === 'instructions' ? '1 of 2 · Instructions' : '1 of 2 · Payment due') : 'In progress';
+            return <li key={st.id} className={cls}><i>{i < didx ? <Check size={12} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{sub}</small></li>;
+          })}
         </ol>
         <div className="is-dfoot">
-          <span>Stage {idx + 1} of {STEPS.length} · {Math.round(((idx + 1) / STEPS.length) * 100)}%</span>
-          {nextLabel && <><i /><span><b className="is-next-tag">Next</b><strong>{nextLabel}</strong>{cta ? `${cta} when ready.` : ''}</span></>}
+          <span>Stage {didx + 1} of {DSTEPS.length} · {Math.round(((didx + 1) / DSTEPS.length) * 100)}%</span>
+          {nextLabel && <><i /><span><b className="is-next-tag">Next</b><strong>{didx < DSTEPS.length - 1 ? DSTEPS[didx + 1].label : nextLabel}</strong>{s.status === 'instructions' ? 'One item left: payment due.' : cta ? `${cta} when ready.` : ''}</span></>}
         </div>
       </section>
 

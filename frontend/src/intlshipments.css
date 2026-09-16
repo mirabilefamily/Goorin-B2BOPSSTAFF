@@ -370,3 +370,4 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-dfoot span { display: inline-flex; align-items: center; gap: 8px; } .is-dfoot strong { color: var(--ink); font-weight: 600; }
 .is-next-tag { font-family: var(--ui); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: #fff; padding: 3px 8px; border-radius: 6px; }
 @media (max-width: 1280px) { .is-dfacts--flat { grid-template-columns: repeat(3, 1fr) !important; row-gap: 18px; } .is-dfacts--flat > div:nth-child(3n) { border-right: none; } }
+.is-steps--6 { grid-template-columns: repeat(6, 1fr); }
