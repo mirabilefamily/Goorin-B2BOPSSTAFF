@@ -71,6 +71,7 @@ import DashboardPage from './DashboardPage';
 import MarketplacePage from './MarketplacePage';
 import CheckoutPage from './CheckoutPage';
 import PreBookPage from './PreBookPage';
+import LinesheetPage from './LinesheetPage';
 import MyOrdersPage from './MyOrdersPage';
 import ShipmentsPage from './ShipmentsPage';
 import IntlShipmentsPage from './IntlShipmentsPage';
@@ -113,6 +114,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'Forecast Goals', icon: Target },
       { label: 'Pre-Book Review', icon: CalendarClock },
+      { label: 'Linesheet', icon: FileText },
       { label: 'Place Order', icon: ShoppingCart },
       { label: 'ATS Inventory', icon: Box },
       { label: 'Intl Shipments', icon: Ship },
@@ -529,6 +531,8 @@ function App() {
             <MyOrdersPage />
           ) : view === 'dashboard' && activeNav === 'Intl Shipments' ? (
             <IntlShipmentsPage />
+          ) : view === 'dashboard' && activeNav === 'Linesheet' ? (
+            <LinesheetPage />
           ) : view === 'dashboard' && activeNav === 'Marketing Assets' ? (
             <ResourcesPage />
           ) : view === 'dashboard' && activeNav === 'Invoices' ? (
