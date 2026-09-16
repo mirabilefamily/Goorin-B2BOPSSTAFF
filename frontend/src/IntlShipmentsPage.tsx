@@ -277,9 +277,7 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   return (
     <div className="is" data-testid="intl-shipment-detail">
       <nav className="is-crumbs" aria-label="Breadcrumb">
-        <button className="is-back" onClick={onBack} data-testid="is-back" title="Back to Intl Shipments (Esc)"><i><ArrowLeft size={15} /></i><span>All shipments</span></button>
-        <span className="is-crumb-sep" />
-        <span className="is-crumb-path">Intl Shipments <ChevronRight size={13} /> <b>{s.id}</b></span>
+        <button className="is-back" onClick={onBack} data-testid="is-back" title="Back (Esc)"><ArrowLeft size={16} /> Shipments</button>
       </nav>
 
       <section className="is-card is-dhero">
