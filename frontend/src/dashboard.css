@@ -288,3 +288,10 @@
 .rv-goal-split { margin-top: auto; gap: 16px; }
 .rv-goal-split-row > span { color: var(--ink); font-weight: 500; }
 .rv-goal-split-row > em { font-size: 12px; }
+.rv-goal-bar { margin-top: 18px; }
+.rv-goal-bar u { height: 12px; top: -2px; background: var(--ink-3); }
+.rv-goal-bar u span { background: transparent; padding: 0; transform: translate(-50%, -3px); font-size: 9.5px; letter-spacing: .08em; color: var(--ink-4); font-weight: 700; }
+.rv-goal-meta { margin-top: 4px; font-size: 12.5px; }
+.rv-goal-meta em { font-size: 10.5px; padding: 3px 8px; letter-spacing: .02em; }
+.rv-goal-split { gap: 14px; padding-top: 16px; }
+.rv-goal-split-bar { height: 4px; } .rv-goal-split-bar u { height: 9px; top: -2.5px; width: 1.5px; opacity: .45; }
