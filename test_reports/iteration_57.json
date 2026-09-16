@@ -1,0 +1,61 @@
+{
+  "summary": "Frontend UI testing of Goorin Linesheet page cohesive chrome + MultiSelect (Seasons/Collections). All requested behaviors verified. Header uses .ops-head with kicker 'Tools', h1 'Linesheet', ls-open-saved and ls-new-top buttons visible. Catalog card head shows 'Catalog · N shown'. Season MultiSelect opens with search, options SS27(26)/FW26(20)/Core(11), SS27 pre-checked. Adding FW26 → '46 products found', toggle shows '2 seasons' with badge 2. Search 'co' filters to Core only. Clear → 'All seasons' + 57 products. Done, Escape, and outside click all close the menu. Collections MultiSelect works identically; selecting Suede+Core with SS27+FW26 → 18 products; button shows '2 collections' with badge. ls-select-page, ls-select-all, ls-clear all work. Card price row shows '$16.00 MSRP $40.00'; ls-toggle-msrp hides the MSRP small element (count 0 after off). Saved draft with SS27+FW26 persisted to backend with season='SS27,FW26' (verified via GET /api/linesheets); the drawer entry shows 'SS27 · FW26'. No console errors observed at 1920x800.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_evidence": {
+    "header": {"kicker": "Tools", "h1": "Linesheet", "ls-open-saved": true, "ls-new-top": true},
+    "catalog_head": "Catalog 26 shown (default SS27)",
+    "seasons_ms": {
+      "SS27_pre_checked": true,
+      "options_with_counts": {"SS27": 26, "FW26": 20, "Core": 11},
+      "after_check_FW26_found": "46 products found",
+      "toggle_summary": "2 seasons",
+      "badge": "2",
+      "search_co_filters_to": ["Core"],
+      "clear_summary": "All seasons",
+      "clear_found": "57 products found",
+      "done_closes": true,
+      "escape_closes": true,
+      "outside_click_closes": true
+    },
+    "collections_ms": {
+      "options_with_counts": {"The Farm": 27, "Suede": 9, "Core": 12, "Heritage": 4, "Fedoras": 5},
+      "combined_ss27_fw26_suede_core_found": "18 products found",
+      "toggle_summary": "2 collections",
+      "badge": "2"
+    },
+    "select_helpers": {
+      "select_page_result": "46 products found · 18 selected",
+      "select_all_result": "46 products found · 46 selected",
+      "selected_count_widget": "(46/120)"
+    },
+    "price_row": "$16.00 MSRP $40.00",
+    "msrp_toggle_off_small_count": 0,
+    "save_and_reopen": {
+      "saved_title": "TEST_ML_1789602008",
+      "persisted_season": "SS27,FW26",
+      "drawer_row_shows": "SS27 · FW26",
+      "reopen_restores_both_seasons": true
+    },
+    "console_errors": "none"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "LinesheetPage.tsx has many extremely long single-line JSX expressions (lines 34, 44, 70, 111, 172, 182, 211) that hurt readability and PR-review quality; consider light formatting or extracting sub-components (price chip, picked-row, saved-row).",
+    "In LinesheetPage.open(), season is read from stored string via ls.season.split(',') — works, but consider storing seasons as an array to avoid string-parse coupling and to allow season values that ever contain commas.",
+    "MultiSelect close-on-outside relies on mousedown but the toggle button uses onClick; behavior is fine today but a click on the toggle after opening via focus/keyboard could double-toggle in edge cases."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password → 'Log in' (demo). Per /app/memory/test_credentials.md.",
+  "seed_data_creation": "One draft TEST_ML_1789602008 created and cleaned up via DELETE /api/linesheets/{id} (HTTP 204).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet uses hash routing (#linesheet). Sidebar link 'Linesheet' navigates reliably; page.evaluate hash change also works but may need click fallback. MSRP toggle is a hidden checkbox inside label.ls-switch — click the label. Saved drafts stored via REAL /api/linesheets with season as CSV string. When looking up saved rows in drawer, filter data-testid strictly to /^ls-saved-[^-]+$/ to avoid matching ls-saved-drawer/open/dup/link/del elements.",
+  "rca of the issue": "N/A — feature implementation validated end-to-end without defects."
+}
