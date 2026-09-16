@@ -169,17 +169,6 @@ export default function DashboardPage({ onNavigate }: Props) {
 
   return (
     <div className="rv" data-testid="dashboard-page">
-      <div className="ops-head">
-        <div className="ops-head-l">
-          <p className="ops-kicker"><i />Analytics</p>
-          <h1>Dashboard</h1>
-          <small className="ops-sub">Invoiced revenue, open orders and goal pace across every channel.</small>
-        </div>
-        <div className="ops-head-r">
-          <span className="ops-stamp" data-testid="rv-updated"><i />Updated today · FY2026</span>
-          <button className="ops-btn" onClick={exportCsv} data-testid="rv-export-head"><Download size={15} /> Export CSV</button>
-        </div>
-      </div>
       {/* HERO */}
       <section className="rv-card rv-hero" data-testid="rv-hero">
         <div className="rv-hero-left">
