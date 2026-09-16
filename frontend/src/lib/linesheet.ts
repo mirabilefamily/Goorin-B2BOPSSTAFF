@@ -45,7 +45,7 @@ export const CATALOG: LsItem[] = NAMES.flatMap(([name, imgKey, style, collection
     const size = collection === 'Fedoras' ? SIZES[3 + (k % 3)] : 'One Size';
     const base = collection === 'Fedoras' ? 42 : collection === 'Suede' ? 22 : season === 'Core' ? 14 : 16;
     return { id: `${style}-${code}`, name, color, size, sku: `${style}-${code}-${size === 'One Size' ? 'O/S' : size.slice(0, 1) === 'X' ? 'XL' : size.slice(0, 1)}`, style, collection, shape: collection === 'Fedoras' ? 'Fedora' : collection === 'Core' ? 'Baseball' : 'Trucker',
-      season, colors: [color], base, msrp: Math.round(base * 2.5), image: k === 0 ? IMG[imgKey] ?? null : null, moq: 6, delivery: DELIVERY[season] };
+      season, colors: [color], base, msrp: Math.round(base * 2.5), image: k === 0 || n % 2 === 0 ? (IMG[imgKey] ?? Object.values(IMG)[(n + k) % 5]) : null, moq: 6, delivery: DELIVERY[season] };
   });
 });
 

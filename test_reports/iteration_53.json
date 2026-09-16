@@ -1,0 +1,18 @@
+{
+  "summary": "Frontend-only testing of Linesheet page v2 (Tools › Linesheet). All acceptance criteria from the review request pass. Login via empty credentials, sidebar navigation, toolbar (ls-search, ls-season default SS27 with 26 products, ls-filter-collection), season 'all' shows 57 products with pager 'Page 1 of 4' and ls-next advances to page 2. Card click toggles aria-pressed=true and shows selected count (1/120). ls-select-page selects 18 visible (label toggles to 'Deselect visible page'), ls-clear resets to (0/120). Rail: title 'Linesheet' with 9/200 counter. ls-ctx default 'customer' shows ls-customer-list with ls-customer-c1; ls-customer-search 'lids' filters to Lids only. Before customer, picked row shows 'Select customer' and Preview is disabled. After selecting c1 (Mirabile Distribution · #70057 · Distributor), row shows 'Price pending' then resolves to $8.80 (base $16 × 0.55). ls-customer-clear resets. ls-ctx 'list' shows ls-pricelist select. ls-ctx 'generic' resolves to $16.00 (US Wholesale). MSRP/MOQ toggles work. Notes textarea works. ls-remove-<id> present. ls-preview opens ls-preview-page/ls-doc; ls-print & ls-download increment window.print stub (calls 1→2). ls-back returns keeping selection (2/120). ls-print-direct/ls-download-direct open preview and call print (calls 3→4). Layout at 1920x800: grid x=339 w=1122, rail x=1482 w=400, no overlap. 0 console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "priceFor is unit-based only; multiplier applied irrespective of currency for International EUR (1.08x), which is a naive proxy — noted but acceptable for mock.",
+    "ls-toggle-msrp/moq use visually-hidden inputs; interact via label click in future tests."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password login (demo one-click) per /app/memory/test_credentials.md",
+  "seed_data_creation": "None (frontend-mocked catalog/customers/price lists)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet v2 verified. ls-* testids match code. Stub window.print via add_init_script BEFORE navigation. Customer list is searchable ul (ls-customer-list) with ls-customer-<id> buttons; selecting one hides the list and shows ls-customer-selected + ls-customer-clear."
+}
