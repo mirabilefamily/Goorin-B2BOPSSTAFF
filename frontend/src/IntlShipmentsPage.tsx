@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, Factory, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -287,20 +287,16 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
         <button className="is-back" onClick={onBack} data-testid="is-back" title="Back (Esc)"><ArrowLeft size={16} /> Shipments</button>
       </nav>
 
-      <section className="is-card is-dhero">
+      <section className="is-card is-dhero is-dhero--flat">
         <div className="is-dhero-top">
           <div className="is-dhero-id">
-            <p className="is-kicker"><i className="is-dot" />International shipment · Created {s.created}</p>
-            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em>{idx < stepIdx('prepaid') && idx >= stepIdx('prepayment') && <em className="is-status prepayment">Blocked on payment</em>}</div>
-            <div className="is-route">
-              <span><i className="is-mono-av">{mono(s.customer)}</i><span><small>Customer</small><strong>{s.customer}</strong></span></span>
-              <i className="is-route-line"><Ship size={13} /></i>
-              <span><i className="is-mono-av fac">{mono(s.factory)}</i><span><small>Factory</small><strong>{s.factory}</strong></span></span>
-            </div>
+            <p className="is-kicker">International shipment · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}</p>
+            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em></div>
+            <div className="is-dmeta"><span><Factory size={15} /> {s.factory}</span><i /><span>{s.customer}</span><i /><span>Created {s.created}</span><i /><span>{s.booking.mode} · {s.incoterms}</span></div>
           </div>
           <div className="is-dactions">
-            <button className="is-btn" onClick={() => setDtab('chat')} data-testid="is-hero-message"><MessageSquare size={15} /> Message</button>
-            {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance"><Check size={15} /> {cta}</button>}
+            <button className="is-btn" onClick={() => setDtab('chat')} data-testid="is-hero-message"><MessageSquare size={15} /> Message customer</button>
+            {cta ? <button className="is-btn dark" onClick={advance} data-testid="is-advance"><Check size={15} /> {cta}</button> : <button className="is-btn dark" onClick={() => toast('Downloading documents…')} data-testid="is-download-docs"><Download size={15} /> Download documents</button>}
             <div className="is-menu-wrap">
               <button className="is-btn is-icon" onClick={() => setMenu((v) => !v)} aria-label="More" data-testid="is-more"><MoreHorizontal size={16} /></button>
               {menu && (<><div className="is-backdrop clear" onClick={() => setMenu(false)} /><div className="is-menu" data-testid="is-more-menu">
@@ -312,16 +308,21 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
             </div>
           </div>
         </div>
-        <div className="is-dfacts">
-          <div><i className="is-fact-ic"><CalendarDays size={15} /></i><small>Ship date</small><strong>{s.ship}</strong><ShipChip s={s} /></div>
-          <div><i className="is-fact-ic"><Ship size={15} /></i><small>Mode · Incoterms</small><strong>{s.booking.mode}</strong><span className="is-fact-sub">{s.incoterms} · {s.currency}</span></div>
-          <div><i className="is-fact-ic"><Boxes size={15} /></i><small>Units</small><strong>{units(s).toLocaleString()}</strong><span className="is-fact-sub">{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</span></div>
-          <div><i className="is-fact-ic"><FileText size={15} /></i><small>Declared value</small><strong>{money(total)}</strong><span className="is-fact-sub">SO {money(total)} · PO {money(poTotal(s))}</span></div>
-          <div className={idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}><i className="is-fact-ic"><CheckCircle2 size={15} /></i><small>Prepayment{idx >= stepIdx('prepaid') ? ' · received' : idx === stepIdx('prepayment') ? ' · awaiting' : ''}</small><strong>{money(s.prepay)}</strong><span className="is-fact-sub">{total ? Math.round((s.prepay / total) * 100) : 0}% of value</span></div>
+        <div className="is-dfacts is-dfacts--flat">
+          <div><small>Est. ship date</small><strong>{s.ship}</strong><span className="is-fact-sub">{daysTo(s.ship) === null ? '—' : daysTo(s.ship)! < 0 ? `${Math.abs(daysTo(s.ship)!)} days ago` : `in ${daysTo(s.ship)} days`}</span></div>
+          <div><small>Mode</small><strong>{s.booking.mode}</strong><span className="is-fact-sub">{s.booking.forwarder === '—' ? 'Forwarder TBD' : s.booking.forwarder}</span></div>
+          <div><small>Incoterms</small><strong>{s.incoterms} · {s.currency}</strong><span className="is-fact-sub">Factory port</span></div>
+          <div><small>Units</small><strong>{units(s).toLocaleString()}</strong><span className="is-fact-sub">{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</span></div>
+          <div><small>Declared value</small><strong>{money(total)}</strong><span className="is-fact-sub">Commercial invoice</span></div>
+          <div><small>Prepayment</small><strong>{money(s.prepay)}</strong><span className={`is-fact-sub ${idx >= stepIdx('prepaid') ? 'g' : idx === stepIdx('prepayment') ? 'a' : ''}`}>{idx >= stepIdx('prepaid') ? 'Received · 50%' : idx === stepIdx('prepayment') ? 'Due · 50%' : 'Not yet due · 50%'}</span></div>
         </div>
-        <ol className="is-steps" data-testid="is-stepper">
-          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx ? <Check size={11} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{i < idx ? 'Done' : i === idx ? 'In progress' : 'Upcoming'}</small></li>)}
+        <ol className="is-steps is-steps--flat" data-testid="is-stepper">
+          {STEPS.map((st, i) => <li key={st.id} className={i < idx ? 'done' : i === idx ? 'now' : ''}><i>{i < idx ? <Check size={12} strokeWidth={3} /> : i + 1}</i><span>{st.label}</span><small>{i < idx ? 'Done' : i === idx ? (st.id === 'prepayment' ? 'Payment due' : 'In progress') : 'Upcoming'}</small></li>)}
         </ol>
+        <div className="is-dfoot">
+          <span>Stage {idx + 1} of {STEPS.length} · {Math.round(((idx + 1) / STEPS.length) * 100)}%</span>
+          {nextLabel && <><i /><span><b className="is-next-tag">Next</b><strong>{nextLabel}</strong>{cta ? `${cta} when ready.` : ''}</span></>}
+        </div>
       </section>
 
       <div className="is-dnav" role="tablist">

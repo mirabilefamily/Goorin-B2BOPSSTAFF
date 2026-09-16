@@ -132,3 +132,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Detail nav: icon tabs in grey tray (is-dnav) w/ counts replacing segmented pills.
 - 2026-06 Needs-attention v3: adds "Customer communication" reason (last message from customer, unanswered) with per-row Ignore (dismiss alert, e.g. a "thanks"); chips filter pipeline (message chip toggles fMsg); rows show multiple reason tags. State in-memory (MOCKED).
 - 2026-06 Attention card → "Customer messages" inbox only (unanswered customer messages w/ preview, Reply opens chat tab, Ignore dismisses, Filter pipeline). Prepayment/packing reasons removed per user (use stage filters instead).
+- 2026-06 Detail hero → flat editorial layout per reference: kicker w/ SO, big id + status, meta line (factory · customer · created · mode·incoterms), 6-col divided facts, connected stepper w/ Done/Payment due/Upcoming, footer "Stage x of 7 · % | NEXT …".
