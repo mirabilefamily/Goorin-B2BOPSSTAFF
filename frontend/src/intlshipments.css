@@ -312,3 +312,11 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
 .is-crumbs .is-back { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px 8px 13px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink-3); font-family: var(--ui); font-size: 14px; font-weight: 600; transition: color .16s, border-color .16s, background .16s; }
 .is-crumbs .is-back:hover { color: var(--ink); border-color: #c9d3ce; background: #fff; }
 .is-crumbs .is-back svg { transition: transform .18s; } .is-crumbs .is-back:hover svg { transform: translateX(-2px); }
+/* detail nav — icon tabs */
+.is-dnav { display: inline-flex; align-self: flex-start; gap: 2px; padding: 5px; background: #e9eeeb; border-radius: 14px; }
+.is-dnav button { display: inline-flex; align-items: center; gap: 9px; border: none; background: transparent; color: var(--ink-3); font-family: var(--ui); font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; transition: background .18s, color .18s, box-shadow .18s; }
+.is-dnav button svg { color: var(--ink-4); transition: color .18s; }
+.is-dnav button:hover { color: var(--ink); } .is-dnav button:hover svg { color: var(--ink); }
+.is-dnav button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(15,31,24,.08), 0 6px 14px -8px rgba(15,31,24,.25); } .is-dnav button.active svg { color: var(--ink); }
+.is-dnav button b { font-size: 11.5px; font-weight: 700; min-width: 22px; height: 22px; display: inline-grid; place-items: center; padding: 0 6px; border-radius: 999px; background: rgba(15,31,24,.08); color: var(--ink-3); }
+.is-dnav button.active b { background: var(--ink); color: #fff; }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, Ship, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -270,8 +270,8 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
   const nextLabel = idx < STEPS.length - 1 ? STEPS[idx + 1].label : null;
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && !menu) onBack(); }; window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h); }, [onBack, menu]);
   const tabs = [
-    { id: 'overview', label: 'Overview' }, { id: 'booking', label: 'Booking & payment' }, { id: 'chat', label: 'Conversation', n: s.msgs.length },
-    { id: 'docs', label: 'Documents', n: s.docs.length + (s.bookingDocs?.length ?? 0) }, { id: 'activity', label: 'Activity', n: s.activity.length },
+    { id: 'overview', label: 'Overview', Icon: LayoutGrid }, { id: 'booking', label: 'Booking & payment', Icon: Truck }, { id: 'chat', label: 'Conversation', Icon: MessageSquare, n: s.msgs.length },
+    { id: 'docs', label: 'Documents', Icon: FileText, n: s.docs.length + (s.bookingDocs?.length ?? 0) }, { id: 'activity', label: 'Activity', Icon: Activity, n: s.activity.length },
   ] as const;
 
   return (
@@ -317,8 +317,8 @@ function Detail({ s, onBack, update }: { s: Shipment; onBack: () => void; update
         </ol>
       </section>
 
-      <div className="ops-seg is-dseg" role="tablist">
-        {tabs.map((t) => <button key={t.id} role="tab" aria-selected={dtab === t.id} className={dtab === t.id ? 'active' : ''} onClick={() => setDtab(t.id)} data-testid={`is-dtab-${t.id}`}>{t.label}{'n' in t && t.n > 0 && <b>{t.n}</b>}</button>)}
+      <div className="is-dnav" role="tablist">
+        {tabs.map((t) => <button key={t.id} role="tab" aria-selected={dtab === t.id} className={dtab === t.id ? 'active' : ''} onClick={() => setDtab(t.id)} data-testid={`is-dtab-${t.id}`}><t.Icon size={17} strokeWidth={1.9} />{t.label}{'n' in t && t.n > 0 && <b>{t.n}</b>}</button>)}
       </div>
 
       {dtab === 'overview' && (
