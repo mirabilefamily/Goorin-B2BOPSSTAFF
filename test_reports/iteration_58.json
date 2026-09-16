@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend cross-page visual regression tested at 1920x800. Global ops.css chrome verified across Dashboard, Pre-Book Review, Intl Shipments, Linesheet and Open Orders. Login via empty fields signs in as demo. Dashboard: rv-hero renders; All/US Wholesale/Distributors (.rv-seg) — active tab is WHITE (rgb(255,255,255)) with dark text (rgb(15,31,24)), radius 9px; annual goal card renders; segment click switches to US Wholesale correctly. Pre-Book Review: page container has .ops-head.ops-head-slim (no h1); layout justify-content=flex-end (right-aligned); .pb-seg3 Review/Setup segmented + Export all drops (pb-export-all) present and right-aligned; sidebar tree works (pb-season-toggle-FW27 present; clicking pb-drop-FW27-drop1 loads .pbx-hero). Intl Shipments: .ops-head-slim (no h1, justify=flex-end); Shipments/Open Orders tabs (is-tab-shipments/is-tab-orders) under .ops-seg with active tab white (rgb 255) dark text, radius 9px; is-new-shipment button right-aligned; .is-stage border-radius=12px (squared); attention inbox present; is-row-IS-0011 opens detail with .is-dnav (5 icon tabs) — active tab white/dark/9px; is-back returns to list. Linesheet: .ops-head-slim (no h1); ls-open-saved and ls-new-top right-aligned; MultiSelect .ls-ms-btn opens .ls-ms-pop popup; ls-save and ls-preview visible. Open Orders: orders-search renders inline (display:inline-flex, flex-direction:row, svg left of input, 44px height, 12px radius, white bg) — no stacking/broken layout. .dash-search radius=12px; .is-stage=12px; all segmented control inner buttons=9px inside 12px containers → matches spec (~12px squared, not pill). No console errors. Screenshots captured for all 4 pages at 1920x800 confirming cohesive chrome (kicker + slim right-aligned actions, no title blocks on the three requested pages) with no overlapping or broken layouts.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_evidence": {
+    "dashboard": {"rv_seg_active": {"bg": "rgb(255,255,255)", "color": "rgb(15,31,24)", "radius": "9px"}, "hero": true, "goal_card": true, "seg_switches_to_us": true},
+    "pre_book": {"head_slim": true, "has_h1_in_head": false, "justify": "flex-end", "pb_seg3_active_white": true, "pb_export_all": true, "pb_season_toggle_FW27": true, "pb_drop_FW27_drop1": true, "hero_renders": true},
+    "intl_shipments": {"head_slim": true, "has_h1": false, "justify": "flex-end", "tabs_parent": "ops-seg", "active_bg": "rgb(255,255,255)", "active_color": "rgb(15,31,24)", "is_new_shipment": true, "is_stage_radius": "12px", "attn_inbox": true, "is_row_IS_0011_opens_detail": true, "is_dnav_button_count": 5, "is_back": true},
+    "linesheet": {"head_slim": true, "has_h1": false, "ls_open_saved": true, "ls_new_top": true, "multiselect_opens": true, "ls_save": true, "ls_preview": true},
+    "open_orders": {"orders_search_inline": {"display": "inline-flex", "flexDir": "row", "radius": "12px", "height": 44, "svgLeftOfInput": true, "sameRow": true}},
+    "console_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Global !important overrides in ops.css (lines 38-44) win the cascade but make future page-level radius/color tweaks hard; consider CSS variables (e.g. --ops-radius) instead of !important sprawl.",
+    "Hash-driven activeNav in App.tsx works but doesn't sync when window.location.hash is set programmatically — automation and deep-linking must click the sidebar nav-item. Consider listening to hashchange to auto-update activeNav.",
+    "ops-head-slim justifies to flex-end but keeps flex-wrap; on very narrow widths the right cluster (segmented + button) could wrap awkwardly — no repro at 1920x800 but worth a tablet visual pass."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password → 'Log in' (demo). Per /app/memory/test_credentials.md.",
+  "seed_data_creation": "None. Linesheet save flow was not executed to persist a draft this run (previous iteration already validated end-to-end).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Navigation is state-driven via activeNav in App.tsx; setting window.location.hash alone does not switch page — click the sidebar '.nav-item:has-text(\"<Label>\")' instead. Labels: 'Pre-Book Review', 'Intl Shipments', 'Linesheet', 'Open Orders'. The ops-seg / rv-seg / pb-seg3 / is-dnav all resolve to: container radius 12px + inner buttons 9px, active button bg white + color rgb(15,31,24). is-stage chips are 12px squared. dash-search is inline-flex with 12px radius (used on Open Orders).",
+  "rca of the issue": "N/A — no defects. Cross-page visual regression fully verified."
+}
