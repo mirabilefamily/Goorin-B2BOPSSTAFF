@@ -134,3 +134,7 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Attention card → "Customer messages" inbox only (unanswered customer messages w/ preview, Reply opens chat tab, Ignore dismisses, Filter pipeline). Prepayment/packing reasons removed per user (use stage filters instead).
 - 2026-06 Detail hero → flat editorial layout per reference: kicker w/ SO, big id + status, meta line (factory · customer · created · mode·incoterms), 6-col divided facts, connected stepper w/ Done/Payment due/Upcoming, footer "Stage x of 7 · % | NEXT …".
 - 2026-06 Stepper: Shipping Instructions + Pre-payment merged into one display step "Booking & payment" (1 of 2 · Instructions / Payment due); 6 display steps; underlying statuses unchanged.
+
+## 2026-06 Linesheet page (NEW, MOCKED) — Tools › Linesheet
+- `LinesheetPage.tsx`, `linesheet.css`, `lib/linesheet.ts`: season switcher (All/SS27/FW26/Core), search + collection/shape filters, selectable product grid (select all), builder rail (title, Prepared-for customer → auto price list, price list override, MSRP/MOQ toggles, notes, picked list, summary), Preview page with branded print document (header, 4-col grid, footer) and Print / Save as PDF via window.print() with @media print rules.
+- Price lists: US Wholesale ×1, Key Account ×0.92, Distributor ×0.55, International EUR ×1.08. Customers map to lists.

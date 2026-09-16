@@ -94,7 +94,7 @@ export default function LinesheetPage() {
           )}
           <div className="ls-actions">
             <button className="ops-btn" onClick={() => setSel(new Set())} disabled={!chosen.length} data-testid="ls-clear">Clear</button>
-            <button className="ops-btn dark" onClick={() => setPreview(true)} disabled={!chosen.length} data-testid="ls-preview"><Eye size={15} /> Preview & print</button>
+            <button className="ops-btn dark" onClick={() => { setPreview(true); document.querySelector('.page-content')?.scrollTo({ top: 0 }); }} disabled={!chosen.length} data-testid="ls-preview"><Eye size={15} /> Preview & print</button>
           </div>
         </aside>
       </div>

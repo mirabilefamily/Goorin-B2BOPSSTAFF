@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only testing of new Linesheet page (Tools › Linesheet). All specified acceptance criteria verified: login, sidebar nav, header, season switcher (SS27 default with 5 items, All 14, FW26 5, Core 4), filters (search/collection/shape), select-all/deselect-all with count updates, aria-pressed toggle on ls-item-p2, title auto-rename on season change when default, customer auto-sets price list to 'dist' with 'auto from customer' tag, price drops $16→$8.80 for Alpha Dog on dist, manual pricelist override to intl works (EUR/€ in preview), MSRP & MOQ toggles hide fields in preview, notes textarea, picked list with ls-remove-<id>, ls-clear empties selection, ls-preview disabled when empty, preview page shows title/prepared for/pricelist·currency/date/prepared by/notes/grid/footer, ls-back retains selection, ls-print triggers window.print (stubbed) and shows 'Opening print dialog' toast. Layout at 1920x900: builder rail on the right (x=1522) and grid on the left (x=338). No JS console errors on the Linesheet page.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Toggle inputs use visually-hidden pattern (position:absolute; opacity:0; width:0; height:0). Playwright cannot directly click them; must click parent label. This is acceptable UX but note in future test scripts to interact via label click.",
+    "Minor unrelated console warnings from Recharts (chart width/height -1) come from Dashboard, not Linesheet page — not blocking."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password login (demo one-click) per /app/memory/test_credentials.md",
+  "seed_data_creation": "None (frontend-mocked)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet page at /#linesheet (via sidebar Tools › Linesheet). All ls-* data-testid selectors verified. Note: ls-toggle-msrp/ls-toggle-moq inputs are visually hidden — click via label:has([data-testid='ls-toggle-msrp']) or use force+check state via is_checked()."
+}
