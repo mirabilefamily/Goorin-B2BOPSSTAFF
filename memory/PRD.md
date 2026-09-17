@@ -150,3 +150,7 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Premium layer (ops.css): unified card shadows + hover lift, staggered entrance on all 4 pages, unified table-header/section-title typography, green focus rings, button hover lift; Pre-Book header slimmed (switcher + export only); fixed base `.dash-search` styling (Orders/Account).
 - 2026-06 Linesheet: "Hide items missing images" filter (count), sub-bar controls converted to styled checkboxes (Select visible page / Select all N), card check now 8px square that appears on hover/selected with green tint overlay.
 - 2026-06 Linesheet: Saved / New Linesheet moved into Catalog card head (standalone header row removed).
+- 2026-06 Linesheet: rail renamed "Linesheet Builder"; Saved (folder icon w/ count badge) + New (dark icon) moved into rail header; draft badge row beneath.
+- 2026-06 Pre-Book: Review/Setup segment moved into sidebar top (full-width), Export all drops became icon in sidebar head; standalone header row removed.
+- 2026-06 Pre-Book: Rename drop (⋯ menu → inline input in hero, Enter/blur commits, Esc cancels; in-memory). Linesheet rail organized into numbered steps (1 Document, 2 Pricing, 3 Styles), tighter catalog spacing.
+- 2026-06 Pre-Book clean pass (CSS): sidebar spacing + stacked full-width footer buttons, hero chips softened, divided KPI row, table row hover, setup title w/ subtitle, drop rows as cards w/ hover, tag radii 8px.

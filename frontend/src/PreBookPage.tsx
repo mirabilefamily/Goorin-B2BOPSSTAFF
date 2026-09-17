@@ -144,6 +144,11 @@ export default function PreBookPage({ onNavigate }: Props) {
   const [orderFilter, setOrderFilter] = useState<'All' | 'Draft' | 'Submitted' | 'Confirmed' | 'Released'>('All');
   const [actionsOpen, setActionsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [renames, setRenames] = useState<Record<string, string>>({});
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [renameVal, setRenameVal] = useState('');
+  const lbl = (sid: string, d: { id: string; label: string }) => renames[`${sid}:${d.id}`] ?? d.label;
+  const commitRename = () => { if (renaming && renameVal.trim()) { setRenames((r) => ({ ...r, [renaming]: renameVal.trim() })); toast(`Renamed to “${renameVal.trim()}”`); } setRenaming(null); };
   const [previewOpen, setPreviewOpen] = useState(false);
   const [consOpen, setConsOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -217,20 +222,14 @@ export default function PreBookPage({ onNavigate }: Props) {
   return (
     <div className="pb" data-testid="prebook-page">
       {/* top bar */}
-      <div className="ops-head ops-head-slim">
-        <div className="ops-head-r">
-          <div className="ops-seg" role="tablist">
-            <button role="tab" aria-selected={tab === 'review'} className={tab === 'review' ? 'active' : ''} onClick={() => setTab('review')} data-testid="pb-tab-review">Review <b>{SEASONS.filter((x) => !x.archived).reduce((a, x) => a + x.drops.filter((d) => d.status === 'open').length, 0)}</b></button>
-            <button role="tab" aria-selected={tab === 'setup'} className={tab === 'setup' ? 'active' : ''} onClick={() => setTab('setup')} data-testid="pb-tab-setup">Setup</button>
-          </div>
-          <button className="ops-btn" onClick={() => toast('Exporting all drops…')} data-testid="pb-export-all"><Download size={15} /> Export all drops</button>
-        </div>
-      </div>
-
       <div className={`pb-body ${tab === 'review' ? 'pb-body--review' : ''}`}>
         {/* sidebar */}
         <aside className="pb-side">
-          <div className="pb-side-head"><span>{tab === 'setup' ? 'Pre-book Collections' : 'Seasons'}</span>{tab === 'review' && <button className="pb-side-add" aria-label="Add season" onClick={() => toast('New season')}><Plus size={15} /></button>}</div>
+          <div className="ops-seg pb-mode-seg" role="tablist" data-testid="pb-mode-seg">
+            <button role="tab" aria-selected={tab === 'review'} className={tab === 'review' ? 'active' : ''} onClick={() => setTab('review')} data-testid="pb-tab-review">Review <b>{SEASONS.filter((x) => !x.archived).reduce((a, x) => a + x.drops.filter((d) => d.status === 'open').length, 0)}</b></button>
+            <button role="tab" aria-selected={tab === 'setup'} className={tab === 'setup' ? 'active' : ''} onClick={() => setTab('setup')} data-testid="pb-tab-setup">Setup</button>
+          </div>
+          <div className="pb-side-head"><span>{tab === 'setup' ? 'Pre-book Collections' : 'Seasons'}</span><span className="pb-side-tools">{tab === 'review' && <><button className="pb-side-add" aria-label="Export all drops" title="Export all drops" onClick={() => toast('Exporting all drops…')} data-testid="pb-export-all"><Download size={14} /></button><button className="pb-side-add" aria-label="Add season" title="Add season" onClick={() => toast('New season')}><Plus size={15} /></button></>}</span></div>
           {tab === 'review' ? (
             <div className="pbx-tree" data-testid="pb-drop-switcher">
               {SEASONS.filter((x) => showArchived || !x.archived).map((sn) => {
@@ -252,7 +251,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                             return (
                               <button key={d.id} className={`pb-drop-item ${on ? 'active' : ''} ${d.status}`} onClick={() => { setActiveSeason(sn.id); setActiveDrop(d.id); }} data-testid={`pb-drop-${sn.id}-${d.id}`}>
                                 <FolderClosed size={15} />
-                                <span>{d.label}</span>
+                                <span>{lbl(sn.id, d)}</span>
                                 {d.status === 'open' ? <em className="pb-drop-open">OPEN <b>{d.count}</b></em> : <em className="pb-drop-closed">CLOSED</em>}
                               </button>
                             );
@@ -295,7 +294,7 @@ export default function PreBookPage({ onNavigate }: Props) {
               <div className="pbx-hero-body">
                 <div className="pbx-hero-main">
                   <p className="pbx-kicker"><span className={`pb-live ${drop.status}`} />Season {season.id} · Drop {dropIndex} of {seasonDrops.length}{drop.status === 'open' && <> · <b>{daysLeft} days left</b></>}</p>
-                  <div className="pb-drop-idtop"><strong>{season.id} <span>/ {drop.label}</span></strong><em className={`pb-open-pill ${drop.status}`}>{drop.status.toUpperCase()}</em></div>
+                  <div className="pb-drop-idtop"><strong>{season.id} <span>/ {renaming === `${season.id}:${drop.id}` ? <input className="pb-rename" autoFocus value={renameVal} onChange={(e) => setRenameVal(e.target.value)} onBlur={commitRename} onKeyDown={(e) => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setRenaming(null); }} data-testid="pb-rename-input" /> : lbl(season.id, drop)}</span></strong><em className={`pb-open-pill ${drop.status}`}>{drop.status.toUpperCase()}</em></div>
                   <div className="pbx-deadline-wrap">
                     <span className="pbx-deadline"><Calendar size={14} /> {drop.status === 'open' ? 'Closes' : 'Closed'} {season.deadline}</span>
                     <span className="pbx-days-track" aria-hidden="true"><i style={{ width: `${Math.max(4, 100 - (daysLeft / 90) * 100)}%` }} /></span>
@@ -325,6 +324,7 @@ export default function PreBookPage({ onNavigate }: Props) {
                       <>
                         <div className="pb-menu-backdrop" onClick={() => setMoreOpen(false)} />
                         <div className="pb-menu pb-menu--left" role="menu" data-testid="pb-more-menu">
+                          <button className="pb-menu-item" onClick={() => { setMoreOpen(false); setRenameVal(lbl(season.id, drop)); setRenaming(`${season.id}:${drop.id}`); }} data-testid="pb-rename-drop"><Pencil size={16} /> Rename drop</button>
                           <button className="pb-menu-item" onClick={() => runMore('Editing drop details…')}><Pencil size={16} /> Edit drop details</button>
                           <button className="pb-menu-item" onClick={() => runMore('Drop duplicated.')}><Copy size={16} /> Duplicate drop</button>
                           <button className="pb-menu-item" onClick={() => runMore('Exporting this drop…')}><Download size={16} /> Export this drop</button>
@@ -375,10 +375,12 @@ export default function PreBookPage({ onNavigate }: Props) {
               {/* panel */}
               <section className="pb-panel">
                 <div className="pb-panel-head">
-                  <div className="pb-panel-tabs">
-                    <button className={subTab === 'demand' ? 'active' : ''} onClick={() => setSubTab('demand')} data-testid="pb-subtab-demand">SKU Demand <b className="pb-count">{skus.length}</b></button>
-                    <button className={subTab === 'orders' ? 'active' : ''} onClick={() => setSubTab('orders')} data-testid="pb-subtab-orders">Orders <b className="pb-count">{orders.length}</b></button>
-                    {subTab === 'demand' && <><span className="pb-panel-num">{atOrAbove}/{skus.length}</span><button className="pb-ext" onClick={() => toast('Import external volume')} data-testid="pb-ext-btn"><Upload size={14} /> External volume</button></>}
+                  <div className="pb-panel-left">
+                    <div className="pb-panel-tabs">
+                      <button className={subTab === 'demand' ? 'active' : ''} onClick={() => setSubTab('demand')} data-testid="pb-subtab-demand">SKU Demand <b className="pb-count">{skus.length}</b></button>
+                      <button className={subTab === 'orders' ? 'active' : ''} onClick={() => setSubTab('orders')} data-testid="pb-subtab-orders">Orders <b className="pb-count">{orders.length}</b></button>
+                    </div>
+                    {subTab === 'demand' && <><span className="pb-panel-num">{atOrAbove}/{skus.length} at MOQ</span><button className="pb-ext" onClick={() => toast('Import external volume')} data-testid="pb-ext-btn"><Upload size={14} /> External volume</button></>}
                   </div>
                   <div className="pb-panel-tools">
                     {subTab === 'demand' ? (
@@ -501,7 +503,7 @@ export default function PreBookPage({ onNavigate }: Props) {
           ) : (
             /* ---------- SETUP ---------- */
             <div className="pb-setup">
-              <h1 className="pb-setup-h"><Circle size={12} fill="currentColor" /> {activeColl}</h1>
+              <h1 className="pb-setup-h"><Circle size={12} fill="currentColor" /> {activeColl}<small className="pb-setup-sub">Pre-book collection · {setupDrops.length} drops · {setupDrops.filter((d) => d.status === 'open').length} open</small></h1>
 
               <section className="pb-card">
                 <div className="pb-card-head"><span className="pb-card-title"><Calendar size={16} /> Pre-book Drops <b className="pb-count dark">{setupDrops.length}</b></span><button className="pb-dark-btn" onClick={addDrop} data-testid="pb-new-drop"><Plus size={15} /> New drop</button></div>

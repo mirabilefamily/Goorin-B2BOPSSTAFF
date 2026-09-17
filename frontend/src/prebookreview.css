@@ -488,3 +488,59 @@
 .pb-coll-main { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; min-width: 0; }
 .pb-coll-main strong { font-family: var(--ui); font-size: 14px; font-weight: 700; color: #16241d; } .pb-coll-main small { font-size: 11.5px; color: #8a938d; font-weight: 500; }
 .pb-coll > svg { color: #b9c2bb; } .pb-coll.active .pb-coll-main strong { color: #2952c8; } .pb-coll.active > svg { color: #2952c8; }
+/* mode segment inside sidebar */
+.pb-mode-seg { display: grid !important; grid-template-columns: 1fr 1fr; width: 100%; margin-bottom: 14px; }
+.pb-mode-seg button { justify-content: center; padding: 9px 12px !important; font-size: 14px !important; }
+.pb-side-tools { display: inline-flex; gap: 6px; }
+/* panel tabs → tray style, consistent with segmented controls */
+.pb-panel-tabs { gap: 4px !important; padding: 5px; background: #e9eeeb; border-radius: 12px; }
+.pb-panel-tabs > button { padding: 8px 16px !important; border-radius: 9px !important; color: #8a958f !important; background: transparent !important; }
+.pb-panel-tabs > button.active { background: #fff !important; color: #0f1f18 !important; box-shadow: 0 1px 2px rgba(15,31,24,.08), 0 6px 14px -8px rgba(15,31,24,.25); }
+.pb-panel-tabs > button.active .pb-count { background: #0f1f18 !important; color: #fff !important; }
+.pb-panel-tabs > button:not(.active) .pb-count { background: rgba(15,31,24,.08) !important; color: #66746d !important; }
+.pb-ghost-btn, .pb-ext { white-space: nowrap; }
+.pb-panel-left { display: flex; align-items: center; gap: 12px; }
+.pb-panel-tools .pb-ghost-btn { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; flex-shrink: 0; }
+.pb-panel-tools { flex-wrap: nowrap; }
+.pb-rename { font: inherit; font-size: inherit; font-weight: inherit; color: var(--ink); border: none; border-bottom: 2px solid var(--green); background: transparent; outline: none; padding: 0 2px; min-width: 120px; width: 200px; }
+
+/* ===== Pre-Book clean pass ===== */
+/* sidebar */
+.pb-side { padding: 16px; gap: 12px; }
+.pb-side-head { padding: 0 4px; margin-bottom: 2px; }
+.pb-side-head > span:first-child { font-size: 10.5px; letter-spacing: .12em; }
+.pbx-season { padding: 8px; border-radius: 14px; }
+.pbx-season-head strong { font-size: 14.5px; }
+.pb-drop-item { border-radius: 10px !important; padding: 9px 10px !important; font-size: 13.5px !important; }
+.pb-side-foot { display: flex; flex-direction: column; gap: 6px; align-items: stretch; padding-top: 12px; border-top: 1px solid var(--line); }
+.pb-side-foot .pb-foot-link { display: flex; justify-content: center; align-items: center; gap: 7px; width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px !important; background: #fff; font-family: var(--ui); font-size: 13px; font-weight: 600; color: var(--ink); }
+.pb-side-foot .pb-foot-link:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pb-side-foot .pb-foot-link.muted { color: var(--ink-3); border-style: dashed; } .pb-side-foot .pb-foot-link.muted:hover { color: #fff; border-style: solid; }
+.pb-body--review .pb-side-foot { flex-direction: row; justify-content: space-between; align-items: center; }
+/* review hero */
+.pbx-hero { padding: 22px 26px; }
+.pbx-chip { font-size: 12px; padding: 6px 12px; border-radius: 10px; background: var(--sub); color: var(--ink-3); border: 1px solid transparent; }
+.pbx-chip.ok { background: #e6f4ee; color: #0f8a66; } .pbx-chip.warn { background: #fff6e3; color: #9a6208; }
+.pb-drop-idtop strong { font-size: 24px; letter-spacing: -.03em; } .pb-drop-idtop strong span { color: var(--ink-3); font-weight: 500; }
+.pbx-hero-stats { gap: 0; }
+.pbx-hero-stats > div { padding: 0 22px; border-right: 1px solid var(--line); } .pbx-hero-stats > div:first-child { padding-left: 0; } .pbx-hero-stats > div:last-of-type { border-right: none; }
+.pbx-hero-stats small { font-size: 10px; letter-spacing: .12em; } .pbx-hero-stats strong, .pbx-hero-stats b.big { font-size: 24px; letter-spacing: -.03em; }
+/* panel + table */
+.pb-panel-head { padding: 16px 22px !important; }
+.pb-table-wrap, .pbx-table { padding: 0 6px 8px; }
+.pb-row, .pbx-row { border-bottom: 1px solid #f0f3f1; transition: background .14s; } .pb-row:hover, .pbx-row:hover { background: #fbfcfb; }
+.pb-th, .pbx-th, .pb-table thead th { padding: 10px 16px; }
+.pb-sum-row, .pbx-sum { background: var(--sub); border-radius: 10px; font-weight: 600; }
+.pb-gap-pill, .pbx-gap { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 8px; }
+/* setup */
+.pb-setup-h { display: flex; align-items: baseline; gap: 12px; font-size: 24px; letter-spacing: -.03em; margin-bottom: 6px; }
+.pb-setup-h svg { color: var(--green); align-self: center; }
+.pb-setup-sub { font-size: 13px; font-weight: 500; color: var(--ink-4); letter-spacing: 0; }
+.pb-setup-card, .pb-setup-section { border-radius: 22px; padding: 22px 26px; }
+.pb-setup-card h2, .pb-setup-section h2 { font-size: 17px; }
+.pb-drow, .pb-setup-drop { border-radius: 14px; padding: 16px 18px; border: 1px solid var(--line); background: #fff; transition: border-color .16s, box-shadow .16s; }
+.pb-drow:hover, .pb-setup-drop:hover { border-color: #c9d3ce; box-shadow: 0 10px 24px -20px rgba(15,31,24,.35); }
+.pb-drow.active, .pb-setup-drop.active { border-left: 3px solid var(--green); }
+.pb-drow small, .pb-setup-drop small { font-size: 10px; letter-spacing: .12em; }
+.pb-group-card { border-radius: 14px; border: 1px solid var(--line); padding: 16px 18px; }
+.pb-tag, .pb-cg-chip { border-radius: 8px !important; font-size: 12px; }

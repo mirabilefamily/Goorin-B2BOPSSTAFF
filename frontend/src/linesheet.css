@@ -258,3 +258,25 @@
 .ls-item .ls-thumb::after { content: ''; position: absolute; inset: 0; background: rgba(15,31,24,0); transition: background .16s; pointer-events: none; }
 .ls-item .ls-thumb { position: relative; } .ls-item.on .ls-thumb::after { background: rgba(15,138,102,.08); }
 .ls-head-actions { display: flex; gap: 8px; } .ls-head-actions .ops-btn { padding: 8px 14px; font-size: 13px; }
+.ls-builder-top .ls-head-actions { gap: 6px; }
+.ls-icon { position: relative; }
+.ls-icon.dark { background: var(--ink); color: #fff; border-color: var(--ink); } .ls-icon.dark:hover { background: var(--green); border-color: var(--green); }
+.ls-icon-n { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 5px; border-radius: 7px; background: var(--green); color: #fff; font-size: 10.5px; font-weight: 700; border: 2px solid #fff; }
+.ls-builder-sub { display: flex; align-items: center; gap: 10px; margin-top: -8px; } .ls-builder-sub .ls-muted { padding: 0; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* v6 — organized rail */
+.ls-step { display: flex; align-items: center; gap: 9px; font-family: var(--ui); font-size: 13px; font-weight: 700; color: var(--ink); margin: 6px 0 -4px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ls-step b { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; background: var(--ink); color: #fff; font-size: 11px; }
+.ls-step span { color: var(--ink-4); font-weight: 500; }
+.ls-builder-scroll > .ls-step:first-of-type { border-top: none; padding-top: 4px; }
+.ls-sel-head { border-top: none; padding-top: 0; margin-top: 0; } .ls-sel-head .ls-step { flex: 1; }
+.ls-builder-scroll { gap: 12px; }
+.ls-field > span { font-size: 10px; }
+.ls-hint { font-size: 11.5px; }
+.ls-switch { padding: 9px 12px; }
+.ls-toolbar { padding: 12px 26px 12px; }
+.ls-toolbar.sub { padding: 8px 26px; }
+.ls-pipe-head { padding: 18px 26px 0; }
+.ls-item .ls-thumb { aspect-ratio: 1 / .85; }
+.ls-item-body { padding: 10px 12px 12px; } .ls-item-body strong { font-size: 13px; }
+.ls-item-price { margin-top: 6px; padding-top: 6px; }
+.ls-grid { gap: 12px; }

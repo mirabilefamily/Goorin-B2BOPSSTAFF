@@ -93,10 +93,6 @@ export default function LinesheetPage() {
         <section className="ls-card ls-catalog">
           <div className="ls-pipe-head">
             <h2>Catalog <span className="ls-muted">{items.length} shown{sel.size > 0 ? ` · ${sel.size} selected` : ''}</span></h2>
-            <div className="ls-head-actions">
-              <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
-              <button className="ops-btn dark" onClick={startNew} data-testid="ls-new-top"><FilePlus2 size={15} /> New Linesheet</button>
-            </div>
           </div>
           <div className="ls-toolbar">
             <MultiSelect label="Seasons" testId="ls-season" value={seasons} onChange={setSeasons} options={SEASONS.map((s) => ({ value: s, label: s, count: CATALOG.filter((i) => i.season === s).length }))} />
@@ -137,10 +133,17 @@ export default function LinesheetPage() {
         <aside className="ls-card ls-builder" data-testid="ls-builder">
           <div className="ls-builder-scroll">
             <div className="ls-builder-top">
-              <h2>Export setup</h2>
-              {current ? <span className="ls-draft" data-testid="ls-draft-badge"><Save size={12} /> {dirty ? 'Unsaved changes' : `Saved ${rel(current.updatedAt)}`}</span> : <span className="ls-draft muted">New draft</span>}
+              <h2>Linesheet Builder</h2>
+              <div className="ls-head-actions">
+                <button className="ls-icon" onClick={() => setDrawer(true)} title="Saved linesheets" data-testid="ls-open-saved"><FolderOpen size={15} />{saved.length > 0 && <b className="ls-icon-n">{saved.length}</b>}</button>
+                <button className="ls-icon dark" onClick={startNew} title="New linesheet" data-testid="ls-new-top"><FilePlus2 size={15} /></button>
+              </div>
             </div>
+            <div className="ls-builder-sub">{current ? <span className="ls-draft" data-testid="ls-draft-badge"><Save size={12} /> {dirty ? 'Unsaved changes' : `Saved ${rel(current.updatedAt)}`}</span> : <span className="ls-draft muted">New draft</span>}{current && <small className="ls-muted">{current.title}</small>}</div>
+            <p className="ls-step"><b>1</b> Document</p>
             <label className="ls-field"><span>Document title</span><input maxLength={200} value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} data-testid="ls-title" /><small className="ls-hint">Up to 200 characters<b>{doc.title.length}/200</b></small></label>
+            <label className="ls-field"><span>Notes for customer</span><textarea rows={2} value={doc.notes} onChange={(e) => setDoc({ ...doc, notes: e.target.value })} placeholder="Terms, delivery window, contact…" data-testid="ls-notes" /></label>
+            <p className="ls-step"><b>2</b> Pricing</p>
             <div className="ls-field"><span>Pricing context</span>
               <div className="ops-seg ls-ctx-seg" role="tablist" data-testid="ls-ctx">
                 <button role="tab" aria-selected={doc.ctx === 'list'} className={doc.ctx === 'list' ? 'active' : ''} onClick={() => setDoc({ ...doc, ctx: 'list' })} data-testid="ls-ctx-list">Price list</button>
@@ -168,9 +171,8 @@ export default function LinesheetPage() {
             <div className="ls-toggles">
               <label className="ls-switch"><span>Show MSRP<small>Retail price next to wholesale on cards and the PDF</small></span><input type="checkbox" checked={doc.showMsrp} onChange={(e) => setDoc({ ...doc, showMsrp: e.target.checked })} data-testid="ls-toggle-msrp" /><i className="ls-track" /></label>
             </div>
-            <label className="ls-field"><span>Notes for customer</span><textarea rows={2} value={doc.notes} onChange={(e) => setDoc({ ...doc, notes: e.target.value })} placeholder="Terms, delivery window, contact…" data-testid="ls-notes" /></label>
 
-            <div className="ls-sel-head"><h2>Selected <span data-testid="ls-selected-count">({chosen.length}/{MAX_SEL})</span></h2>{resolving && <Loader2 size={15} className="ls-spin" />}</div>
+            <div className="ls-sel-head"><p className="ls-step"><b>3</b> Styles <span data-testid="ls-selected-count">({chosen.length}/{MAX_SEL})</span></p>{resolving && <Loader2 size={15} className="ls-spin" />}</div>
             {chosen.length > 0 && (
               <div className="ls-stats">
                 <div><small>Styles</small><strong>{chosen.length}</strong></div>
