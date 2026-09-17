@@ -28,7 +28,7 @@ export const poUnits = (p: PO) => p.lines.reduce((a, l) => a + l.ordered - l.shi
 export const poValue = (p: PO) => Math.round(poUnits(p) * p.unit);
 const parse = (d: string) => { const [m, dd, y] = d.split('-').map(Number); return new Date(y, m - 1, dd).getTime(); };
 const TODAY = parse('06-08-2026');
-const daysOut = (d: string) => Math.round((parse(d) - TODAY) / 86_400_000);
+export const daysOut = (d: string) => Math.round((parse(d) - TODAY) / 86_400_000);
 
 type SortKey = 'po' | 'customer' | 'factory' | 'shipDate' | 'units';
 type Group = { key: string; customer: string; factory: string; pos: PO[] };

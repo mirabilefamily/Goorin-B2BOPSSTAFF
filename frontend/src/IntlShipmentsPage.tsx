@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, ArrowLeft, CalendarClock, Check, ChevronRight, CreditCard, Download, FileWarning, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
-import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
+import { IntlOpenOrders, OPEN_POS, daysOut, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
 import './intlshipments.css';
 
@@ -132,16 +131,13 @@ export default function IntlShipmentsPage() {
   return (
     <div className="is" data-testid="intl-shipments-page">
       {(() => {
-        const now = new Date();
-        const sched = Array.from({ length: 6 }, (_, i) => { const d = new Date(now.getFullYear(), now.getMonth() + i, 1); return { key: `${d.getMonth()}-${d.getFullYear()}`, w: i === 0 ? 'Now' : d.toLocaleString('en-US', { month: 'short' }), units: 0, late: false }; });
-        list.forEach((s) => { const d = daysTo(s.ship); if (d === null || s.status === 'shipped' || s.status === 'invoiced') return; const [mm, , yy] = s.ship.split('-').map(Number); const hit = d < 0 ? sched[0] : sched.find((w) => w.key === `${mm - 1}-${yy}`); if (hit) { hit.units += units(s); if (d < 0) hit.late = true; } });
         const relPct = active.length ? Math.round((released.length / active.length) * 100) : 0;
         const stageColor: Record<string, string> = { draft: '#c9c0a5', ready: '#8fd1b6', instructions: '#9db1ec', prepayment: '#e0a629', prepaid: '#0f8a66', shipped: '#2952c8', invoiced: '#b7c1bb' };
         return (
       <section className="is-card is-hero" data-testid="is-priority-strip">
         <div className="is-hero-left">
           <div className="is-hero-top">
-            <p className="is-eyebrow"><i /> Action center · {tab === 'shipments' ? 'Shipments' : 'Open orders'}</p>
+            <p className="is-eyebrow"><i /> {tab === 'shipments' ? 'Action center' : 'Order intake'}</p>
             <div className="is-hero-tools" data-testid="is-modebar">
               <div className="is-seg" role="tablist">
                 <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
@@ -151,50 +147,75 @@ export default function IntlShipmentsPage() {
               <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
             </div>
           </div>
-          {(() => {
+          {tab === 'shipments' ? (() => {
             const prepayDue = list.filter((s) => s.status === 'prepayment');
-            const soon = list.filter(dueSoon); const late = list.filter(isOverdue); const packs = list.filter(noPack);
+            const late = list.filter(isOverdue); const packs = list.filter(noPack); const soon = list.filter(dueSoon);
             const items = prepayDue.length + attention.length + late.length + packs.length;
             const setQueue = (k: typeof fQueue) => { setFQueue(fQueue === k ? '' : k); setFStatus('all'); setFMsg(false); };
+            const queues = [
+              { k: 'prepay', on: fStatus === 'prepayment', tone: 'warn', Icon: CreditCard, label: 'Collect prepayment', n: prepayDue.length, sub: `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}`, tid: 'is-kpi-released', go: () => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); } },
+              { k: 'msg', on: fMsg, tone: 'info', Icon: MessageSquare, label: 'Reply to customers', n: attention.length, sub: attention.map((s) => `${s.customer.split(' ')[0]} · ${s.id}`).join(', '), tid: 'is-attn-group-message', go: () => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); } },
+              { k: 'overdue', on: fQueue === 'overdue', tone: 'danger', Icon: AlertTriangle, label: 'Overdue ship date', n: late.length, sub: late.map((s) => s.id).join(', '), tid: 'is-queue-overdue', go: () => setQueue('overdue') },
+              { k: 'nopack', on: fQueue === 'nopack', tone: 'warn', Icon: FileWarning, label: 'Missing packing list', n: packs.length, sub: packs.map((s) => s.id).join(', '), tid: 'is-queue-nopack', go: () => setQueue('nopack') },
+              { k: 'soon', on: fQueue === 'soon', tone: '', Icon: CalendarClock, label: 'Shipping in 30 days', n: soon.length, sub: `${soon.reduce((a, s) => a + units(s), 0).toLocaleString()} units`, tid: 'is-queue-soon', go: () => setQueue('soon') },
+            ].filter((x) => x.n > 0);
+            const upcoming = list.filter((s) => s.status !== 'shipped' && s.status !== 'invoiced' && daysTo(s.ship) !== null).sort((a, b) => daysTo(a.ship)! - daysTo(b.ship)!).slice(0, 3);
             return (<>
           <div className="is-figure">
             <strong>{items}</strong>
-            <div className="is-figure-txt"><em>item{items === 1 ? '' : 's'} need action today</em><small>{money(prepayDue.reduce((a, s) => a + s.prepay, 0))} prepayment outstanding</small></div>
+            <div className="is-figure-txt"><em>item{items === 1 ? '' : 's'} need action</em><small>{money(prepayDue.reduce((a, s) => a + s.prepay, 0))} prepayment outstanding · {attention.length} unanswered</small></div>
           </div>
-          {(() => {
-            const queues = [
-              { k: 'prepay', on: fStatus === 'prepayment', tone: 'warn', Icon: CreditCard, label: 'Collect prepayment', n: prepayDue.length, sub: prepayDue.length ? `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}` : 'Nothing outstanding', tid: 'is-kpi-released', go: () => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); } },
-              { k: 'msg', on: fMsg, tone: 'info', Icon: MessageSquare, label: 'Reply to customers', n: attention.length, sub: attention.length ? attention.map((s) => `${s.customer.split(' ')[0]} · ${s.id}`).join(', ') : 'Inbox clear', tid: 'is-attn-group-message', go: () => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); } },
-              { k: 'overdue', on: fQueue === 'overdue', tone: 'danger', Icon: AlertTriangle, label: 'Overdue ship date', n: late.length, sub: late.length ? `Up to ${Math.max(...late.map((s) => Math.abs(daysTo(s.ship)!)))} days past due` : 'On schedule', tid: 'is-queue-overdue', go: () => setQueue('overdue') },
-              { k: 'nopack', on: fQueue === 'nopack', tone: 'warn', Icon: FileWarning, label: 'Missing packing list', n: packs.length, sub: packs.length ? 'Upload to populate lines' : 'All uploaded', tid: 'is-queue-nopack', go: () => setQueue('nopack') },
-              { k: 'soon', on: fQueue === 'soon', tone: '', Icon: CalendarClock, label: 'Shipping in 30 days', n: soon.length, sub: soon.length ? `${soon.reduce((a, s) => a + units(s), 0).toLocaleString()} units leaving factory` : 'Nothing due this month', tid: 'is-queue-soon', go: () => setQueue('soon') },
-            ];
-            const live = queues.filter((x) => x.n > 0); const clear = queues.filter((x) => x.n === 0);
+          <div className="is-body">
+            <div className="is-queues">
+              {queues.map((x) => (
+                <button key={x.k} className={`is-queue ${x.on ? 'on' : ''} ${x.tone}`} onClick={x.go} data-testid={x.tid}>
+                  <i><x.Icon size={15} /></i><span>{x.label}</span><small>{x.sub}</small><b>{x.n}</b><ChevronRight size={15} className="is-queue-chev" />
+                </button>
+              ))}
+              {queues.length === 0 && <div className="is-queue-empty"><Check size={16} /> Nothing needs action — pipeline is clear.</div>}
+              <button className={`is-all ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); }} data-testid="is-kpi-all">Show all {active.length} active · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</button>
+            </div>
+            <div className="is-next">
+              <p className="is-eyebrow">Next to ship</p>
+              {upcoming.map((s) => { const d = daysTo(s.ship)!; return (
+                <button key={s.id} className="is-next-row" onClick={() => setOpenId(s.id)} data-testid={`is-next-${s.id}`}>
+                  <i className="is-mono-av xs">{mono(s.customer)}</i>
+                  <span><strong>{s.customer}</strong><small>{s.id} · {units(s).toLocaleString()} units</small></span>
+                  <em className={d < 0 ? 'late' : d <= 14 ? 'soon' : ''}><b>{d < 0 ? `${Math.abs(d)}d late` : `${d}d`}</b><small>{s.ship}</small></em>
+                </button>
+              ); })}
+              {upcoming.length === 0 && <p className="is-muted">Nothing scheduled.</p>}
+            </div>
+          </div>
+            </>); })() : (() => {
+            const oUnits = OPEN_POS.reduce((a, p) => a + poUnits(p), 0); const oValue = OPEN_POS.reduce((a, p) => a + poValue(p), 0);
+            const dd = daysOut;
+            const due14 = OPEN_POS.filter((p) => dd(p.shipDate) <= 14); const lateOs = OPEN_POS.filter((p) => dd(p.shipDate) < 0);
+            const gm = new Map<string, number>(); due14.forEach((p) => gm.set(`${p.customer}|${p.factory}`, (gm.get(`${p.customer}|${p.factory}`) ?? 0) + 1));
+            const groups = Array.from(gm.values()).filter((n) => n > 1).length;
+            const byCust = Array.from(new Set(OPEN_POS.map((p) => p.customer))).map((c) => ({ c, u: OPEN_POS.filter((p) => p.customer === c).reduce((a, p) => a + poUnits(p), 0), n: OPEN_POS.filter((p) => p.customer === c).length })).sort((a, b) => b.u - a.u).slice(0, 4);
+            const mx = byCust[0]?.u || 1;
             return (<>
-          <div className="is-queues">
-            {live.map((x) => (
-              <button key={x.k} className={`is-queue ${x.on ? 'on' : ''} ${x.tone}`} onClick={x.go} data-testid={x.tid}>
-                <i><x.Icon size={15} /></i><span>{x.label}</span><small>{x.sub}</small><b>{x.n}</b><em className="is-queue-go">{x.on ? 'Showing' : 'Show'} <ChevronRight size={13} /></em>
-              </button>
-            ))}
-            {live.length === 0 && <div className="is-queue-empty"><Check size={16} /> Nothing needs action — pipeline is clear.</div>}
+          <div className="is-figure">
+            <strong>{OPEN_POS.length}</strong>
+            <div className="is-figure-txt"><em>open purchase orders</em><small>{oUnits.toLocaleString()} units · {money(oValue)} not yet on a shipment</small></div>
           </div>
-            </>); })()}
-          <button className={`is-all ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); }} data-testid="is-kpi-all">Show all {active.length} active · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</button>
-          <div className="is-sched">
-            <div className="is-sched-head"><span>Ship schedule</span><small>next 6 months · units</small></div>
-            <div className="is-hero-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sched} margin={{ top: 4, right: 0, left: 0, bottom: 0 }} barCategoryGap="42%">
-                  <XAxis dataKey="w" tickLine={false} axisLine={false} interval={0} tick={{ fill: '#98a39d', fontSize: 10 }} dy={4} />
-                  <Tooltip cursor={{ fill: 'rgba(15,31,24,.04)' }} content={({ active: on, payload, label }: any) => on && payload?.length ? <div className="is-tip"><p>{label}</p><b>{payload[0].value.toLocaleString()} units</b></div> : null} />
-                  <Bar dataKey="units" radius={[4, 4, 2, 2]} isAnimationActive={false} minPointSize={2}>{sched.map((w, i) => <Cell key={i} fill={w.late ? '#d9344a' : w.units ? '#0f8a66' : '#e3e9e5'} />)}</Bar>
-                </BarChart>
-              </ResponsiveContainer>
+          <div className="is-body">
+            <div className="is-queues">
+              <div className={`is-queue ${lateOs.length ? 'danger' : ''}`} data-testid="is-oo-kpi-overdue"><i><AlertTriangle size={15} /></i><span>Past ship date</span><small>{lateOs.length ? lateOs.map((p) => p.po).join(', ') : 'None overdue'}</small><b>{lateOs.length}</b></div>
+              <div className="is-queue" data-testid="is-oo-kpi-due"><i><CalendarClock size={15} /></i><span>Due within 14 days</span><small>{due14.reduce((a, p) => a + poUnits(p), 0).toLocaleString()} units</small><b>{due14.length}</b></div>
+              <div className={`is-queue ${groups ? 'ok' : ''}`} data-testid="is-oo-kpi-groups"><i><Truck size={15} /></i><span>Consolidation opportunities</span><small>Same customer & factory, close ship dates</small><b>{groups}</b></div>
+            </div>
+            <div className="is-next">
+              <p className="is-eyebrow">Largest customers · units</p>
+              {byCust.map((x) => (
+                <div key={x.c} className="is-bar-row" data-testid="is-oo-cust-bar"><span><strong>{x.c}</strong><small>{x.n} PO{x.n === 1 ? '' : 's'}</small></span><i><b style={{ width: `${(x.u / mx) * 100}%` }} /></i><em>{x.u.toLocaleString()}</em></div>
+              ))}
             </div>
           </div>
             </>); })()}
         </div>
+        {tab === 'shipments' ? (
         <aside className="is-hero-rail">
           <div className="is-rail-head"><p className="is-eyebrow">Pipeline</p><span className="is-pct">{relPct}% released</span></div>
           <div className="is-rail-nums"><strong>{active.length}</strong><span>active shipment{active.length === 1 ? '' : 's'} · {list.length - active.length} invoiced</span></div>
@@ -210,6 +231,18 @@ export default function IntlShipmentsPage() {
             ))}
           </div>
         </aside>
+        ) : (
+        <aside className="is-hero-rail">
+          <div className="is-rail-head"><p className="is-eyebrow">By factory</p><span className="is-pct">{new Set(OPEN_POS.map((p) => p.factory)).size} factories</span></div>
+          <div className="is-rail-nums"><strong>{OPEN_POS.reduce((a, p) => a + poUnits(p), 0).toLocaleString()}</strong><span>units awaiting shipment</span></div>
+          <div className="is-rail-stack" aria-hidden="true">{Array.from(new Set(OPEN_POS.map((p) => p.factory))).map((f, i) => <i key={f} style={{ width: `${(OPEN_POS.filter((p) => p.factory === f).reduce((a, p) => a + poUnits(p), 0) / (OPEN_POS.reduce((a, p) => a + poUnits(p), 0) || 1)) * 100}%`, background: ['#0f8a66', '#2952c8', '#e0a629'][i % 3] }} />)}</div>
+          <div className="is-rail-split">
+            {Array.from(new Set(OPEN_POS.map((p) => p.factory))).map((f, i) => (
+              <div className="is-rail-row" key={f} data-testid="is-oo-rail-factory"><span><i style={{ background: ['#0f8a66', '#2952c8', '#e0a629'][i % 3] }} />{f.replace(/\s*\(.*\)$/, '')}</span><b>{OPEN_POS.filter((p) => p.factory === f).length}</b><em>{OPEN_POS.filter((p) => p.factory === f).reduce((a, p) => a + poUnits(p), 0).toLocaleString()}<small>units</small></em></div>
+            ))}
+          </div>
+        </aside>
+        )}
       </section>
         ); })()}
 
