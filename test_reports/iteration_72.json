@@ -1,0 +1,59 @@
+{
+  "summary": "Frontend regression for tab-aware Intl Shipments hero (Shipments Action Center + Open Orders Order Intake) at 1920x900, 1280x800, 390x844. All review-request flows pass with 0 console errors, 0 pageerrors, 0 horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty email/password -> ryan@mirabile.com; sidebar 'Intl Shipments'",
+    "shipments_hero": {
+      "figure": "'3 items need action' ($3,182.50 prepayment outstanding · 2 unanswered)",
+      "queues_visible_only_when_positive": {
+        "is-kpi-released": "present (1)",
+        "is-attn-group-message": "present (2)",
+        "is-queue-overdue/nopack/soon": "absent (0) — correct"
+      },
+      "filters (is-row-* count)": {
+        "initial": 3,
+        "is-kpi-released": 1,
+        "is-attn-group-message": 2,
+        "is-kpi-all": 3,
+        "is-kpi-shipped rail": 1
+      },
+      "is-next-IS-0011": "opens intl-shipment-detail; is-back returns",
+      "is-attn-ignore-IS-0010": "Reply-to-customers 2 -> 1; queue text 'Mirabile · IS-0012 · 1'"
+    },
+    "orders_tab": {
+      "is-oo-kpi-overdue": "0 (None overdue)",
+      "is-oo-kpi-due": "6 (6,088 units) — 6 POs within 14d of mocked TODAY 06-08-2026 [review expected 4; code math is consistent with seed]",
+      "is-oo-kpi-groups": "2",
+      "is-oo-cust-bar rows": 4,
+      "is-oo-rail-factory rows": 3,
+      "is-oo-groups-toggle": "present",
+      "is-oo-row-P0159": "present",
+      "switch_back": "is-tab-shipments restores Action Center (is-kpi-all visible)"
+    },
+    "regression": {
+      "is-stage-shipped": "1 row filter works",
+      "is-filter-customer-toggle": "menu opens",
+      "is-search": "present",
+      "is-clear-filters": "renders only when a filter is active (works)",
+      "create_flow": "is-new-shipment -> is-create-modal -> fill customer/factory -> is-form-submit creates IS-0013 and opens intl-shipment-detail; is-back returns"
+    },
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 516 lines and still bundles list + detail + drawer + create modal + Action Center hero + Order Intake hero in one file; split into IntlShipmentsHero.tsx, IntlShipmentDetail.tsx, IntlCreateModal.tsx for maintainability.",
+    "Review request expected 'due 4' on Order Intake but seed OPEN_POS has 6 POs within 14 days of mocked TODAY (06-10 x3, 06-14, 06-18, 06-21). Either the review's expected count is stale or the seed should be trimmed to match documented expectations — worth confirming with main agent.",
+    "is-oo-cust-bar limits are unclear; verify sort/topN logic if design expects a max of 4 bars long-term."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "1 test shipment IS-0013 (client-side only, cleared on reload)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Tab-aware hero: is-tab-shipments -> Action Center (figure `.is-figure strong` = items-need-action count; queues render only when n>0: is-kpi-released, is-attn-group-message, is-queue-overdue/nopack/soon; is-kpi-all resets; rail is-kpi-<stage>). is-tab-orders -> Order Intake (is-oo-kpi-overdue/due/groups non-interactive; is-oo-cust-bar bars; is-oo-rail-factory rail). Board `is-open-orders` (is-oo-groups-toggle, is-oo-row-<po>) renders below when Orders tab active. TODAY mocked to 06-08-2026; within-14d POs = 6 (review said 4 — likely stale). is-clear-filters is conditional (renders only when a filter is active). Create modal requires customer+factory else shows 'Customer and factory are required' toast."
+}
