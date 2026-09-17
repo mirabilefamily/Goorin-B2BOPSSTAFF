@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, ChevronRight, Download, Factory, LayoutGrid, Ship, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Check, Download, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -58,13 +58,6 @@ const stepIdx = (st: Status) => STEPS.findIndex((x) => x.id === st);
 const DSTEPS = [{ id: 'draft', label: 'Draft' }, { id: 'ready', label: 'Ready' }, { id: 'booking', label: 'Booking & payment' }, { id: 'prepaid', label: 'Released' }, { id: 'shipped', label: 'Shipped' }, { id: 'invoiced', label: 'Invoiced' }];
 const dStepIdx = (st: Status) => DSTEPS.findIndex((x) => x.id === (st === 'instructions' || st === 'prepayment' ? 'booking' : st));
 const daysTo = (d: string) => { const [m, dd, y] = d.split('-').map(Number); if (!y) return null; return Math.ceil((new Date(y, m - 1, dd).getTime() - Date.now()) / 86_400_000); };
-function ShipChip({ s }: { s: Shipment }) {
-  if (s.status === 'shipped' || s.status === 'invoiced') return <em className="is-ship ok">Shipped {s.ship}</em>;
-  const d = daysTo(s.ship);
-  if (d === null) return <em className="is-ship">Ship date TBD</em>;
-  if (d < 0) return <em className="is-ship late">Overdue · {Math.abs(d)}d</em>;
-  return <em className={`is-ship ${d <= 14 ? 'soon' : ''}`}>Ships in {d}d · {s.ship}</em>;
-}
 
 export default function IntlShipmentsPage() {
   const toast = useToast();
@@ -115,23 +108,40 @@ export default function IntlShipmentsPage() {
   const factories = Array.from(new Set(list.map((s) => s.factory)));
 
   const active = list.filter((s) => s.status !== 'invoiced');
+  const released = list.filter((s) => s.status === 'prepaid');
   const viewUnits = rows.reduce((a, s) => a + units(s), 0);
-  const viewValue = rows.reduce((a, s) => a + soTotal(s), 0);
   const filtered = fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q;
   const dist = STEPS.map((st) => ({ ...st, n: list.filter((s) => s.status === st.id).length }));
+  const shipText = (s: Shipment) => {
+    if (s.status === 'shipped' || s.status === 'invoiced') return { main: s.ship, sub: 'Shipped', tone: 'ok' };
+    const d = daysTo(s.ship);
+    if (d === null) return { main: 'TBD', sub: 'Ship date', tone: '' };
+    if (d < 0) return { main: s.ship, sub: `${Math.abs(d)}d overdue`, tone: 'late' };
+    return { main: s.ship, sub: `in ${d} days`, tone: d <= 14 ? 'soon' : '' };
+  };
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <div className="is-modebar" data-testid="is-modebar">
-        <div className="ops-seg is-mode-seg" role="tablist">
-          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments"><Ship size={15} /> Shipments <b>{active.length}</b></button>
-          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders"><FileText size={15} /> Open Orders <b>{OPEN_ORDERS.length}</b></button>
+      <header className="is-top" data-testid="is-modebar">
+        <div className="is-top-l">
+          <h1>International Shipments</h1>
+          <p className="is-sub" data-testid="is-priority-strip">
+            <button className={fStatus === 'all' ? 'on' : ''} onClick={() => setFStatus('all')} data-testid="is-kpi-all">{active.length} active</button>
+            <button className={fStatus === 'prepaid' ? 'on' : ''} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">{released.length} released</button>
+            <span>{list.reduce((a, s) => a + units(s), 0).toLocaleString()} units</span>
+            <span>{money(list.reduce((a, s) => a + soTotal(s), 0))} declared</span>
+            {attention.length > 0 && <button className={`msg ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message"><i />{attention.length} awaiting reply</button>}
+          </p>
         </div>
-        <div className="is-modebar-r">
+        <div className="is-top-r">
+          <div className="ops-seg is-mode-seg" role="tablist">
+            <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
+            <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
+          </div>
           <button className="ops-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
           <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
-      </div>
+      </header>
 
       {tab === 'orders' && (
         <IntlOpenOrders
@@ -141,87 +151,45 @@ export default function IntlShipmentsPage() {
       )}
 
       {tab === 'shipments' && <>
-      <section className="is-card is-hero" data-testid="is-priority-strip">
-        <div className="is-hero-main">
-          <p className="is-kicker"><i className="is-dot" /> Pipeline · live</p>
-          <div className="is-hero-fig">
-            <h1>{active.length}</h1>
-            <div><strong>active shipment{active.length === 1 ? '' : 's'}</strong><small>{units(list[0]) >= 0 && list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div>
-          </div>
-          <div className="is-dist" aria-hidden="true">
-            {dist.filter((d) => d.n > 0).map((d) => <i key={d.id} className={`is-dist-seg ${d.id} ${fStatus !== 'all' && fStatus !== d.id ? 'dim' : ''}`} style={{ flex: d.n }} />)}
-          </div>
-          <div className="is-dist-legend">
-            {dist.map((d) => <button key={d.id} className={`is-dist-key ${d.id} ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-kpi-${d.id}`}><i />{STATUS_LABEL[d.id]}<b>{d.n}</b></button>)}
-          </div>
-
-          <div className={`is-inbox ${attention.length === 0 ? 'clear' : ''}`}>
-            <div className="is-inbox-head">
-              <span className="is-inbox-ic"><MessageSquare size={14} /></span>
-              <strong>{attention.length === 0 ? 'Inbox clear — every customer message answered' : `${attention.length} customer message${attention.length === 1 ? '' : 's'} awaiting reply`}</strong>
-              {attention.length > 0 && <button className={`is-inbox-filter ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message">{fMsg ? 'Showing in pipeline' : 'Filter pipeline'}<ChevronRight size={13} /></button>}
-            </div>
-            {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return (
-              <div key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
-                <i className="is-mono-av">{mono(m.who)}</i>
-                <span className="is-attn-body">
-                  <span className="is-attn-top"><strong>{m.who}</strong><small>{s.customer} · <b className="is-id">{s.id}</b></small><time>{m.at}</time></span>
-                  <q>{m.text}</q>
-                </span>
-                <span className="is-attn-actions">
-                  <button className="is-attn-reply" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}><MessageSquare size={12} /> Reply</button>
-                  <button className="is-attn-ignore" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={12} /> Ignore</button>
-                </span>
-              </div>
-            ); })}
-            {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFMsg(true)} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
-          </div>
-        </div>
-
-        <aside className="is-hero-rail">
-          <button className={`is-stat ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-            <span><Ship size={14} /> In pipeline</span><strong>{active.length}</strong><small>{list.length - active.length} invoiced · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units</small>
-          </button>
-          <button className={`is-stat g ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-            <span><CheckCircle2 size={14} /> Released to factory</span><strong>{list.filter((s) => s.status === 'prepaid').length}</strong><small>{money(list.filter((s) => s.status === 'prepaid').reduce((a, s) => a + s.prepay, 0))} prepaid received</small>
-          </button>
-          <div className="is-stat">
-            <span><Boxes size={14} /> Units in view</span><strong>{viewUnits.toLocaleString()}</strong><small>{money(viewValue)} across {rows.length} shipment{rows.length === 1 ? '' : 's'}</small>
-          </div>
-        </aside>
-      </section>
-
-      <section className="is-card is-pipeline">
-        <div className="is-pipe-head">
-          <h2>Shipments <span className="is-muted">{rows.length} of {list.length}</span></h2>
+      <section className="is-card is-board">
+        <div className="is-board-head">
+          <label className="is-search"><Search size={16} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipments, customers, SO or PO" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
           <div className="is-tools">
-            <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
-            <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
-            <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
+            <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">Customer</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
+            <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">Factory</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
             {filtered && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
           </div>
         </div>
         <div className="is-stages" role="tablist" data-testid="is-stages">
-          <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all">All<b>{list.length}</b></button>
-          {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]}<b>{d.n}</b></button>)}
+          <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all">All <b>{list.length}</b></button>
+          {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]} <b>{d.n}</b></button>)}
         </div>
+
         <div className="is-table" role="table">
-          <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory · terms</span><span>Orders & value</span><span className="r">Units · shipping</span></div>
-          {rows.map((s) => (
-            <button key={s.id} className={`is-tr is-row ${unanswered(s) ? 'has-msg' : ''}`} onClick={() => setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
-              <span className="is-c1 is-who"><i className="is-mono-av">{mono(s.customer)}</i><span><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b><i className="is-sep" />Created {s.created}{unanswered(s) && <em className="is-msg-dot" title="Unanswered message"><MessageSquare size={11} /> Reply</em>}</small></span></span>
-              <span className="is-c2"><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em><i className="is-prog">{STEPS.map((st, i) => <b key={st.id} className={i < stepIdx(s.status) ? 'd' : i === stepIdx(s.status) ? 'n' : ''} />)}</i></span>
-              <span className="is-c2"><strong className="is-fac">{s.factory}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
-              <span className="is-c3">
-                <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
-                <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
+          <div className="is-tr is-th"><span>Customer</span><span>Status</span><span>Factory</span><span>Ship date</span><span className="r">Units</span><span className="r">Value</span><span /></div>
+          {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); return (
+            <div key={s.id} className={`is-tr is-row ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
+              <span className="is-c1">
+                <strong>{s.customer}</strong>
+                <small><b className="is-id">{s.id}</b> · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}</small>
+                {m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><i /><em>{m.who}:</em> {m.text}</span>}
               </span>
-              <span className="is-c4 is-c4--last r"><strong>{units(s).toLocaleString()}<small> units · {s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></strong><ShipChip s={s} /></span>
-            </button>
-          ))}
+              <span className="is-c2"><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><small>Step {stepIdx(s.status) + 1} of {STEPS.length}</small></span>
+              <span className="is-c2"><strong>{s.factory.replace(/\s*\(.*\)$/, '')}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
+              <span className={`is-c2 is-date ${sh.tone}`}><strong>{sh.main}</strong><small>{sh.sub}</small></span>
+              <span className="is-c4 r"><strong>{units(s).toLocaleString()}</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></span>
+              <span className="is-c4 r"><strong>{money(soTotal(s))}</strong><small>PO {money(poTotal(s))}</small></span>
+              <span className="is-c5">
+                {m ? <>
+                  <button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}><MessageSquare size={13} /> Reply</button>
+                  <button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={13} /></button>
+                </> : <i className="is-chev" />}
+              </span>
+            </div>
+          ); })}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match these filters.</div>}
         </div>
-        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span>Units <b>{viewUnits.toLocaleString()}</b></span><span>SO total <b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b></span><span>PO total <b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b></span></div>
+        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span><b>{viewUnits.toLocaleString()}</b> units</span><span><b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b> SO value</span><span><b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b> PO value</span></div>
       </section>
       </>}
 
@@ -299,7 +267,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
         <div className="is-dhero-top">
           <div className="is-dhero-id">
             <p className="is-kicker">International shipment · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}</p>
-            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em></div>
+            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em></div>
             <div className="is-dmeta"><span><Factory size={15} /> {s.factory}</span><i /><span>{s.customer}</span><i /><span>Created {s.created}</span><i /><span>{s.booking.mode} · {s.incoterms}</span></div>
           </div>
           <div className="is-dactions">
@@ -354,7 +322,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
           </section>
           <div className="is-col">
             <section className="is-card is-facts is-next-card" data-testid="is-next-card">
-              <div className="is-card-head"><h2>Next action</h2>{nextLabel && <em className="is-status ready">→ {nextLabel}</em>}</div>
+              <div className="is-card-head"><h2>Next action</h2>{nextLabel && <em className="is-status ready"><i />{nextLabel}</em>}</div>
               <ul className="is-check">
                 {[
                   { l: 'Packing list uploaded', ok: s.packing !== '—' && s.lines.length > 0 },
@@ -395,7 +363,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
             <div className="is-docs" data-testid="is-booking-docs">{(s.bookingDocs ?? []).map((d) => <button key={d} className="is-docbtn" onClick={() => toast(`Downloading ${d}`)}><FileText size={15} /> {d}<Download size={14} /></button>)}</div>
           </section>
           <section className="is-card is-facts">
-            <div className="is-card-head"><h2>Prepayment</h2><em className={`is-status ${idx >= stepIdx('prepaid') ? 'prepaid' : idx === stepIdx('prepayment') ? 'prepayment' : 'draft'}`}>{idx >= stepIdx('prepaid') ? 'Received' : idx === stepIdx('prepayment') ? 'Awaiting' : 'Not requested'}</em></div>
+            <div className="is-card-head"><h2>Prepayment</h2><em className={`is-status ${idx >= stepIdx('prepaid') ? 'prepaid' : idx === stepIdx('prepayment') ? 'prepayment' : 'draft'}`}><i />{idx >= stepIdx('prepaid') ? 'Received' : idx === stepIdx('prepayment') ? 'Awaiting' : 'Not requested'}</em></div>
             <div className="is-pay"><strong>{money(s.prepay)}</strong><span>50% of invoice value · terms 50% Prepay / 50% Net 60</span></div>
             <div className="is-paybar" aria-hidden="true"><i style={{ width: idx >= stepIdx('invoiced') ? '100%' : idx >= stepIdx('prepaid') ? '50%' : '0%' }} /></div>
             <div className="is-paylegend"><span><b>{money(idx >= stepIdx('prepaid') ? s.prepay : 0)}</b> paid</span><span><b>{money(total - (idx >= stepIdx('prepaid') ? s.prepay : 0))}</b> outstanding</span></div>

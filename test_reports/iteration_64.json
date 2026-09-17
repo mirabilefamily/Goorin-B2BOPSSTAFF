@@ -1,0 +1,62 @@
+{
+  "summary": "Frontend-only regression for the redesigned INTL Shipments page (unified hero card with priority strip + KPI rail, pipeline card with underline stage tabs, single-card Open Orders with recommended groups band, borderless mode bar). All target data-testids present and functional; all flows in the review request pass at 1920x1080 and 390x844 with zero console errors and no horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "works (redirects to /#dashboard)",
+    "testids_present_shipments_view": [
+      "intl-shipments-page","is-priority-strip",
+      "is-kpi-all","is-kpi-released","is-kpi-prepaid","is-kpi-shipped",
+      "is-tab-shipments","is-tab-orders","is-factories","is-new-shipment",
+      "is-search","is-filter-customer","is-filter-factory",
+      "is-stage-all","is-stage-prepaid","is-stage-shipped"
+    ],
+    "filtering": {
+      "rows_all": 3,
+      "rows_stage_prepaid": 1,
+      "rows_kpi_shipped_legend": 1,
+      "rows_search_Mirabile": 1,
+      "clear_filters_shown_and_resets": true
+    },
+    "factories_drawer": "opens (is-factories-drawer) and closes via X",
+    "new_shipment_flow": "is-create-modal opens, is-form-customer/is-form-factory fill, is-form-submit creates new shipment (IS-0013) and navigates to intl-shipment-detail; is-back returns",
+    "detail": {
+      "dtab_count": 5,
+      "advance_click": "works (stage advanced)"
+    },
+    "priority_strip": {
+      "reply_buttons": 2,
+      "ignore_buttons": 2,
+      "group_message_toggle": "toggles (reply btn count stable while active messages remain)",
+      "reply_IS_0012_opens_detail_chat_tab": true,
+      "ignore_IS_0010_decrements_count": "2 -> 1"
+    },
+    "open_orders": {
+      "toolbar_testids": ["is-oo-search","is-oo-customer","is-oo-factory","is-oo-groups-toggle"],
+      "groups_toggle_reveals_is-oo-group-create-0": true,
+      "group_create_opens_modal_prefilled": "customer=Owear, factory=ASI Global Limited (China)",
+      "row_P0159_expands_lines_and_shows_is-order-create-P0159": true,
+      "order_create_P0159_opens_is-create-modal": true,
+      "oo_search_P01_matches": 8
+    },
+    "responsive": {
+      "desktop_1920_overflow": false,
+      "mobile_390_overflow": false
+    },
+    "console_errors": "none",
+    "controls_button_removed": true
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 449 lines and contains both List + Detail + FACTORIES data + create modal; consider splitting Detail into its own file for maintainability.",
+    "Factories drawer and Create modal share the same .is-backdrop class without click-outside disambiguation; not a bug but worth centralizing into a single reusable component."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "Transient shipment IS-0013 (TEST Customer Y / TEST Factory Y) created via create modal — in-memory only",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All INTL Shipments redesign flows verified end-to-end in this run. Note: Factories drawer & Create modal are only closable by X button or clicking .is-backdrop (Escape key does NOT close them) — future playwright scripts should click .is-x rather than page.keyboard.press('Escape')."
+}
