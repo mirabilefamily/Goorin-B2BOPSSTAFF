@@ -168,3 +168,8 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Mode bar (tabs + New Shipment) no longer a card; floats as toolbar.
 - Stage chips + customer/factory filters merged into one `.is-controls` row; tinted filter band and dividers removed.
 - Table header/footer restyled for one continuous surface. Regression: iteration_63 PASS.
+
+## 2026-06 — INTL Shipments redesign v3 (clean/refined)
+- Slim header: title + text stats (active/released/units/declared/awaiting reply, clickable filters), seg tabs, Factories + New Shipment.
+- Single board card: borderless search, ghost selects, quiet stage chips, 7-col table (customer+ID/SO, status dot, factory, ship date, units, value, hover Reply/Ignore). Inline unanswered-message line on rows.
+- Removed hero/KPI tiles/progress bars/pills. Open Orders in one card. Regression: iteration_65 PASS.

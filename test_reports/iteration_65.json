@@ -1,0 +1,59 @@
+{
+  "summary": "Frontend-only regression on the v3 INTL Shipments redesign (slim header with clickable text-stat filters, board card with borderless search + quiet stage chips + 7-column table + unanswered message line + hover Reply/Ignore, footer totals, detail + open orders). All flows from the review request pass at 1920x1080 and 390x844 with zero console/page errors and no horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "works (signs in as ryan@mirabile.com)",
+    "testids_present": [
+      "intl-shipments-page","is-kpi-all","is-kpi-released","is-attn-group-message",
+      "is-tab-shipments","is-tab-orders","is-factories","is-new-shipment",
+      "is-search","is-filter-customer","is-filter-factory",
+      "is-stage-all","is-stage-prepaid","is-stage-shipped","is-footer","is-empty","is-clear-filters"
+    ],
+    "filtering": {
+      "rows_all_initial": 3,
+      "rows_kpi_released": 1,
+      "rows_stage_prepaid": 1,
+      "rows_attn_group_message": 2,
+      "rows_search_Mirabile": 1,
+      "empty_state_shown_for_no_match": true,
+      "clear_filters_resets_all": true
+    },
+    "attn_flow": {
+      "is-attn-reply-IS-0012_opens_detail_with_is-chat": true,
+      "is-attn-ignore-IS-0010_decrements": "2 awaiting reply -> 1 awaiting reply; is-attn-IS-0010 removed"
+    },
+    "detail": {
+      "dtabs_present": ["overview","booking","chat","docs","activity"],
+      "is-advance_works": true,
+      "is-back_returns_to_list": true
+    },
+    "factories_drawer": "opens (is-factories-drawer) and closes via .is-x",
+    "create_modal": "is-create-modal opens; fill is-form-customer + is-form-factory; is-form-submit creates IS-0013 and navigates to intl-shipment-detail",
+    "open_orders": {
+      "toolbar_testids": ["is-oo-search","is-oo-customer","is-oo-factory","is-oo-groups-toggle"],
+      "is-oo-groups-toggle_reveals_is-oo-group-create-0": true,
+      "group_create_modal_prefilled": "customer=Owear, factory=ASI Global Limited (China)",
+      "is-oo-row-P0159_expands_is-oo-lines-P0159": true,
+      "is-order-create-P0159_opens_is-create-modal": true,
+      "is-oo-search_P01_matches_rows": 8
+    },
+    "responsive": {"desktop_1920_overflow_px": 0, "mobile_390_overflow_px": 0},
+    "console_errors": "none",
+    "page_errors": "none"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 417 lines with SEED data, List, Detail, Factories drawer, and Create modal in one file — consider splitting Detail and SEED into their own modules for maintainability.",
+    "unanswered() is recomputed on every render for every shipment; fine at current N=3 but worth memoizing or precomputing a Set<id> for larger lists.",
+    "The keydown Escape handler only exists in Detail; the create modal and factories drawer are not closable via Escape (only backdrop click or .is-x). Minor UX inconsistency."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "Transient shipment IS-0013 (TEST_Cust / TEST_Fac) created via create modal — in-memory only",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All v3 redesign flows verified. Header stats (is-kpi-all, is-kpi-released, is-attn-group-message) act as toggle filters. Stage chip filters (is-stage-<id>) toggle-on-click. is-clear-filters appears whenever any filter/search is active. Escape does NOT close create modal / factories drawer — use .is-x."
+}
