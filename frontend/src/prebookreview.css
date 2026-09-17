@@ -590,3 +590,20 @@
 .pbx-rep .pbx-rep-nums > div:nth-child(2) { margin-top: 18px; }
 .pbx-rep.primary .pbx-rep-nums > div:nth-child(2), .pbx-rep.primary .pbx-rep-ring { margin-top: 26px; }
 .pbx-rep-ring b span, .pbx-rep-nums b span { font: inherit !important; color: inherit !important; }
+/* report v3 — light comparison table */
+.pbx-report--table { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-top: 4px; }
+.pbx-rt-row { display: grid; grid-template-columns: 1.3fr .6fr 1.6fr .9fr 1.4fr .8fr; gap: 20px; align-items: center; padding: 13px 20px; border-bottom: 1px solid #f0f3f1; font-size: 14px; color: var(--ink); }
+.pbx-rt-row:last-child { border-bottom: none; }
+.pbx-rt-head { padding: 10px 20px; background: var(--sub); font-family: var(--ui); font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-4); }
+.pbx-rt-row.total { background: #fbfcfb; font-weight: 600; }
+.pbx-rt-row.total b, .pbx-rt-row.total .g { font-size: 16px; }
+.pbx-rt-row .r { text-align: right; } .pbx-rt-row .g { color: var(--green); font-weight: 600; font-family: var(--ui); }
+.pbx-rt-ch { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-family: var(--ui); } .pbx-rt-ch i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.pbx-rt-units, .pbx-rt-moq { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; }
+.pbx-rt-units b, .pbx-rt-moq b { font-family: var(--ui); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 52px; }
+.pbx-rt-moq b.g { color: var(--green); } .pbx-rt-moq b.a { color: #b8790c; }
+.pbx-rt-share { display: block; height: 6px; border-radius: 3px; background: #edf1ee; overflow: hidden; } .pbx-rt-share u { display: block; height: 100%; border-radius: 3px; transition: width .6s cubic-bezier(.16,1,.3,1); }
+.pbx-rt-units small, .pbx-rt-moq small { font-size: 11.5px; color: var(--ink-4); font-weight: 500; font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+.pbx-rt-delta { font-style: normal; font-family: var(--ui); font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 8px; }
+.pbx-rt-delta.up { background: #e6f4ee; color: #0f8a66; } .pbx-rt-delta.down { background: #fff6e3; color: #9a6208; }
+.pbx-rt-row:not(.pbx-rt-head):hover { background: #fbfcfb; }

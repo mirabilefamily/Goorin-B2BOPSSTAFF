@@ -304,23 +304,20 @@ export default function PreBookPage({ onNavigate }: Props) {
                     <button className="pbx-chip warn" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details"><Layers size={14} /> Purchasing · 4 standard · 0 consolidated · no POs <ChevronDown size={13} className={previewOpen ? 'flip' : ''} /></button>
                   </div>
                 </div>
-                <div className="pbx-report" data-testid="pb-stat-combined">
+                <div className="pbx-report pbx-report--table" data-testid="pb-stat-combined">
+                  <div className="pbx-rt-row pbx-rt-head"><span>Channel</span><span className="r">Accounts</span><span>Units · share</span><span className="r">Wholesale</span><span>MOQ hit</span><span className="r">vs Drop 2</span></div>
                   {[
-                    { key: 'all', name: 'Total Combined', dot: '#fff', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#6ee7b7', share: 100, delta: '+12% vs Drop 2', testId: 'pb-stat-total' },
-                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', share: Math.round((chan.usw.units / combined.units) * 100), delta: '−4% vs Drop 2', testId: 'pb-stat-usw' },
-                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', share: Math.round((chan.dist.units / combined.units) * 100), delta: '+18% vs Drop 2', testId: 'pb-stat-dist' },
-                  ].map((c, i) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; const R = 17, C = 2 * Math.PI * R; return (
-                    <div key={c.key} className={`pbx-rep ${i === 0 ? 'primary' : ''}`} data-testid={c.testId}>
-                      <div className="pbx-rep-head"><i style={{ background: c.dot }} /><strong>{c.name}</strong>{i > 0 && <em className="pbx-rep-share">{c.share}% of units</em>}<small>{c.accounts} accounts</small></div>
-                      <div className="pbx-rep-nums">
-                        <div className="pbx-rep-main"><small>Units</small><b>{c.units.toLocaleString()}</b><em className={c.delta.startsWith('+') ? 'up' : 'down'}>{c.delta}</em></div>
-                        <div><small>Wholesale</small><b className="g">{c.wholesale}</b></div>
-                        <div className="pbx-rep-ring">
-                          <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r={R} fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="4" /><circle cx="20" cy="20" r={R} fill="none" stroke={rate >= 90 ? '#34d399' : '#fbbf24'} strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(rate / 100) * C} ${C}`} transform="rotate(-90 20 20)" /></svg>
-                          <div><small>MOQ rate</small><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b><span>{c.hit}/{c.of} SKUs</span></div>
-                        </div>
-                      </div>
-                      <div className="pbx-rep-bar"><span><i style={{ width: `${rate}%`, background: c.bar }} /></span></div>
+                    { key: 'all', name: 'Total Combined', dot: '#0f1f18', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#0f1f18', share: 100, delta: 12, testId: 'pb-stat-total' },
+                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', share: Math.round((chan.usw.units / combined.units) * 100), delta: -4, testId: 'pb-stat-usw' },
+                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', share: Math.round((chan.dist.units / combined.units) * 100), delta: 18, testId: 'pb-stat-dist' },
+                  ].map((c, i) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; return (
+                    <div key={c.key} className={`pbx-rt-row ${i === 0 ? 'total' : ''}`} data-testid={c.testId}>
+                      <span className="pbx-rt-ch"><i style={{ background: c.dot }} />{c.name}</span>
+                      <span className="r">{c.accounts}</span>
+                      <span className="pbx-rt-units"><b>{c.units.toLocaleString()}</b><i className="pbx-rt-share"><u style={{ width: `${c.share}%`, background: c.bar }} /></i><small>{c.share}%</small></span>
+                      <span className="r g">{c.wholesale}</span>
+                      <span className="pbx-rt-moq"><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b><i className="pbx-rt-share"><u style={{ width: `${rate}%`, background: rate >= 90 ? '#16a37a' : '#e39a1c' }} /></i><small>{c.hit}/{c.of}</small></span>
+                      <span className="r"><em className={`pbx-rt-delta ${c.delta >= 0 ? 'up' : 'down'}`}>{c.delta >= 0 ? '+' : ''}{c.delta}%</em></span>
                     </div>
                   ); })}
                 </div>

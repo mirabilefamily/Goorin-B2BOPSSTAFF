@@ -157,3 +157,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Pre-Book hero: 3 dark channel report panels (Total Combined / US Wholesale / Distributor: accounts, units, wholesale, MOQ rate, MOQ-hit bar) replacing KPI row; Orders table fixed column widths/gaps.
 - 2026-06 Pre-Book report v2: unified dark band (Total Combined primary w/ 34px units + delta pill, USW/DIST with share-of-units chip), MOQ-rate rings, thin hit bars; hero body white.
 - Note: dev harness wraps dynamic text in <span display:contents>; avoid bare descendant `span` selectors on number containers (fixed .pbx-rep-ring).
+- 2026-06 Pre-Book report v3 (user disliked dark band): light comparison table — Channel | Accounts | Units·share bar | Wholesale | MOQ hit rate bar | vs Drop 2 delta; Total row emphasized.
