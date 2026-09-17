@@ -1,0 +1,59 @@
+{
+  "summary": "Verified rewritten Intl Shipments 'Shipment pipeline' board (data-testid is-board) end-to-end per iteration_82 spec. All targeted flows PASS with 0 console errors and 0 horizontal overflow at 1920x900 / 1280x800 / 390x844.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty creds -> Intl Shipments board loads",
+    "pipeline_stages": {
+      "is-stage-prepaid": ["IS-0012"],
+      "is-stage-msg": ["IS-0010", "IS-0012"],
+      "is-stage-all": ["IS-0010", "IS-0011", "IS-0012"]
+    },
+    "search": {"'Hangzhou'": ["IS-0011"]},
+    "filters": {
+      "is-filter-customer-toggle": "menu visible, is-filter-customer-opt-* options render with counts",
+      "opt_click_Mirabile": ["IS-0012"],
+      "is-clear-filters": "resets to 3 rows"
+    },
+    "footer": "3 shipments · Units 2,670 · SO total $24,099 · PO total $9,822.75",
+    "empty_state": "is-empty visible for gibberish search",
+    "sorting": {
+      "is-sort-value_asc": ["IS-0012", "IS-0011", "IS-0010"],
+      "is-sort-value_desc": ["IS-0010", "IS-0011", "IS-0012"],
+      "is-sort-customer_asc": ["IS-0010 (Industrias)", "IS-0012 (Mirabile)", "IS-0011 (SASAtrend)"]
+    },
+    "rows_and_attention": {
+      "is-row-IS-0012": "opens intl-shipment-detail",
+      "is-back": "returns to board",
+      "is-attn-reply-IS-0012": "opens detail on chat tab (is-chat visible)",
+      "is-attn-ignore-IS-0010": "removes attention row; Messages tile 2 -> 1 awaiting reply"
+    },
+    "is-factories-2": "opens is-factories-drawer",
+    "activity_tab": {
+      "items_count_IS-0012": 5,
+      "date_format_sample": "Sep 11, 2026, 3:29 AM · Ryan M"
+    },
+    "tabs_and_create": {
+      "is-tab-orders / is-tab-shipments": "switch works",
+      "is-new-shipment": "form submit creates IS-0013 and opens detail; toast 'IS-0013 created'"
+    },
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "is-drawer (factories) and is-modal (new shipment) have no Escape keydown handler; only the Detail view listens for Escape. Adding a shared handler on these overlays would match user expectation.",
+    "IntlShipmentsPage.tsx (~499 lines) still combines list + Detail — extraction into IntlShipmentDetail.tsx recommended.",
+    "fmtAt only formats MM-DD-YYYY timestamps; entries created via create() use toLocaleString('MM/DD/YYYY, h:mm A') so their activity timeline dates fall through unformatted. Normalize stamp() to match SEED format.",
+    "Rows filter useMemo dep array uses eslint-disable — hides potential missed deps in future refactors."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth)",
+  "seed_data_creation": "Created IS-0013 (TEST_Cust / TEST_Fac) during new-shipment flow test — client-side only.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "v16: Board rewritten with is-board wrapper containing is-search + is-factories-2, stage pills is-stage-all/is-stage-<status>/is-stage-instr/is-stage-msg, MultiSelect is-filter-customer/is-filter-factory, sortable headers is-sort-customer/is-sort-status/is-sort-value/is-sort-ship (is-sort-units removed), rows is-row-<id> with is-attn-<id>/is-attn-reply-<id>/is-attn-ignore-<id>, is-empty and is-footer. Detail is-dtab-activity renders is-activity timeline with formatted dates. All flows verified PASS."
+}
