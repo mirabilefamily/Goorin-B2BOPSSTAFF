@@ -76,7 +76,7 @@ export default function IntlShipmentsPage() {
   const [form, setForm] = useState({ customer: '', factory: '', so: '', po: '', ship: '' });
   const [ignored, setIgnored] = useState<Set<string>>(new Set());
   const [fMsg, setFMsg] = useState(false);
-  const [fQueue, setFQueue] = useState<'' | 'soon' | 'overdue' | 'nopack'>('');
+  const [fQueue, setFQueue] = useState<'' | 'soon' | 'overdue' | 'nopack' | 'instr'>('');
   const dueSoon = (s: Shipment) => { const d = daysTo(s.ship); return d !== null && d >= 0 && d <= 30 && s.status !== 'shipped' && s.status !== 'invoiced'; };
   const isOverdue = (s: Shipment) => { const d = daysTo(s.ship); return d !== null && d < 0 && s.status !== 'shipped' && s.status !== 'invoiced'; };
   const noPack = (s: Shipment) => s.lines.length === 0 || s.packing === '—';
@@ -90,6 +90,7 @@ export default function IntlShipmentsPage() {
     if (fQueue === 'soon' && !dueSoon(s)) return false;
     if (fQueue === 'overdue' && !isOverdue(s)) return false;
     if (fQueue === 'nopack' && !noPack(s)) return false;
+    if (fQueue === 'instr' && s.status !== 'ready' && s.status !== 'draft') return false;
     if (fCustomer.size && !fCustomer.has(s.customer)) return false;
     if (fFactory.size && !fFactory.has(s.factory)) return false;
     return true;
@@ -173,7 +174,7 @@ export default function IntlShipmentsPage() {
             <small>{prepayDue.length ? `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}` : `${money(released.reduce((a, s) => a + s.prepay, 0))} received · ${released.length} released`}</small>
             {prepayDue.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); markAllPrepaid(); }} data-testid="is-act-mark-prepaid"><Check size={13} /> Mark prepaid</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); toast(`Payment reminder sent to ${prepayDue.map((s) => s.buyer).join(', ')}`); }} data-testid="is-act-remind">Send reminder</em></span>}
           </button>
-          <button className={`is-tile ${fStatus === 'ready' || fStatus === 'draft' ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'ready' ? 'all' : 'ready'); }} disabled={needInstr.length === 0} data-testid="is-tile-instructions">
+          <button className={`is-tile ${fQueue === 'instr' ? 'on' : ''}`} onClick={() => setQueue('instr')} disabled={needInstr.length === 0} data-testid="is-tile-instructions">
             <header><i className="violet"><Send size={15} /></i><span>Needing shipping instructions</span></header>
             <strong>{needInstr.length}</strong>
             <small>{needInstr.length ? `${needInstr.map((s) => `${s.customer.split(' ')[0]} · ${s.id}`).join(', ')}` : `All instructions sent · ${list.filter((s) => s.status === 'instructions').length} awaiting factory confirmation`}</small>

@@ -189,3 +189,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - v11.1: table restyled to match tiles (dot statuses w/o pills, transparent header, right-aligned footer totals, pill actions), staggered tile entrance, soft ring on selected tile.
 - Verified clean/modern pass on desktop, Open Orders tab and 390px mobile (screenshots). CSS-only since iteration_77 PASS.
 - Tiles reordered per user: In pipeline | Messages (Reply/Ignore all) | Needing payment (Mark prepaid/Send reminder) | Needing shipping instructions (ready+draft; Send instructions advances to instructions, Open). v12 inset-panel styling.
+- Instructions tile filters draft+ready via fQueue=instr. Regression iteration_78 PASS.

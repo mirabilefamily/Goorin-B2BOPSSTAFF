@@ -1,0 +1,48 @@
+{
+  "summary": "Frontend regression for reordered Intl Shipments overview tiles (In pipeline / Messages / Needing payment / Needing shipping instructions). All specified flows and selectors pass. Draft-created shipment correctly enables the instructions tile with count 1; is-act-send-instr advances to 'instructions' and resets tile to 0/disabled. 0 console errors, 0 page errors, 0 horizontal overflow at 1920x800 and 390x844.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "tile_order": ["is-kpi-all", "is-attn-group-message", "is-kpi-released", "is-tile-instructions"],
+    "tile_counts_initial": {"is-kpi-all": "3", "is-attn-group-message": "2", "is-kpi-released": "1", "is-tile-instructions": "0 (disabled)"},
+    "filters": {"is-attn-group-message_rows": 2, "is-kpi-released_rows": 1, "is-kpi-all_rows": 3},
+    "actions": {
+      "is-next-IS-0011": "present",
+      "is-act-reply": "opens is-chat; is-back returns",
+      "is-act-mark-prepaid": "is-kpi-released -> 0",
+      "is-act-ignore-all": "is-attn-group-message -> 0"
+    },
+    "create_flow": {
+      "is-new-shipment_submit": "opens intl-shipment-detail",
+      "instructions_tile_after_create": "1, enabled",
+      "instructions_tile_filter_ready_rows": 0,
+      "is-act-send-instr": "tile resets to 0, disabled"
+    },
+    "regression": {
+      "is-row-IS-0012": "opens detail",
+      "is-search_SASA_rows": 1,
+      "is-filter-customer-toggle_menu": "visible",
+      "is-stage-shipped_rows": 1,
+      "is-clear-filters": "works",
+      "is-tab-orders/is-tab-shipments": "toggle works"
+    },
+    "responsive": {"1920x800_overflow": 0, "390x844_overflow": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Instructions tile filter selects status='ready' (setFStatus('ready')), but the tile counts ready+draft. As expected/spec'd, clicking the tile shows 0 rows when only a draft exists. Consider a compound filter (ready||draft) or renaming small caption to indicate this.",
+    "IntlShipmentsPage.tsx (~465 lines) still bundles list + Detail (~180 lines). Extract Detail into its own file for maintainability.",
+    "is-kpi-released testid label is semantically 'awaiting prepayment' — consider renaming to is-focus-prepay.",
+    "Nested <em class='is-tile-link'> onClick handlers inside <button class='is-tile'> are not keyboard-focusable independently; consider restructuring as a div container + inner buttons for tile filter and actions."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth per /app/memory/test_credentials.md)",
+  "seed_data_creation": "Transient IS-0013 (client-only) via New Shipment",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All 4 tiles render in requested order (In pipeline / Messages / Needing payment / Needing shipping instructions) with counts 3/2/1/0. Instructions tile disabled when 0, becomes 1 & enabled after draft creation, resets to 0 after is-act-send-instr. Clicking instructions tile filters to status='ready' (not 'ready||draft'), so drafts don't appear — spec calls this out as acceptable. All regression selectors verified."
+}
