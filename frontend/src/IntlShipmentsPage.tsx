@@ -181,17 +181,19 @@ export default function IntlShipmentsPage() {
             <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
           </div>
         </div>
-        <div className="is-stages" data-testid="is-stages">
-          <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all"><span>All</span><b>{list.length}</b></button>
-          {STEPS.map((st) => { const n = list.filter((s) => s.status === st.id).length; return (
-            <button key={st.id} className={`is-stage ${fStatus === st.id ? 'on' : ''} ${n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === st.id ? 'all' : st.id)} data-testid={`is-stage-${st.id}`}><span>{STATUS_LABEL[st.id]}</span><b>{n}</b></button>
-          ); })}
-        </div>
-        <div className="is-filters">
-          <span className="is-flabel"><Filter size={13} /> Filters</span>
-          <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
-          <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
-          {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
+        <div className="is-controls">
+          <div className="is-stages" data-testid="is-stages">
+            <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all"><span>All</span><b>{list.length}</b></button>
+            {STEPS.map((st) => { const n = list.filter((s) => s.status === st.id).length; return (
+              <button key={st.id} className={`is-stage ${fStatus === st.id ? 'on' : ''} ${n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === st.id ? 'all' : st.id)} data-testid={`is-stage-${st.id}`}><span>{STATUS_LABEL[st.id]}</span><b>{n}</b></button>
+            ); })}
+          </div>
+          <div className="is-filters">
+            <span className="is-flabel"><Filter size={13} /></span>
+            <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
+            <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
+            {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
+          </div>
         </div>
         <div className="is-table" role="table">
           <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory</span><span>Orders & value</span><span>Shipping</span></div>
