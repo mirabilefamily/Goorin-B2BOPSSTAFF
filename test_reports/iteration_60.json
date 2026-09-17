@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend Pre-Book Review tiles + Orders filter + Rename drop tested at 1920x800 via public URL. Tile values, filter click behavior (active ring, subtab switch, chip, toast), chip clear, total-tile clear, rename drop, and SKU Demand toggle all work. Only issue found: mock order counts per channel don't match the review spec.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "PreBookPage Orders mock data", "issue": "Review request specifies DIST=3 rows (badge=3) and USW=1 row (badge=1), but seeded orderList has DIST=2 (#443, #441) and USW=2 (#444, #442). Filter and badge counts correctly reflect the underlying (incorrect) mock; hence dist badge shows 2 (expected 3) and usw badge shows 2 (expected 1). Total remains 4.", "selector": "pb-subtab-orders .pb-count", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Pre-Book Review", "issues": ["Console warning (non-blocking): recharts ResponsiveContainer width(-1)/height(-1) warnings emitted repeatedly on mount — likely from mix bar or trend charts before layout settles. Suggest setting minWidth/minHeight or defer render until container has size."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Adjust mock orderList so Distributor has 3 orders and US Wholesale has 1 order to match Pre-Book Review spec (dist badge=3, usw badge=1, total=4).",
+    "Silence recharts width/height warnings by giving parent containers explicit dimensions."
+  ],
+  "critical_code_review_comments": [
+    "PreBookPage.tsx is very large (>500 lines with dense JSX); consider extracting hero tiles, orders table, and rename UI into separate components.",
+    "orderRows filter/count is derived from a single mocked array; seed data should be moved to a fixture so the spec-expected 3/1 channel split is enforced."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "90%"},
+  "test_credentials": "Empty email+password → demo login (ryan@mirabile.com) per /app/memory/test_credentials.md",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All pb-stat-* tiles render exact expected values (13,328 / 932 / 12,396 with correct wholesale, MOQ hit, share, delta arrows, mix bar). Clicking a channel tile: (a) applies 'on' class ring, (b) switches to pb-subtab-orders (class active), (c) shows pb-chan-clear chip with correct label, (d) fires toast 'Showing <Channel> orders'. pb-stat-total or pb-chan-clear resets filter (chip disappears, all 4 orders shown). Rename via pb-more-btn → pb-rename-drop → pb-rename-input + Enter updates hero title and sidebar entry. SKU Demand subtab works. Only functional gap: seeded orderList has 2 DIST + 2 USW instead of spec's 3 DIST + 1 USW — badges reflect this correctly but not the requested values.",
+  "rca of the issue": "Seed data mismatch: /app/frontend/src/PreBookPage.tsx lines 82-85 define 4 orders as USW/DIST/USW/DIST giving 2+2 split. Spec requires 3 DIST + 1 USW. Fix: convert one USW order (e.g. #442) to DIST, or add a 3rd DIST order and remove one USW."
+}
