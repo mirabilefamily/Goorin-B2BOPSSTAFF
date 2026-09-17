@@ -155,8 +155,8 @@ export default function IntlShipmentsPage() {
           <div className={`is-tile ${!filtered ? 'on' : ''}`} data-testid="is-tile-pipeline">
             <header><i className="ink"><Ship size={16} /></i><span>In pipeline</span></header>
             <strong>{active.length}</strong>
-            <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
             <small>{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'No shipments yet'}</small>
+            <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
             <footer>
               <button className={`is-tile-act ${!filtered ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); setQ(''); setFCustomer(new Set()); setFFactory(new Set()); }} data-testid="is-kpi-all">{filtered ? 'Show all' : 'Showing all'}</button>
               {nextUp && <button className="is-tile-act" onClick={() => setOpenId(nextUp.id)} data-testid={`is-next-${nextUp.id}`}>Next ship · {daysTo(nextUp.ship)}d <ChevronRight size={12} /></button>}
@@ -183,10 +183,10 @@ export default function IntlShipmentsPage() {
           <div className={`is-tile ${late.length ? 'alert' : ''} ${fQueue === 'overdue' ? 'on' : ''}`} data-testid="is-tile-motion">
             <header><i className={late.length ? 'red' : 'violet'}>{late.length ? <AlertTriangle size={16} /> : <Boxes size={16} />}</i><span>{late.length ? 'Overdue' : 'In motion'}</span></header>
             <strong>{late.length ? late.length : list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
-            <small>{late.length ? `${late.map((s) => s.id).join(', ')} past planned ship date` : `units · ${money(list.reduce((a, s) => a + soTotal(s), 0))} declared · ${factories.length} factories`}</small>
+            <small>{late.length ? `${late.map((s) => s.id).join(', ')} past planned ship date` : `units · ${money(list.reduce((a, s) => a + soTotal(s), 0))} declared value`}</small>
             <footer>
               {late.length ? <><button className={`is-tile-act ${fQueue === 'overdue' ? 'on' : ''}`} onClick={() => setQueue('overdue')} data-testid="is-queue-overdue">{fQueue === 'overdue' ? 'Focused' : 'Focus'}</button><button className="is-tile-act go" onClick={() => toast('Follow-up sent to factories')} data-testid="is-act-chase">Chase factory</button></>
-              : <><button className={`is-tile-act ${fQueue === 'soon' ? 'on' : ''}`} onClick={() => setQueue('soon')} disabled={!list.some(dueSoon)} data-testid="is-queue-soon">Shipping in 30d · {list.filter(dueSoon).length}</button><button className="is-tile-act" onClick={() => setFactoriesOpen(true)} data-testid="is-act-factories">Factories <ChevronRight size={12} /></button></>}
+              : <>{list.some(dueSoon) && <button className={`is-tile-act ${fQueue === 'soon' ? 'on' : ''}`} onClick={() => setQueue('soon')} data-testid="is-queue-soon">Shipping in 30d · {list.filter(dueSoon).length}</button>}<button className="is-tile-act" onClick={() => setFactoriesOpen(true)} data-testid="is-act-factories">{factories.length} factories <ChevronRight size={12} /></button></>}
             </footer>
           </div>
         </div>

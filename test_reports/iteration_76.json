@@ -1,0 +1,68 @@
+{
+  "summary": "Frontend regression for redesigned Intl Shipments overview (4-tile card + shipments board + Open Orders tab + inline messages + New Shipment). Empty-creds login -> Intl Shipments loads. All 4 KPI tiles render figures 3 / 1 / 2 / 2,670. Every specified selector and flow behaves as expected. 0 page errors, 0 horizontal overflow at 1920/1280/390 widths, tiles arrange 4 / 2x2 / stacked.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "tiles": {
+      "is-tile-pipeline": "3 (1 draft · 2 prepaid · 1 shipped, Next ship · 86d)",
+      "is-tile-prepay": "1 ($3,182.50 due · SASAtrend)",
+      "is-tile-msg": "2 (Reply · IS-0012 / Ignore all)",
+      "is-tile-motion": "2,670 units · 2 factories (Shipping in 30d · 0)"
+    },
+    "focus_filters": {
+      "is-kpi-released_rows": 1,
+      "is-kpi-released_btn_label": "Focused",
+      "is-tile-prepay_on_class": true,
+      "is-kpi-all_rows": 3,
+      "is-attn-group-message_rows": 2,
+      "is-stage-shipped_rows": 1
+    },
+    "actions": {
+      "is-act-remind": "toast fired",
+      "is-act-reply": "opens is-chat + is-back present",
+      "is-next-IS-0011": "opens intl-shipment-detail",
+      "is-act-mark-prepaid": "prepay tile shows 0 with '$3,191 received · 2 released'; SASA row now 'Prepaid'",
+      "is-act-ignore-all": "msg tile shows 0 with 'Inbox clear — every message answered'",
+      "is-act-factories": "opens is-factories-drawer"
+    },
+    "table": {
+      "is-row-IS-0012_click": "opens detail",
+      "is-search_SASA_rows": 1,
+      "is-filter-customer_opts": 3,
+      "is-filter-customer_apply_rows": 1,
+      "is-filter-customer_menu_bbox_in_viewport": true,
+      "is-clear-filters_reset_rows": 3,
+      "footer": "3 shipments · 2,670 units · $24,099 SO value · $9,822.75 PO value"
+    },
+    "tabs": {
+      "is-tab-orders_kpis": ["is-oo-kpi-open","is-oo-kpi-overdue","is-oo-kpi-due","is-oo-kpi-groups"],
+      "is-open-orders_present": true,
+      "search_hidden_in_orders_tab": true,
+      "is-tab-shipments_restores_search": true,
+      "is-new-shipment_create_flow": "IS-0013 created and detail opened"
+    },
+    "responsive": {
+      "1920x800": {"overflow_px": 0, "tile_rows": 1},
+      "1280x800": {"overflow_px": 0, "tile_rows": 2},
+      "390x844": {"overflow_px": 0, "tile_rows": 4}
+    },
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 475 lines and still mixes list, overview card, detail and modals. Detail view (~180 lines) is a good candidate to extract into its own file for maintainability.",
+    "is-attn-ignore-IS-0010 cannot be independently verified once is-act-ignore-all is invoked earlier in the session (all inline messages are dismissed). Consider a hidden dev reset or run this assertion before ignore-all, or split into an independent sub-test with fresh state.",
+    "'is-kpi-released' testid label on the prepay tile is semantically 'focus prepayment'. Consider renaming to is-focus-prepay to align testid semantics with visible label 'Focus/Focused'.",
+    "Filter customer/factory MultiSelect toggles ('is-filter-customer-toggle') were verified to render 3 options fully inside viewport at 1920, but there is no test coverage for menu overflow on narrow (1280) widths — recommend a lightweight regression there since the menu is right-anchored.",
+    "Recharts (if still used elsewhere) previously emitted width/height(-1) warnings; not observed on this page after the redesign — no action needed."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked, per /app/memory/test_credentials.md)",
+  "seed_data_creation": "IS-0013 created transiently through New Shipment flow (client-only state)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All review-request flows pass. Verified selectors: is-tab-shipments/is-tab-orders, is-factories, is-new-shipment, is-tile-pipeline/prepay/msg/motion, is-kpi-all, is-kpi-released, is-attn-group-message, is-queue-soon, is-next-IS-<id>, is-act-{remind,reply,mark-prepaid,ignore-all,factories,chase}, is-stage-*, is-row-<id>, is-attn-<id>, is-attn-reply-<id>, is-attn-ignore-<id>, is-search, is-filter-customer-toggle/is-filter-customer-opt-*, is-clear-filters, is-footer, is-oo-kpi-{open,overdue,due,groups}, is-open-orders, is-factories-drawer, is-create-modal, is-form-{customer,factory,so,submit}, is-back, is-chat, intl-shipment-detail. Note: to independently verify is-attn-ignore-IS-0010, run its assertion BEFORE any is-act-ignore-all action."
+}
