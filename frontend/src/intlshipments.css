@@ -465,3 +465,26 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-bar-row > i { grid-area: bar; display: block; height: 6px; border-radius: 999px; background: #e3e9e5; overflow: hidden; } .is-bar-row > i b { display: block; height: 100%; border-radius: 999px; background: var(--green); transform-origin: left; animation: is-grow .8s cubic-bezier(.16,1,.3,1) both .2s; }
 .is-sched { display: none; }
 @media (max-width: 1280px) { .is-body { grid-template-columns: 1fr; } .is-next { padding-left: 0; border-left: none; padding-top: 14px; border-top: 1px dashed #d7e6de; } }
+
+/* action cards */
+.is-figure .is-all { margin: 0 0 0 auto; align-self: center; border: 1px solid var(--line); background: #fff; padding: 7px 12px; border-radius: 999px; text-decoration: none; color: var(--ink-3); }
+.is-figure .is-all:hover { color: var(--ink); border-color: #c9d3ce; } .is-figure .is-all.on { color: var(--ink-4); }
+.is-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.is-acard { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; min-width: 0; transition: box-shadow .18s, border-color .18s, transform .18s; }
+.is-acard:hover { box-shadow: 0 14px 30px -22px rgba(15,31,24,.45); transform: translateY(-1px); }
+.is-acard.on { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.is-acard header { display: flex; align-items: center; gap: 8px; }
+.is-acard header i { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: var(--sub); color: var(--ink-3); flex-shrink: 0; }
+.is-acard.warn header i { background: var(--amber-l); color: #9a6208; } .is-acard.info header i { background: var(--navy-l); color: var(--navy); } .is-acard.danger header i { background: var(--red-l); color: var(--red); } .is-acard.ok header i { background: var(--green-l); color: var(--green); }
+.is-acard header span { font-family: var(--ui); font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-acard-view { border: none; background: transparent; padding: 3px 6px; border-radius: 6px; font-family: var(--ui); font-size: 11.5px; font-weight: 600; color: var(--ink-4); cursor: pointer; transition: color .16s, background .16s; }
+.is-acard-view:hover { color: var(--ink); background: var(--sub); } .is-acard.on .is-acard-view { color: var(--ink); }
+.is-acard strong { font-family: var(--ui); font-size: 30px; font-weight: 600; letter-spacing: -.035em; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.is-acard strong small { font-size: 13px; font-weight: 500; color: var(--ink-4); letter-spacing: 0; }
+.is-acard.warn strong { color: #9a6208; } .is-acard.info strong { color: var(--navy); } .is-acard.danger strong { color: var(--red); }
+.is-acard p { font-size: 12.5px; color: var(--ink-4); line-height: 1.4; min-height: 35px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.is-acard footer { display: flex; gap: 6px; margin-top: 4px; }
+.is-acard footer .is-act { height: 30px; padding: 0 11px; font-size: 12px; } .is-acard footer .is-act:not(.primary) { width: auto; padding: 0 11px; }
+.is-acard footer .is-act.primary { background: var(--ink); border-color: var(--ink); color: #fff; } .is-acard footer .is-act.primary:hover { background: var(--green); border-color: var(--green); }
+@media (max-width: 1280px) { .is-cards { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 768px) { .is-cards { grid-template-columns: 1fr; } .is-figure .is-all { margin-left: 0; } }

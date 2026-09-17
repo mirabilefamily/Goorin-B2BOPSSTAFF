@@ -152,40 +152,43 @@ export default function IntlShipmentsPage() {
             const late = list.filter(isOverdue); const packs = list.filter(noPack); const soon = list.filter(dueSoon);
             const items = prepayDue.length + attention.length + late.length + packs.length;
             const setQueue = (k: typeof fQueue) => { setFQueue(fQueue === k ? '' : k); setFStatus('all'); setFMsg(false); };
-            const queues = [
-              { k: 'prepay', on: fStatus === 'prepayment', tone: 'warn', Icon: CreditCard, label: 'Collect prepayment', n: prepayDue.length, sub: `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}`, tid: 'is-kpi-released', go: () => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); } },
-              { k: 'msg', on: fMsg, tone: 'info', Icon: MessageSquare, label: 'Reply to customers', n: attention.length, sub: attention.map((s) => `${s.customer.split(' ')[0]} · ${s.id}`).join(', '), tid: 'is-attn-group-message', go: () => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); } },
-              { k: 'overdue', on: fQueue === 'overdue', tone: 'danger', Icon: AlertTriangle, label: 'Overdue ship date', n: late.length, sub: late.map((s) => s.id).join(', '), tid: 'is-queue-overdue', go: () => setQueue('overdue') },
-              { k: 'nopack', on: fQueue === 'nopack', tone: 'warn', Icon: FileWarning, label: 'Missing packing list', n: packs.length, sub: packs.map((s) => s.id).join(', '), tid: 'is-queue-nopack', go: () => setQueue('nopack') },
-              { k: 'soon', on: fQueue === 'soon', tone: '', Icon: CalendarClock, label: 'Shipping in 30 days', n: soon.length, sub: `${soon.reduce((a, s) => a + units(s), 0).toLocaleString()} units`, tid: 'is-queue-soon', go: () => setQueue('soon') },
-            ].filter((x) => x.n > 0);
-            const upcoming = list.filter((s) => s.status !== 'shipped' && s.status !== 'invoiced' && daysTo(s.ship) !== null).sort((a, b) => daysTo(a.ship)! - daysTo(b.ship)!).slice(0, 3);
+            const upcoming = list.filter((s) => s.status !== 'shipped' && s.status !== 'invoiced' && daysTo(s.ship) !== null).sort((a, b) => daysTo(a.ship)! - daysTo(b.ship)!);
+            const nextUp = upcoming[0];
+            const stampNow = () => new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+            const markAllPrepaid = () => { prepayDue.forEach((p) => update(p.id, (x) => ({ ...x, status: 'prepaid', activity: [{ title: 'Status changed', detail: 'awaiting prepayment → prepaid — marked from action center', at: stampNow(), by: 'Ryan Mirabile' }, ...x.activity] }))); toast(`${prepayDue.length} shipment${prepayDue.length === 1 ? '' : 's'} marked prepaid`); };
+            const cards = [
+              prepayDue.length > 0 && { k: 'prepay', tone: 'warn', Icon: CreditCard, label: 'Collect prepayment', n: prepayDue.length, ctx: `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due from ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}`,
+                primary: { label: 'Send reminder', tid: 'is-act-remind', go: () => toast(`Payment reminder sent to ${prepayDue.map((s) => s.buyer).join(', ')}`) }, secondary: { label: 'Mark prepaid', tid: 'is-act-mark-prepaid', go: markAllPrepaid },
+                view: { on: fStatus === 'prepayment', tid: 'is-kpi-released', go: () => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); } } },
+              attention.length > 0 && { k: 'msg', tone: 'info', Icon: MessageSquare, label: 'Reply to customers', n: attention.length, ctx: `${attention[0].msgs[attention[0].msgs.length - 1].who}: “${attention[0].msgs[attention[0].msgs.length - 1].text}”`,
+                primary: { label: `Reply · ${attention[0].id}`, tid: 'is-act-reply', go: () => { setOpenTab('chat'); setOpenId(attention[0].id); } }, secondary: { label: 'Ignore all', tid: 'is-act-ignore-all', go: () => attention.forEach(ignoreMsg) },
+                view: { on: fMsg, tid: 'is-attn-group-message', go: () => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); } } },
+              late.length > 0 && { k: 'late', tone: 'danger', Icon: AlertTriangle, label: 'Overdue ship date', n: late.length, ctx: `${late.map((s) => s.id).join(', ')} past planned date`,
+                primary: { label: 'Chase factory', tid: 'is-act-chase', go: () => toast('Follow-up sent to factories') }, secondary: { label: 'Reschedule', tid: 'is-act-resched', go: () => toast('Open first overdue shipment to edit date') },
+                view: { on: fQueue === 'overdue', tid: 'is-queue-overdue', go: () => setQueue('overdue') } },
+              packs.length > 0 && { k: 'pack', tone: 'warn', Icon: FileWarning, label: 'Missing packing list', n: packs.length, ctx: `${packs.map((s) => s.id).join(', ')} have no lines yet`,
+                primary: { label: 'Request from factory', tid: 'is-act-request-pack', go: () => toast('Packing list requested') }, secondary: { label: 'Upload', tid: 'is-act-upload-pack', go: () => setOpenId(packs[0].id) },
+                view: { on: fQueue === 'nopack', tid: 'is-queue-nopack', go: () => setQueue('nopack') } },
+              nextUp && { k: 'next', tone: 'ok', Icon: CalendarClock, label: 'Next to ship', n: daysTo(nextUp.ship)!, unit: 'days', ctx: `${nextUp.customer} · ${nextUp.id} · ${units(nextUp).toLocaleString()} units · ${nextUp.ship}`,
+                primary: { label: 'Open shipment', tid: `is-next-${nextUp.id}`, go: () => setOpenId(nextUp.id) }, secondary: { label: 'Message customer', tid: 'is-act-next-msg', go: () => { setOpenTab('chat'); setOpenId(nextUp.id); } },
+                view: { on: fQueue === 'soon', tid: 'is-queue-soon', go: () => setQueue('soon') } },
+            ].filter(Boolean) as { k: string; tone: string; Icon: typeof CreditCard; label: string; n: number; unit?: string; ctx: string; primary: { label: string; tid: string; go: () => void }; secondary: { label: string; tid: string; go: () => void }; view: { on: boolean; tid: string; go: () => void } }[];
             return (<>
           <div className="is-figure">
             <strong>{items}</strong>
-            <div className="is-figure-txt"><em>item{items === 1 ? '' : 's'} need action</em><small>{money(prepayDue.reduce((a, s) => a + s.prepay, 0))} prepayment outstanding · {attention.length} unanswered</small></div>
+            <div className="is-figure-txt"><em>item{items === 1 ? '' : 's'} need action</em><small>{active.length} active · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div>
+            <button className={`is-all ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); }} data-testid="is-kpi-all">{filtered ? 'Clear focus' : 'Showing all'}</button>
           </div>
-          <div className="is-body">
-            <div className="is-queues">
-              {queues.map((x) => (
-                <button key={x.k} className={`is-queue ${x.on ? 'on' : ''} ${x.tone}`} onClick={x.go} data-testid={x.tid}>
-                  <i><x.Icon size={15} /></i><span>{x.label}</span><small>{x.sub}</small><b>{x.n}</b><ChevronRight size={15} className="is-queue-chev" />
-                </button>
-              ))}
-              {queues.length === 0 && <div className="is-queue-empty"><Check size={16} /> Nothing needs action — pipeline is clear.</div>}
-              <button className={`is-all ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); }} data-testid="is-kpi-all">Show all {active.length} active · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</button>
-            </div>
-            <div className="is-next">
-              <p className="is-eyebrow">Next to ship</p>
-              {upcoming.map((s) => { const d = daysTo(s.ship)!; return (
-                <button key={s.id} className="is-next-row" onClick={() => setOpenId(s.id)} data-testid={`is-next-${s.id}`}>
-                  <i className="is-mono-av xs">{mono(s.customer)}</i>
-                  <span><strong>{s.customer}</strong><small>{s.id} · {units(s).toLocaleString()} units</small></span>
-                  <em className={d < 0 ? 'late' : d <= 14 ? 'soon' : ''}><b>{d < 0 ? `${Math.abs(d)}d late` : `${d}d`}</b><small>{s.ship}</small></em>
-                </button>
-              ); })}
-              {upcoming.length === 0 && <p className="is-muted">Nothing scheduled.</p>}
-            </div>
+          <div className="is-cards">
+            {cards.map((c) => (
+              <article key={c.k} className={`is-acard ${c.tone} ${c.view.on ? 'on' : ''}`} data-testid={`is-acard-${c.k}`}>
+                <header><i><c.Icon size={14} /></i><span>{c.label}</span><button className="is-acard-view" onClick={c.view.go} data-testid={c.view.tid}>{c.view.on ? 'Focused' : 'Focus'}</button></header>
+                <strong>{c.n}{c.unit && <small> {c.unit}</small>}</strong>
+                <p>{c.ctx}</p>
+                <footer><button className="is-act primary" onClick={c.primary.go} data-testid={c.primary.tid}>{c.primary.label}</button><button className="is-act" onClick={c.secondary.go} data-testid={c.secondary.tid}>{c.secondary.label}</button></footer>
+              </article>
+            ))}
+            {cards.length === 0 && <div className="is-queue-empty"><Check size={16} /> Nothing needs action — pipeline is clear.</div>}
           </div>
             </>); })() : (() => {
             const oUnits = OPEN_POS.reduce((a, p) => a + poUnits(p), 0); const oValue = OPEN_POS.reduce((a, p) => a + poValue(p), 0);
