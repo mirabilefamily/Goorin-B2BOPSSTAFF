@@ -773,3 +773,30 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-tile-list li.go { cursor: pointer; border-radius: 8px; margin: 0 -6px; padding-left: 6px; padding-right: 6px; transition: background .14s; }
 .is-tile-list li.go:hover { background: #fff; } .is-tile.on .is-tile-list li.go:hover { background: var(--sub-2); }
 .is-tile-list li.go:hover > span b { color: var(--green); }
+
+/* detail tabs — segmented pills (user reference) */
+.is-detail .is-dnav { display: inline-flex; gap: 2px; background: #e9eeeb; border-radius: 16px; padding: 5px; align-self: flex-start; }
+.is-detail .is-dnav button { display: inline-flex; align-items: center; gap: 9px; border: none; background: transparent; color: var(--ink-3); font-family: var(--ui); font-size: 14.5px; font-weight: 600; padding: 10px 18px; border-radius: 12px; cursor: pointer; transition: background .18s, color .18s, box-shadow .18s; }
+.is-detail .is-dnav button svg { display: inline-block; width: 17px; height: 17px; color: var(--ink-4); }
+.is-detail .is-dnav button:hover { color: var(--ink); } .is-detail .is-dnav button:hover svg { color: var(--ink-3); }
+.is-detail .is-dnav button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(15,31,24,.06), 0 6px 14px -10px rgba(15,31,24,.3); } .is-detail .is-dnav button.active svg { color: var(--ink); }
+.is-detail .is-dnav button b { font-family: var(--ui); font-size: 11.5px; font-weight: 700; min-width: 22px; height: 22px; display: inline-grid; place-items: center; padding: 0 6px; border-radius: 999px; background: #dde3df; color: var(--ink-3); }
+.is-detail .is-dnav button.active b { background: var(--ink); color: #fff; }
+@media (max-width: 768px) { .is-detail .is-dnav { display: flex; overflow-x: auto; scrollbar-width: none; align-self: stretch; } .is-detail .is-dnav button { white-space: nowrap; padding: 9px 13px; font-size: 13.5px; } }
+
+/* activity — reference scale */
+.is-detail .is-dnav { align-self: stretch; display: flex; border-radius: 16px; }
+.is-tl { padding: 26px 28px 28px; }
+.is-tl .is-card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.is-tl .is-card-head h2 { font-size: 22px; } .is-tl .is-card-head p { font-size: 15px; margin-top: 4px; }
+.is-tl .is-card-head > small { font-size: 14px; color: var(--ink-4); padding-top: 6px; }
+.is-tl-list { margin-top: 22px; }
+.is-tl-list li { grid-template-columns: 60px 1fr; gap: 26px; padding-bottom: 30px; }
+.is-tl-list li::before { left: 29px; top: 60px; width: 2px; background: #edf1ee; }
+.is-tl-list li > i { width: 60px; height: 60px; background: var(--sub); box-shadow: inset 0 0 0 1px #e9eeeb; color: var(--ink-2); }
+.is-tl-list li > i svg { width: 22px; height: 22px; }
+.is-tl-list li.latest > i { background: var(--ink); color: #fff; box-shadow: none; }
+.is-tl-list li > div { gap: 5px; padding-top: 6px; }
+.is-tl-list strong { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.is-tl-list span { font-size: 16px; color: var(--ink-2); }
+.is-tl-list small { font-size: 14.5px; color: var(--ink-4); margin-top: 1px; }

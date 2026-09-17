@@ -196,3 +196,5 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Detail page v2: customer as title, id/factory meta, inset fact panels, seg-style tabs; Next action card removed per user. Open Orders: MultiSelect filters (is-oo-customer/-factory sets), content-rich intake tiles (by factory, overdue, due-14 list, consolidation groups), quieter board styling.
 - Activity tab: timeline (round icon nodes, title/detail/date·by, latest dark). Open Orders tiles simplified (legend instead of factory list, lists capped at 2). Instructions tile relabeled "Needs shipping instructions". Back button = pill w/ Esc hint.
 - Sortable columns (is-sort-customer/status/ship/units/value, default ship asc). Tile rows are shortcuts (is-tile-msg-<id> opens chat, is-tile-pay-<id>, is-tile-instr-<id>, is-next-<id>). Activity timeline scaled to reference (64px nodes, 20px titles, "Sep 3, 2026" dates).
+- Detail tabs: segmented pill bar with icons + count badges (user reference), active white w/ shadow.
+- Activity timeline & tab bar tuned to user reference (full-width seg tabs, 60px nodes, 19/16/14.5px type).
