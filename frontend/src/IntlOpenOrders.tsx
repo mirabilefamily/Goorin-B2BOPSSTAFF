@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { MultiSelect } from './MultiSelect';
 import { ArrowDown, ArrowUp, ArrowUpDown, CalendarDays, ChevronDown, ChevronRight, Layers, Plus, Search, Sparkles, X } from 'lucide-react';
 
 export type POLine = { sku: string; product: string; ordered: number; allocated: number; shipped: number };
@@ -35,8 +36,8 @@ type Group = { key: string; customer: string; factory: string; pos: PO[] };
 
 export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) => void; onCreateGroup: (g: Group) => void }) {
   const [q, setQ] = useState('');
-  const [cust, setCust] = useState('all');
-  const [fac, setFac] = useState('all');
+  const [cust, setCust] = useState<Set<string>>(new Set());
+  const [fac, setFac] = useState<Set<string>>(new Set());
   const [days, setDays] = useState(14);
   const [recOnly, setRecOnly] = useState(false);
   const [sort, setSort] = useState<{ k: SortKey; d: 1 | -1 }>({ k: 'shipDate', d: 1 });
@@ -61,8 +62,8 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
     const t = q.trim().toLowerCase();
     const r = OPEN_POS.filter((p) => {
       if (t && ![p.po, p.so, p.soName, p.soRef, p.customer, p.factory].join(' ').toLowerCase().includes(t)) return false;
-      if (cust !== 'all' && p.customer !== cust) return false;
-      if (fac !== 'all' && p.factory !== fac) return false;
+      if (cust.size && !cust.has(p.customer)) return false;
+      if (fac.size && !fac.has(p.factory)) return false;
       if (recOnly && !groupOf(p)) return false;
       return true;
     });
@@ -84,8 +85,8 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
       <section className="is-card is-oo-card">
       <div className="is-oo-bar">
         <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search PO, SO, customer, factory…" data-testid="is-oo-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear"><X size={13} /></button>}</label>
-        <select className="is-select" value={cust} onChange={(e) => setCust(e.target.value)} data-testid="is-oo-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
-        <select className="is-select" value={fac} onChange={(e) => setFac(e.target.value)} data-testid="is-oo-factory"><option value="all">All factories</option>{factories.map((f) => <option key={f}>{f}</option>)}</select>
+        <MultiSelect label="Customers" testId="is-oo-customer" value={cust} onChange={setCust} options={customers.map((c) => ({ value: c, label: c, count: OPEN_POS.filter((p) => p.customer === c).length }))} />
+        <MultiSelect label="Factories" testId="is-oo-factory" value={fac} onChange={setFac} options={factories.map((f) => ({ value: f, label: f, count: OPEN_POS.filter((p) => p.factory === f).length }))} />
         <div className="is-oo-spacer" />
         <label className="is-window" data-testid="is-oo-window"><CalendarDays size={15} /> Within <input type="number" min={1} max={120} value={days} onChange={(e) => setDays(Math.max(1, Number(e.target.value) || 1))} /> days</label>
         <button className={`is-btn ${recOnly ? 'dark' : ''}`} onClick={() => setRecOnly((v) => !v)} data-testid="is-oo-rec-toggle"><Sparkles size={14} /> Recommended <b className="is-count">{groups.reduce((a, g) => a + g.pos.length, 0)}</b></button>

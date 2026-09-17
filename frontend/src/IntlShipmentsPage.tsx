@@ -157,9 +157,10 @@ export default function IntlShipmentsPage() {
             <header><i className="ink"><Ship size={15} /></i><span>In pipeline</span><em className="is-tile-hint">{filtered ? 'Show all' : 'All'}</em></header>
             <strong>{active.length}<small>active</small></strong>
             <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
+            <small className="is-legend">{dist.filter((d) => d.n > 0).map((d) => <span key={d.id}><i className={`is-tile-dot ${d.id}`} />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</span>)}</small>
             <ul className="is-tile-list">
-              {dist.filter((d) => d.n > 0).map((d) => <li key={d.id}><i className={`is-tile-dot ${d.id}`} /><span>{STATUS_LABEL[d.id]}</span><b>{d.n}</b></li>)}
-              {nextUp && <li className="is-tile-next"><CalendarClock size={12} /><span>Next ship · {nextUp.customer}</span><b>{daysTo(nextUp.ship)}d</b></li>}
+              {nextUp && <li className="is-tile-next"><CalendarClock size={12} /><span>Next ship · {nextUp.customer} · {nextUp.id}</span><b>{daysTo(nextUp.ship)}d</b></li>}
+              {late.length > 0 && <li className="is-tile-late"><AlertTriangle size={12} /><span>{late.length} overdue · {late.map((s) => s.id).join(', ')}</span></li>}
             </ul>
           </button>
           <button className={`is-tile ${fMsg ? 'on' : ''}`} onClick={() => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); }} disabled={attention.length === 0} data-testid="is-attn-group-message">
@@ -178,7 +179,7 @@ export default function IntlShipmentsPage() {
               {prepayDue.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>{money(released.reduce((a, s) => a + s.prepay, 0))} received · {released.length} released</span></li>}
             </ul>
           </button>
-          <button className={`is-tile ${fQueue === 'instr' ? 'on' : ''}`} onClick={() => setQueue('instr')} disabled={needInstr.length === 0} data-testid="is-tile-instructions">
+          <button className={`is-tile ${fQueue === 'instr' ? 'on' : ''}`} onClick={() => setQueue('instr')} data-testid="is-tile-instructions">
             <header><i className="violet"><Send size={15} /></i><span>Shipping instructions</span><em className="is-tile-hint">{fQueue === 'instr' ? 'Focused' : 'Focus'}</em></header>
             <strong>{needInstr.length}<small>to send</small></strong>
             <ul className="is-tile-list">
@@ -192,13 +193,29 @@ export default function IntlShipmentsPage() {
             const due14 = OPEN_POS.filter((p) => daysOut(p.shipDate) <= 14); const lateOs = OPEN_POS.filter((p) => daysOut(p.shipDate) < 0);
             const gm = new Map<string, number>(); due14.forEach((p) => gm.set(`${p.customer}|${p.factory}`, (gm.get(`${p.customer}|${p.factory}`) ?? 0) + 1));
             const groups = Array.from(gm.values()).filter((n) => n > 1).length;
-            const top = Array.from(new Set(OPEN_POS.map((p) => p.customer))).map((c) => ({ c, u: OPEN_POS.filter((p) => p.customer === c).reduce((a, p) => a + poUnits(p), 0) })).sort((a, b) => b.u - a.u)[0];
             return (
         <div className="is-tiles">
-          <div className="is-tile" data-testid="is-oo-kpi-open"><header><i className="ink"><FileText size={16} /></i><span>Open purchase orders</span></header><strong>{OPEN_POS.length}</strong><small>{oUnits.toLocaleString()} units · {money(oValue)} not yet on a shipment</small><footer><button className="is-tile-act" onClick={() => setCreating(true)} data-testid="is-oo-act-new">New shipment <ChevronRight size={12} /></button></footer></div>
-          <div className={`is-tile ${lateOs.length ? 'alert' : ''}`} data-testid="is-oo-kpi-overdue"><header><i className={lateOs.length ? 'red' : 'violet'}><AlertTriangle size={16} /></i><span>Past ship date</span></header><strong>{lateOs.length}</strong><small>{lateOs.length ? lateOs.map((p) => p.po).join(', ') : 'Nothing overdue'}</small></div>
-          <div className="is-tile" data-testid="is-oo-kpi-due"><header><i className="amber"><CalendarClock size={16} /></i><span>Due within 14 days</span></header><strong>{due14.length}</strong><small>{due14.reduce((a, p) => a + poUnits(p), 0).toLocaleString()} units to book{top ? ` · largest: ${top.c}` : ''}</small></div>
-          <div className="is-tile" data-testid="is-oo-kpi-groups"><header><i className="blue"><Truck size={16} /></i><span>Consolidation</span></header><strong>{groups}</strong><small>Same customer & factory, ship dates within 14 days</small></div>
+          <div className="is-tile static" data-testid="is-oo-kpi-open">
+            <header><i className="ink"><FileText size={15} /></i><span>Open purchase orders</span></header>
+            <strong>{OPEN_POS.length}<small>{oUnits.toLocaleString()} units</small></strong>
+            <small>{money(oValue)} not yet on a shipment</small>
+            <ul className="is-tile-list">{Array.from(new Set(OPEN_POS.map((p) => p.factory))).map((f) => <li key={f}><i className="is-mono-av xs">{mono(f)}</i><span>{f.replace(/\s*\(.*\)$/, '')}</span><b>{OPEN_POS.filter((p) => p.factory === f).length}</b></li>)}</ul>
+          </div>
+          <div className={`is-tile static ${lateOs.length ? 'alert' : ''}`} data-testid="is-oo-kpi-overdue">
+            <header><i className={lateOs.length ? 'red' : 'violet'}><AlertTriangle size={15} /></i><span>Past ship date</span></header>
+            <strong>{lateOs.length}<small>overdue</small></strong>
+            <ul className="is-tile-list">{lateOs.slice(0, 3).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>{Math.abs(daysOut(p.shipDate))}d late</small></li>)}{lateOs.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing overdue — all POs on schedule</span></li>}</ul>
+          </div>
+          <div className="is-tile static" data-testid="is-oo-kpi-due">
+            <header><i className="amber"><CalendarClock size={15} /></i><span>Due within 14 days</span></header>
+            <strong>{due14.length}<small>{due14.reduce((a, p) => a + poUnits(p), 0).toLocaleString()} units to book</small></strong>
+            <ul className="is-tile-list">{due14.slice(0, 3).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>in {daysOut(p.shipDate)}d</small></li>)}{due14.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing due in the next two weeks</span></li>}</ul>
+          </div>
+          <div className="is-tile static" data-testid="is-oo-kpi-groups">
+            <header><i className="blue"><Truck size={15} /></i><span>Consolidation</span></header>
+            <strong>{groups}<small>group{groups === 1 ? '' : 's'} suggested</small></strong>
+            <ul className="is-tile-list">{Array.from(gm.entries()).filter(([, n]) => n > 1).slice(0, 3).map(([k, n]) => { const [c, f] = k.split('|'); return <li key={k}><i className="is-mono-av xs">{mono(c)}</i><span><b>{c}</b> {f.replace(/\s*\(.*\)$/, '')}</span><small>{n} POs</small></li>; })}{groups === 0 && <li className="is-tile-ok"><Check size={12} /><span>No consolidation opportunities right now</span></li>}</ul>
+          </div>
         </div>
             ); })()}
       </section>
@@ -220,6 +237,9 @@ export default function IntlShipmentsPage() {
         </div>
         <div className="is-stages" role="tablist" data-testid="is-stages">
           <button className={`is-stage ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFStatus('all'); setFMsg(false); setFQueue(''); }} data-testid="is-stage-all">All <b>{list.length}</b></button>
+          <button className={`is-stage ${fQueue === 'instr' ? 'on' : ''} ${needInstr.length === 0 ? 'zero' : ''}`} onClick={() => setQueue('instr')} data-testid="is-stage-instr"><Send size={11} /> Missing shipping instructions <b>{needInstr.length}</b></button>
+          <button className={`is-stage ${fMsg ? 'on' : ''} ${attention.length === 0 ? 'zero' : ''}`} onClick={() => { setFStatus('all'); setFQueue(''); setFMsg((v) => !v); }} data-testid="is-stage-msg"><MessageSquare size={11} /> Needs reply <b>{attention.length}</b></button>
+          <span className="is-stages-sep" />
           {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => { setFMsg(false); setFQueue(''); setFStatus(fStatus === d.id ? 'all' : d.id); }} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]} <b>{d.n}</b></button>)}
         </div>
         <div className="is-table" role="table">
@@ -314,7 +334,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
   ] as const;
 
   return (
-    <div className="is" data-testid="intl-shipment-detail">
+    <div className="is is-v12 is-detail" data-testid="intl-shipment-detail">
       <nav className="is-crumbs" aria-label="Breadcrumb">
         <button className="is-back" onClick={onBack} data-testid="is-back" title="Back (Esc)"><ArrowLeft size={16} /> Shipments</button>
       </nav>
@@ -322,9 +342,9 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
       <section className="is-card is-dhero is-dhero--flat">
         <div className="is-dhero-top">
           <div className="is-dhero-id">
-            <p className="is-kicker">International shipment · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}</p>
-            <div className="is-dtitle"><h1>{s.id}</h1><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em></div>
-            <div className="is-dmeta"><span><Factory size={15} /> {s.factory}</span><i /><span>{s.customer}</span><i /><span>Created {s.created}</span><i /><span>{s.booking.mode} · {s.incoterms}</span></div>
+            <p className="is-kicker">International shipment · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'} · {Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || 'No PO'}</p>
+            <div className="is-dtitle"><h1>{s.customer}</h1><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em></div>
+            <div className="is-dmeta"><span className="is-id">{s.id}</span><i /><span><Factory size={14} /> {s.factory}</span><i /><span>Created {s.created}</span><i /><span>{s.booking.mode} · {s.incoterms}</span></div>
           </div>
           <div className="is-dactions">
             <button className="is-btn" onClick={() => setDtab('chat')} data-testid="is-hero-message"><MessageSquare size={15} /> Message customer</button>
@@ -377,20 +397,6 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
             </div>
           </section>
           <div className="is-col">
-            <section className="is-card is-facts is-next-card" data-testid="is-next-card">
-              <div className="is-card-head"><h2>Next action</h2>{nextLabel && <em className="is-status ready"><i />{nextLabel}</em>}</div>
-              <ul className="is-check">
-                {[
-                  { l: 'Packing list uploaded', ok: s.packing !== '—' && s.lines.length > 0 },
-                  { l: 'Shipping instructions sent', ok: idx >= stepIdx('prepayment') },
-                  { l: 'Customer booking submitted', ok: s.booking.submitted !== '—' },
-                  { l: `Prepayment received · ${money(s.prepay)}`, ok: idx >= stepIdx('prepaid') },
-                  { l: 'Released to factory', ok: idx >= stepIdx('prepaid') },
-                  { l: 'Shipped & invoiced', ok: idx >= stepIdx('invoiced') },
-                ].map((c) => <li key={c.l} className={c.ok ? 'ok' : ''}><i>{c.ok && <Check size={11} strokeWidth={3} />}</i>{c.l}</li>)}
-              </ul>
-              {cta && <button className="is-btn dark" onClick={advance} data-testid="is-advance-card"><Check size={15} /> {cta}</button>}
-            </section>
             <section className="is-card is-facts is-parties">
               <h2>Parties</h2>
               <div className="is-party"><i className="is-mono-av">{mono(s.customer)}</i><div><small>Customer</small><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button></div><button className="is-btn is-icon sm" onClick={() => { setDtab('chat'); }} aria-label="Message customer"><MessageSquare size={14} /></button></div>

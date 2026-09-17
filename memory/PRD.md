@@ -191,3 +191,6 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Tiles reordered per user: In pipeline | Messages (Reply/Ignore all) | Needing payment (Mark prepaid/Send reminder) | Needing shipping instructions (ready+draft; Send instructions advances to instructions, Open). v12 inset-panel styling.
 - Instructions tile filters draft+ready via fQueue=instr. Regression iteration_78 PASS.
 - v13 tiles: content lists inside tiles (pipeline stage rows + next ship; message previews w/ avatars; payment lines; instructions queue), $ figure on payment tile, hover Focus hint. Action links removed per user.
+- Added filter chips: Missing shipping instructions (is-stage-instr, draft+ready) and Needs reply (is-stage-msg) before the stage chips; instructions tile always clickable.
+- v13.1: compact tiles (no min-height), pipeline legend inline + Next ship/overdue rows; lists bottom-aligned.
+- Detail page v2: customer as title, id/factory meta, inset fact panels, seg-style tabs; Next action card removed per user. Open Orders: MultiSelect filters (is-oo-customer/-factory sets), content-rich intake tiles (by factory, overdue, due-14 list, consolidation groups), quieter board styling.
