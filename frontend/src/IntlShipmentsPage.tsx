@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Boxes, CalendarDays, Check, CheckCircle2, ChevronRight, Download, Factory, LayoutGrid, Ship, Truck, FileText, Filter, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, ChevronRight, Download, Factory, LayoutGrid, Ship, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -114,14 +114,23 @@ export default function IntlShipmentsPage() {
   const customers = Array.from(new Set(list.map((s) => s.customer)));
   const factories = Array.from(new Set(list.map((s) => s.factory)));
 
+  const active = list.filter((s) => s.status !== 'invoiced');
+  const viewUnits = rows.reduce((a, s) => a + units(s), 0);
+  const viewValue = rows.reduce((a, s) => a + soTotal(s), 0);
+  const filtered = fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q;
+  const dist = STEPS.map((st) => ({ ...st, n: list.filter((s) => s.status === st.id).length }));
+
   return (
     <div className="is" data-testid="intl-shipments-page">
       <div className="is-modebar" data-testid="is-modebar">
         <div className="ops-seg is-mode-seg" role="tablist">
-          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments"><Ship size={15} /> Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>
+          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments"><Ship size={15} /> Shipments <b>{active.length}</b></button>
           <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders"><FileText size={15} /> Open Orders <b>{OPEN_ORDERS.length}</b></button>
         </div>
-        <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
+        <div className="is-modebar-r">
+          <button className="ops-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
+          <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
+        </div>
       </div>
 
       {tab === 'orders' && (
@@ -132,19 +141,28 @@ export default function IntlShipmentsPage() {
       )}
 
       {tab === 'shipments' && <>
-      <section className="is-strip" data-testid="is-priority-strip">
-        <div className={`is-card is-priority ${attention.length === 0 ? 'clear' : ''}`}>
-          <div className="is-priority-head">
-            <span className="is-priority-badge"><MessageSquare size={14} /></span>
-            <div>
-              <p className="is-kicker">{attention.length === 0 ? 'Inbox clear' : 'Customer messages'}</p>
-              <strong>{attention.length === 0 ? 'Every customer message has been answered' : `${attention.length} unanswered message${attention.length === 1 ? '' : 's'}`}</strong>
-            </div>
-            {attention.length > 0 && <button className={`is-attn-group ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message">{fMsg ? 'Showing in pipeline' : 'Filter pipeline'}<ChevronRight size={14} /></button>}
+      <section className="is-card is-hero" data-testid="is-priority-strip">
+        <div className="is-hero-main">
+          <p className="is-kicker"><i className="is-dot" /> Pipeline · live</p>
+          <div className="is-hero-fig">
+            <h1>{active.length}</h1>
+            <div><strong>active shipment{active.length === 1 ? '' : 's'}</strong><small>{units(list[0]) >= 0 && list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div>
           </div>
-          <div className="is-priority-list">
+          <div className="is-dist" aria-hidden="true">
+            {dist.filter((d) => d.n > 0).map((d) => <i key={d.id} className={`is-dist-seg ${d.id} ${fStatus !== 'all' && fStatus !== d.id ? 'dim' : ''}`} style={{ flex: d.n }} />)}
+          </div>
+          <div className="is-dist-legend">
+            {dist.map((d) => <button key={d.id} className={`is-dist-key ${d.id} ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-kpi-${d.id}`}><i />{STATUS_LABEL[d.id]}<b>{d.n}</b></button>)}
+          </div>
+
+          <div className={`is-inbox ${attention.length === 0 ? 'clear' : ''}`}>
+            <div className="is-inbox-head">
+              <span className="is-inbox-ic"><MessageSquare size={14} /></span>
+              <strong>{attention.length === 0 ? 'Inbox clear — every customer message answered' : `${attention.length} customer message${attention.length === 1 ? '' : 's'} awaiting reply`}</strong>
+              {attention.length > 0 && <button className={`is-inbox-filter ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message">{fMsg ? 'Showing in pipeline' : 'Filter pipeline'}<ChevronRight size={13} /></button>}
+            </div>
             {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return (
-              <div key={s.id} className="is-attn is-attn-msg" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
+              <div key={s.id} className="is-attn" onClick={() => setOpenId(s.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-attn-${s.id}`}>
                 <i className="is-mono-av">{mono(m.who)}</i>
                 <span className="is-attn-body">
                   <span className="is-attn-top"><strong>{m.who}</strong><small>{s.customer} · <b className="is-id">{s.id}</b></small><time>{m.at}</time></span>
@@ -159,59 +177,51 @@ export default function IntlShipmentsPage() {
             {attention.length > 3 && <button className="is-link is-attn-more" onClick={() => setFMsg(true)} data-testid="is-attn-more">Show all {attention.length} in pipeline <ChevronRight size={14} /></button>}
           </div>
         </div>
-        <div className="is-card is-kpis">
-          <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-            <i className="is-kpi-ic"><Ship size={16} /></i><span>In pipeline</span><strong>{list.filter((s) => s.status !== 'invoiced').length}</strong><small>{fStatus === 'all' ? 'Showing all' : 'Show all'}</small>
+
+        <aside className="is-hero-rail">
+          <button className={`is-stat ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+            <span><Ship size={14} /> In pipeline</span><strong>{active.length}</strong><small>{list.length - active.length} invoiced · {list.reduce((a, s) => a + units(s), 0).toLocaleString()} units</small>
           </button>
-          <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-            <i className="is-kpi-ic g"><CheckCircle2 size={16} /></i><span>Released</span><strong className="g">{list.filter((s) => s.status === 'prepaid').length}</strong><small>{fStatus === 'prepaid' ? 'Filtering · clear' : 'To factory · filter'}</small>
+          <button className={`is-stat g ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+            <span><CheckCircle2 size={14} /> Released to factory</span><strong>{list.filter((s) => s.status === 'prepaid').length}</strong><small>{money(list.filter((s) => s.status === 'prepaid').reduce((a, s) => a + s.prepay, 0))} prepaid received</small>
           </button>
-          <div className="is-kpi">
-            <i className="is-kpi-ic"><Boxes size={16} /></i><span>Units moving</span><strong>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>{money(rows.reduce((a, s) => a + s.lines.reduce((b, l) => b + l.qty * l.unit, 0), 0))} in view</small>
+          <div className="is-stat">
+            <span><Boxes size={14} /> Units in view</span><strong>{viewUnits.toLocaleString()}</strong><small>{money(viewValue)} across {rows.length} shipment{rows.length === 1 ? '' : 's'}</small>
           </div>
-        </div>
+        </aside>
       </section>
 
       <section className="is-card is-pipeline">
         <div className="is-pipe-head">
-          <h2>Shipment pipeline <span className="is-muted">{rows.length} shown</span></h2>
+          <h2>Shipments <span className="is-muted">{rows.length} of {list.length}</span></h2>
           <div className="is-tools">
             <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
-            <button className="is-btn" onClick={() => toast('Controls panel')}><SlidersHorizontal size={15} /> Controls</button>
-            <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
-          </div>
-        </div>
-        <div className="is-controls">
-          <div className="is-stages" data-testid="is-stages">
-            <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all"><span>All</span><b>{list.length}</b></button>
-            {STEPS.map((st) => { const n = list.filter((s) => s.status === st.id).length; return (
-              <button key={st.id} className={`is-stage ${fStatus === st.id ? 'on' : ''} ${n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === st.id ? 'all' : st.id)} data-testid={`is-stage-${st.id}`}><span>{STATUS_LABEL[st.id]}</span><b>{n}</b></button>
-            ); })}
-          </div>
-          <div className="is-filters">
-            <span className="is-flabel"><Filter size={13} /></span>
             <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
             <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">All factories</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
-            {(fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q) && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
+            {filtered && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
           </div>
         </div>
+        <div className="is-stages" role="tablist" data-testid="is-stages">
+          <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all">All<b>{list.length}</b></button>
+          {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]}<b>{d.n}</b></button>)}
+        </div>
         <div className="is-table" role="table">
-          <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory</span><span>Orders & value</span><span>Shipping</span></div>
+          <div className="is-tr is-th"><span>Shipment</span><span>Stage</span><span>Factory · terms</span><span>Orders & value</span><span className="r">Units · shipping</span></div>
           {rows.map((s) => (
-            <button key={s.id} className="is-tr is-row" onClick={() => setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
-              <span className="is-c1 is-who"><i className="is-mono-av">{s.customer.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}</i><span><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b> · Created {s.created}</small></span></span>
+            <button key={s.id} className={`is-tr is-row ${unanswered(s) ? 'has-msg' : ''}`} onClick={() => setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
+              <span className="is-c1 is-who"><i className="is-mono-av">{mono(s.customer)}</i><span><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b><i className="is-sep" />Created {s.created}{unanswered(s) && <em className="is-msg-dot" title="Unanswered message"><MessageSquare size={11} /> Reply</em>}</small></span></span>
               <span className="is-c2"><em className={`is-status ${s.status}`}>{STATUS_LABEL[s.status]}</em><i className="is-prog">{STEPS.map((st, i) => <b key={st.id} className={i < stepIdx(s.status) ? 'd' : i === stepIdx(s.status) ? 'n' : ''} />)}</i></span>
               <span className="is-c2"><strong className="is-fac">{s.factory}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
               <span className="is-c3">
                 <span><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></span>
                 <span><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></span>
               </span>
-              <span className="is-c4 is-c4--last"><strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small><ShipChip s={s} /></span>
+              <span className="is-c4 is-c4--last r"><strong>{units(s).toLocaleString()}<small> units · {s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></strong><ShipChip s={s} /></span>
             </button>
           ))}
-          {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match.</div>}
+          {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match these filters.</div>}
         </div>
-        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span>Units <b>{rows.reduce((a, s) => a + units(s), 0).toLocaleString()}</b></span><span>SO total <b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b></span><span>PO total <b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b></span></div>
+        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span>Units <b>{viewUnits.toLocaleString()}</b></span><span>SO total <b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b></span><span>PO total <b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b></span></div>
       </section>
       </>}
 

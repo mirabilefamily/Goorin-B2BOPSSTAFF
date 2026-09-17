@@ -1,8 +1,13 @@
 {
-  "project_name": "Goorin B2B Staff Portal — Revenue Ops Dashboard Redesign",
+  "project_name": "Goorin B2B Staff Portal — INTL Shipments Redesign Blueprint",
   "archetype": "Architectural Craft & High-Density B2B Performance (Goorin Bros Heritage Wholesale)",
-  "context": "Internal B2B Staff Dashboard (Desktop-First, Light App Shell)",
+  "context": "Internal Wholesale Operations Portal (Desktop-First, Responsive to 390px, Light Shell)",
   "version": "2026.1",
+  "user_feedback_and_problems_solved": {
+    "problem_1_stacked_overhead": "Removed the separate bulky Customer Messages panel, 3 stacked KPI cards, 7 chip buttons, and 2 filter dropdowns stacked vertically before the shipment table. Replaced with a single, unified Header Hero Card (matching Dashboard & Pre-Book Review aesthetic) that combines key operational metrics in a 3-column inline stat bar. Unanswered customer messages are elegantly integrated into an inline action alert badge inside the hero card rather than a full section. Filter controls (stage tabs, customer, factory, search) are consolidated into a single crisp toolbar inside the table card header.",
+    "problem_2_dense_table_rows": "Redesigned row anatomy with structured multi-line typography, distinct badge chips for SO/PO numbers, JetBrains Mono font for monetary values and unit counts, explicit status indicators with days-until-ship chips, and generous vertical padding (p-4 / p-5) for effortless scanning even with low row counts.",
+    "problem_3_inconsistent_visual_language": "Eliminated heavy borders, separated stacked boxes, and overly rounded toggles. Adopted unified white card surfaces (#ffffff) with subtle 1px border (#e4eae6), soft ambient drop shadows, 16px/20px border radii, glassmorphism backdrops for modals/drawers, and consistent font hierarchy (Barlow Condensed hero figures, Outfit headings, DM Sans body, JetBrains Mono numeric data)."
+  },
   "typography": {
     "google_fonts_link": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;600;700;800&display=swap",
     "headline_font": "'Barlow Condensed', 'Outfit', sans-serif",
@@ -10,7 +15,7 @@
     "body_font": "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
     "mono_data_font": "'JetBrains Mono', monospace",
     "rules": {
-      "H1_Hero_Figure": "font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem (56px); font-weight: 800; letter-spacing: -0.03em; line-height: 1;",
+      "H1_Hero_Figure": "font-family: 'Barlow Condensed', sans-serif; font-size: 3rem (48px); font-weight: 800; letter-spacing: -0.02em; line-height: 1;",
       "H2_Section": "font-family: 'Outfit', sans-serif; font-size: 1.25rem (20px); font-weight: 700; letter-spacing: -0.015em; color: var(--color-slate-900);",
       "H3_Subhead": "font-family: 'Outfit', sans-serif; font-size: 1.05rem (17px); font-weight: 600; color: var(--color-slate-800);",
       "KPI_Value": "font-family: 'Barlow Condensed', sans-serif; font-size: 2rem (32px); font-weight: 800; letter-spacing: -0.02em;",
@@ -21,21 +26,18 @@
   },
   "colors": {
     "palette_name": "Heritage Emerald, Warm Sand & Deep Obsidian",
-    "forbidden_colors_check": "VERIFIED ABSENT: No Teal Green/Teal Blue (#1B93A4) used. No purple gradients.",
+    "forbidden_colors_check": "VERIFIED ABSENT: No Teal Green/Teal Blue (#1B93A4) used. No heavy dark gradients.",
     "css_variables": {
       "--bg-app-base": "#f8faf9",
       "--bg-card": "#ffffff",
       "--bg-card-subtle": "#f4f7f5",
-      "--bg-hero": "linear-gradient(145deg, #0b130f 0%, #111c16 55%, #08100d 100%)",
+      "--bg-hero": "#ffffff",
       "--border-light": "#e4eae6",
       "--border-medium": "#d1dad5",
-      "--border-hero": "rgba(255, 255, 255, 0.11)",
       "--color-emerald-primary": "#128258",
       "--color-emerald-vibrant": "#10b981",
       "--color-emerald-light": "#e6f7f0",
-      "--color-emerald-glow": "rgba(16, 185, 129, 0.22)",
       "--color-cobalt-primary": "#1e40af",
-      "--color-cobalt-vibrant": "#3b82f6",
       "--color-cobalt-light": "#eff6ff",
       "--color-amber-pace": "#d97706",
       "--color-amber-light": "#fef3c7",
@@ -46,40 +48,11 @@
       "--color-slate-600": "#4a5952",
       "--color-slate-400": "#85938d",
       "--color-slate-200": "#e4eae6"
-    },
-    "charts": {
-      "invoiced_bar": {
-        "gradient_start": "#10b981",
-        "gradient_end": "#047857",
-        "legend_label": "Invoiced"
-      },
-      "open_orders_bar": {
-        "gradient_start": "#6ee7b7",
-        "gradient_end": "#10b981",
-        "legend_label": "Open Orders"
-      },
-      "total_line": {
-        "color": "#1e40af",
-        "stroke_width": 2.8,
-        "legend_label": "Total (Invoiced + Open)"
-      },
-      "forecast_line": {
-        "color": "#d97706",
-        "dash_array": "5 4",
-        "stroke_width": 2.2,
-        "legend_label": "Forecast"
-      },
-      "gridlines": "#e6eae8",
-      "tooltip_background": "rgba(255, 255, 255, 0.96)",
-      "tooltip_border": "#d1dad5"
     }
   },
   "spacing_and_layout": {
-    "page_container": "max-width: 1440px; margin: 0 auto; padding: 12px 16px 48px; display: flex; flex-direction: column; gap: 24px;",
-    "bento_grid_mid": "display: grid; grid-template-columns: 1.8fr 1fr; gap: 24px; align-items: stretch;",
-    "card_padding": "padding: 24px 28px;",
+    "page_container": "max-width: 1440px; margin: 0 auto; padding: 16px 20px 48px; display: flex; flex-direction: column; gap: 20px;",
     "radii": {
-      "hero_card": "20px",
       "standard_card": "16px",
       "inner_widget": "12px",
       "pill_badge": "9999px",
@@ -87,113 +60,124 @@
     },
     "shadows": {
       "card_ambient": "0 10px 30px -18px rgba(11, 19, 15, 0.08), 0 2px 6px -1px rgba(11, 19, 15, 0.04)",
-      "card_hover": "0 20px 40px -20px rgba(11, 19, 15, 0.14), 0 4px 12px -2px rgba(11, 19, 15, 0.06)",
-      "hero_glow": "0 24px 60px -20px rgba(11, 19, 15, 0.7)",
-      "tooltip": "0 20px 48px -16px rgba(11, 19, 15, 0.25)"
-    }
+      "card_hover": "0 18px 36px -16px rgba(11, 19, 15, 0.12), 0 4px 10px -2px rgba(11, 19, 15, 0.05)",
+      "dropdown_glass": "0 20px 48px -16px rgba(11, 19, 15, 0.2)"
+    },
+    "responsive": "Desktop-first layout. At breakpoints <= 768px and <= 390px, mode bars stack vertically, table columns collapse to primary customer/ID card format with expandable details, and fact grids adapt to 2 columns."
   },
-  "component_blueprints": {
-    "hero_section": {
-      "description": "Premium dark obsidian card with heritage green/gold ambient lighting, tactical live dot indicator, Barlow Condensed YTD invoiced figure, sparkline, segmented control, KPI 3-column bento, and goal progress pace bar.",
-      "styles": {
-        "background": "var(--bg-hero)",
-        "color": "#ffffff",
-        "border": "1px solid rgba(255, 255, 255, 0.12)",
-        "segment_control": "sliding white indicator on dark translucent background (calc((100% - 8px) / 3))"
+  "view_blueprints": {
+    "list_view_shipments": {
+      "modebar": "Segmented tab switcher [Shipments (active count) | Open Orders (count)] + Right Action Cluster [Factories Drawer button + New Shipment primary button].",
+      "hero_card": {
+        "description": "Unified 1-card header replacing former message block & KPI tiles. Left rail: Section kicker 'INBOUND & OUTBOUND OPERATIONS', title 'International Shipments', subtitle, and if unanswered messages exist, a high-visibility inline Amber/Emerald Alert Banner ('2 unanswered customer messages needing reply' with quick 'Review messages' filter toggle). Right rail: 3 inline stat panels on tinted #f7f9f8 surfaces (Active Pipeline Shipments with stage breakdown micro-pill, Released to Factory count with green badge, and Total Units Moving with currency value in JetBrains Mono).",
+        "styles": "background: #ffffff; border: 1px solid var(--border-light); border-radius: 16px; padding: 24px 28px;"
       },
-      "elements": [
-        "Invoiced YTD hero text + delta badge + 9-month sparkline",
-        "Segment switcher (All, US Wholesale, Distributors)",
-        "3 KPI Tiles: Open orders, Total, Forecast with micro vertical spark bars",
-        "Annual Goal Progress Bar with pace marker (#d97706 line) and % indicator"
-      ]
-    },
-    "chart_card": {
-      "description": "Light & airy Revenue by Month ComposedChart card with range switcher pills (YTD, 12M, Quarter), CSV export button, crisp custom legend, reference line for current month, and cursor-line APCA compliant tooltip.",
-      "styles": {
-        "background": "#ffffff",
-        "border": "1px solid var(--border-light)",
-        "border_radius": "16px"
-      },
-      "elements": [
-        "Header: Title + Range Switcher (YTD / 12M / Quarter)",
-        "Header Right: Color legend + Export CSV button",
-        "Chart area: Height 380px, responsive, stacked bars for Invoiced/Open, Total blue line, Forecast amber dashed line, reference line on current month"
-      ]
-    },
-    "segments_and_top_accounts_card": {
-      "description": "Right side bento column split into top Segments (US Wholesale & Distributors with progress bars & % of goal pills) and Ranked Top 1-5 Accounts list with rank badge, account name, formatted amount, and triangle delta indicators.",
-      "styles": {
-        "background": "#ffffff",
-        "border": "1px solid var(--border-light)",
-        "border_radius": "16px"
+      "pipeline_card": {
+        "toolbar": "Top row: Section title 'Shipments Pipeline' with total count badge + Search input + Controls & Factories actions. Bottom row: Segmented stage pipeline bar [All (n) | Draft | Ready | Instructions | Awaiting prepayment | Released | Shipped | Invoiced] + inline Customer filter select + Factory filter select + Clear filters reset button.",
+        "table_anatomy": {
+          "header": "5 columns: Shipment & Customer | Stage & Progress | Factory & Terms | Orders & Values (SO / PO) | Units & Ship Status",
+          "row_design": "Interactive row with subtle hover highlight (#f4f7f5). Customer name in Outfit bold + Avatar initials badge + IS-XXXX ID pill + Created date. Stage column rendered with colored status badge + 7-step micro progress bar. Factory column showing factory name + Incoterms + Currency + Transport Mode. Orders column showing SO # + SO Value and PO # + PO Value in tabular Mono. Units column with unit count + line count + ShipChip (overdue alert in crimson, upcoming in amber, completed in emerald).",
+          "footer_summary": "Unified bottom summary row displaying Total Shipments count, Total Units sum, Total SO Value sum, and Total PO Value sum."
+        }
       }
     },
-    "account_detail_table": {
-      "description": "Comprehensive B2B account table with live search input, count badge, avatar initials with color seeds, STRATEGIC tags, invoiced horizontal mini-bar, vs Goal pill, YoY delta, and keyboard-accessible accordion expansion showing 5 key metrics and 'Open account' navigation CTA.",
-      "styles": {
-        "row_hover": "background: #f4f7f5;",
-        "expanded_card": "background: #fbfcfb; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--border-medium);"
-      }
+    "detail_view_shipment": {
+      "back_navigation": "Subtle breadcrumb back button with ESC hotkey support ('< Shipments').",
+      "hero_card": {
+        "description": "Header hero card matching Pre-Book Review detail structure. Top row: Kicker 'International Shipment · SO58739' + Large H1 Title ('IS-0012') + Status Pill badge + Customer & Factory meta + Action CTAs ('Message Customer', Primary Advance Stage CTA button, Download Docs, More options dropdown menu).",
+        "facts_grid": "6 inline stat panels on tinted #f7f9f8 surfaces: Est. Ship Date (with days-to tag), Transport Mode & Forwarder, Incoterms & Currency, Total Units & Lines count, Declared Value (CI total), and Prepayment status (due vs paid).",
+        "stepper": "6-step horizontal progress tracker (Draft -> Ready -> Booking & Payment -> Released -> Shipped -> Invoiced) with step numbers, active glow indicator, and next-action descriptor footer.",
+        "tabs": "Segmented tab navigation: Overview, Booking & payment, Conversation (with unread badge), Documents (with doc count), Activity (with timeline count)."
+      },
+      "overview_tab_layout": "Bento 2-column layout. Left (65% width): Shipment Lines Table with SKU, SO #, PO #, Description, Qty, Unit Value, and summary total row. Right (35% width): Next Action Checklist card with tick icons + Parties card (Customer contact & Factory contact with email copy triggers and packing list download CTA) + Recent Activity feed."
+    },
+    "open_orders_tab": {
+      "consolidation_card": "Collapsible 'Recommended Order Groups' card with green count badge. Highlights POs sharing the same customer & factory with ship dates within N days. Each group card displays customer, factory, combined POs, total units, line count, earliest ship date, and 'Create grouped shipment' primary CTA.",
+      "toolbar": "Search input + Customer filter + Factory filter + Ship-within-days window number input + 'Recommended' toggle button + Expand/Collapse all lines toggle.",
+      "po_table": "Expandable PO table. Headers: Purchase Order, Customer, Factory, Ship Date, Group consolidation match badge, Units, and 'Shipment' create action button. Expanded view reveals itemized POLine breakdown (SKU, Product, Ordered, Allocated, Shipped, Remaining)."
     }
-  },
-  "motion_and_interactions": {
-    "hero_entrance": "animation: rv-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;",
-    "mid_entrance": "animation: rv-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both 0.08s;",
-    "table_entrance": "animation: rv-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both 0.16s;",
-    "progress_bar_fill": "animation: rv-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.25s;",
-    "card_hover_lift": "transform: translateY(-2px); transition: transform 0.2s ease, box-shadow 0.2s ease;",
-    "reduced_motion": "@media (prefers-reduced-motion: reduce) { animation: none !important; transition: none !important; }"
   },
   "data_testid_inventory": {
-    "dashboard_page": "dashboard-page",
-    "rv_hero": "rv-hero",
-    "rv_invoiced_ytd": "rv-invoiced-ytd",
-    "rv_invoiced_delta": "rv-invoiced-delta",
-    "rv_seg_all": "rv-seg-all",
-    "rv_seg_us": "rv-seg-us",
-    "rv_seg_dist": "rv-seg-dist",
-    "rv_tile_open": "rv-tile-open",
-    "rv_tile_total": "rv-tile-total",
-    "rv_tile_forecast": "rv-tile-forecast",
-    "rv_goal_pct": "rv-goal-pct",
-    "rv_chart_card": "rv-chart-card",
-    "rv_range_ytd": "rv-range-ytd",
-    "rv_range_12m": "rv-range-12m",
-    "rv_range_q": "rv-range-q",
-    "rv_export_btn": "rv-export-btn",
-    "rv_chart": "rv-chart",
-    "revenue_tooltip": "revenue-tooltip",
-    "rv_segments_card": "rv-segments-card",
-    "rv_segment_us": "rv-segment-us",
-    "rv_segment_dist": "rv-segment-dist",
-    "rv_top_accounts": "rv-top-accounts",
-    "rv_top_account_1": "rv-top-account-1",
-    "rv_top_account_2": "rv-top-account-2",
-    "rv_top_account_3": "rv-top-account-3",
-    "rv_top_account_4": "rv-top-account-4",
-    "rv_top_account_5": "rv-top-account-5",
-    "rv_account_detail": "rv-account-detail",
-    "rv_account_search": "rv-account-search",
-    "rv_account_row_id": "rv-account-row-[id]",
-    "rv_account_expand_id": "rv-account-expand-[id]",
-    "rv_open_account_id": "rv-open-account-[id]",
-    "rv_account_empty": "rv-account-empty"
+    "page": "intl-shipments-page",
+    "modebar": "is-modebar",
+    "tab_shipments": "is-tab-shipments",
+    "tab_orders": "is-tab-orders",
+    "new_shipment_btn": "is-new-shipment",
+    "priority_strip": "is-priority-strip",
+    "attn_group_msg": "is-attn-group-message",
+    "attn_row_id": "is-attn-[id]",
+    "attn_reply_id": "is-attn-reply-[id]",
+    "attn_ignore_id": "is-attn-ignore-[id]",
+    "kpi_all": "is-kpi-all",
+    "kpi_released": "is-kpi-released",
+    "search": "is-search",
+    "stages": "is-stages",
+    "stage_id": "is-stage-[id]",
+    "filter_customer": "is-filter-customer",
+    "filter_factory": "is-filter-factory",
+    "clear_filters": "is-clear-filters",
+    "row_id": "is-row-[id]",
+    "footer": "is-footer",
+    "factories_btn": "is-factories",
+    "factories_drawer": "is-factories-drawer",
+    "factory_card": "is-factory",
+    "create_modal": "is-create-modal",
+    "form_customer": "is-form-customer",
+    "form_factory": "is-form-factory",
+    "form_so": "is-form-so",
+    "form_submit": "is-form-submit",
+    "detail_page": "intl-shipment-detail",
+    "back_btn": "is-back",
+    "hero_message": "is-hero-message",
+    "advance_btn": "is-advance",
+    "more_btn": "is-more",
+    "more_menu": "is-more-menu",
+    "stepper": "is-stepper",
+    "dtab_id": "is-dtab-[id]",
+    "lines": "is-lines",
+    "next_card": "is-next-card",
+    "copy_buyer": "is-copy-buyer",
+    "packing_btn": "is-packing",
+    "recent_activity": "is-recent",
+    "booking_card": "is-booking",
+    "upload_btn": "is-upload",
+    "booking_docs": "is-booking-docs",
+    "chat_card": "is-chat",
+    "msg_item": "is-msg",
+    "msg_input": "is-msg-input",
+    "msg_send": "is-msg-send",
+    "docs_card": "is-docs",
+    "activity_card": "is-activity",
+    "open_orders": "is-open-orders",
+    "oo_search": "is-oo-search",
+    "oo_customer": "is-oo-customer",
+    "oo_factory": "is-oo-factory",
+    "oo_window": "is-oo-window",
+    "oo_rec_toggle": "is-oo-rec-toggle",
+    "oo_expand_all": "is-oo-expand-all",
+    "oo_groups": "is-oo-groups",
+    "oo_groups_toggle": "is-oo-groups-toggle",
+    "oo_group_idx": "is-oo-group-[index]",
+    "oo_group_create_idx": "is-oo-group-create-[index]",
+    "oo_sort_key": "is-oo-sort-[key]",
+    "oo_row_po": "is-oo-row-[po]",
+    "oo_lines_po": "is-oo-lines-[po]",
+    "order_create_po": "is-order-create-[po]"
   },
   "instructions_to_main_agent": [
-    "Ensure Google Fonts link for Barlow Condensed, Outfit, DM Sans, and JetBrains Mono is present in public/index.html or imported in index.css.",
-    "Verify all data-testid attributes listed in data_testid_inventory match exactly in DashboardPage.tsx.",
-    "Do NOT use Space Grotesk or Inter for headings.",
-    "Do NOT use teal green/blue (#1B93A4) anywhere in palette.",
-    "Maintain APCA contrast: high contrast dark theme for Hero section, crisp light theme for Chart & Detail sections.",
-    "Keep interactive element states (hover, focus-visible) clear with 2px outline offsets."
+    "Verify Google Fonts link for Barlow Condensed, Outfit, DM Sans, and JetBrains Mono is included in public/index.html or index.css.",
+    "Ensure all data-testid attributes in data_testid_inventory match existing test specifications perfectly.",
+    "Maintain high APCA contrast ratios on light surfaces (#ffffff, #f8faf9, #f4f7f5).",
+    "Do NOT use Space Grotesk or Inter for main headings.",
+    "Do NOT use teal green/blue (#1B93A4) anywhere in the application.",
+    "Ensure smooth hover states, button focus outlines, and keyboard accessibility."
   ],
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
     "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
     "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
     "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
     "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur) on tooltips and floating navs.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) on floating navs and overlays.",
     "You MUST NOT apply universal transition (e.g. transition: all). This breaks transforms. Always add transitions for specific interactive elements.",
     "You MUST NOT center align the app container. Keep left-aligned natural hierarchy.",
     "Always use modern button styles with clear hover/active micro-interactions.",

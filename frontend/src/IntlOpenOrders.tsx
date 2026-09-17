@@ -81,7 +81,8 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
 
   return (
     <div className="is-oo" data-testid="is-open-orders">
-      <section className="is-card is-oo-bar">
+      <section className="is-card is-oo-card">
+      <div className="is-oo-bar">
         <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search PO, SO, customer, factory…" data-testid="is-oo-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear"><X size={13} /></button>}</label>
         <select className="is-select" value={cust} onChange={(e) => setCust(e.target.value)} data-testid="is-oo-customer"><option value="all">All customers</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
         <select className="is-select" value={fac} onChange={(e) => setFac(e.target.value)} data-testid="is-oo-factory"><option value="all">All factories</option>{factories.map((f) => <option key={f}>{f}</option>)}</select>
@@ -89,9 +90,9 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
         <label className="is-window" data-testid="is-oo-window"><CalendarDays size={15} /> Within <input type="number" min={1} max={120} value={days} onChange={(e) => setDays(Math.max(1, Number(e.target.value) || 1))} /> days</label>
         <button className={`is-btn ${recOnly ? 'dark' : ''}`} onClick={() => setRecOnly((v) => !v)} data-testid="is-oo-rec-toggle"><Sparkles size={14} /> Recommended <b className="is-count">{groups.reduce((a, g) => a + g.pos.length, 0)}</b></button>
         <button className="is-link" onClick={() => setOpen(allOpen ? new Set() : new Set(rows.map((p) => p.po)))} data-testid="is-oo-expand-all">{allOpen ? 'Collapse all' : 'Expand all lines'}</button>
-      </section>
+      </div>
 
-      <section className={`is-card is-groups ${groupsOpen ? 'open' : ''}`} data-testid="is-oo-groups">
+      <div className={`is-groups ${groupsOpen ? 'open' : ''}`} data-testid="is-oo-groups">
         <button className="is-groups-head" onClick={() => setGroupsOpen((v) => !v)} data-testid="is-oo-groups-toggle">
           <span className="is-groups-ic"><Layers size={16} /></span>
           <div>
@@ -118,10 +119,9 @@ export function IntlOpenOrders({ onCreate, onCreateGroup }: { onCreate: (p: PO) 
             ))}
           </div>
         )}
-      </section>
+      </div>
 
-      <section className="is-card is-pipeline">
-        <div className="is-pipe-head"><h2>Open purchase orders <span className="is-muted">{rows.length} POs · {totalUnits.toLocaleString()} units remaining</span></h2></div>
+      <div className="is-pipe-head"><h2>Open purchase orders <span className="is-muted">{rows.length} POs · {totalUnits.toLocaleString()} units remaining</span></h2></div>
         <div className="is-table is-oo-table">
           <div className="is-tr is-potr is-th"><span>{sortBtn('po', 'Purchase order')}</span><span>{sortBtn('customer', 'Customer')}</span><span>{sortBtn('factory', 'Factory')}</span><span>{sortBtn('shipDate', 'Ship date')}</span><span>Group with</span><span className="r">{sortBtn('units', 'Units')}</span><span /></div>
           {rows.length === 0 && <div className="is-empty">No open orders match these filters.</div>}
