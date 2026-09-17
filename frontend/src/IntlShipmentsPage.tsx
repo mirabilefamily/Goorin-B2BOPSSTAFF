@@ -122,20 +122,16 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <header className="is-top" data-testid="is-modebar">
-        <div className="is-top-l">
-          <h1>International Shipments</h1>
-          <p className="is-sub">Factory-direct international orders, bookings and prepayments.</p>
+      <div className="is-modebar" data-testid="is-modebar">
+        <div className="ops-seg is-mode-seg" role="tablist">
+          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
+          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
         </div>
-        <div className="is-top-r">
-          <div className="ops-seg is-mode-seg" role="tablist">
-            <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
-            <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
-          </div>
+        <div className="is-modebar-r">
           <button className="ops-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
           <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
-      </header>
+      </div>
 
       {tab === 'orders' && (
         <IntlOpenOrders
