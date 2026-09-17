@@ -1,0 +1,55 @@
+{
+  "summary": "Frontend-only iter 59 pass for Pre-Book Review + Linesheet refinements at 1920x800. Login via empty fields (demo). PRE-BOOK REVIEW: Sidebar top has pb-mode-seg with pb-tab-review/pb-tab-setup (Review active white). Sidebar head shows 'Seasons' with pb-export-all icon (toast fires) and + icon. Season tree works — pb-season-toggle-FW27 expands and pb-drop-FW27-drop1 is present/clickable. Rename drop: pb-more-btn → pb-rename-drop shows pb-rename-input prefilled 'Drop 3'; typing 'Drop 3 — Summer' + Enter updates hero title to 'SS27 / Drop 3 — Summer', sidebar drop label updated to 'Drop 3 — Summer' and success toast 'Renamed to “Drop 3 — Summer”' shown. Esc cancels edits (hero stays 'Drop 3 — Summer'). Panel: pb-subtab-demand/orders sit in grey tray (bg rgb(233,238,235)); '2/12 at MOQ' pill and External volume button (pb-ext-btn) sit beside tabs; All/Hit/Under segmented present (pb-demand-all/hit/under); Download button single-line (95x24). Setup tab: title 'SS27' with subtitle 'Pre-book collection · 3 drops · 1 open'; sidebar footer buttons stacked full-width (pb-new-prebook and Enable existing both 206px wide, parent 206); clicking pb-new-prebook adds a new collection (SS28) — toast 'Created SS28' shown. LINESHEET: rail header 'Linesheet Builder' with ls-open-saved (folder icon + count badge) and ls-new-top (dark icon) present. Steps '1 Document' (ls-title, ls-notes), '2 Pricing' (ls-ctx toggle, ls-pricelist, ls-toggle-msrp), '3 Styles' (ls-selected-count) all present. ls-hide-noimg checkbox reduces SS27 count 26 → 17 (spec expected 14; small (12) counter matches CATALOG global no-image count, filter/count still works). ls-select-page and ls-select-all are proper checkboxes; card selection works on click. Save draft REAL via /api/linesheets — draft badge 'Saved just now' appeared and toast 'Saved “TEST_LS_iter59”' shown. Cleanup: two test drafts deleted via DELETE /api/linesheets/{id} (HTTP 204). No console errors on any page.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Linesheet catalog filter", "issues": ["ls-hide-noimg small counter shows global CATALOG no-image count (12) but Hide filter operates only on currently-filtered (season) list, so 26→17 for SS27 rather than 26→14. Consider scoping the (N) count to the currently filtered/season set for internal consistency (minor)."]}
+    ]
+  },
+  "test_evidence": {
+    "pre_book": {
+      "hero_default": "SS27 / Drop 3",
+      "subtab_tray_bg": "rgb(233,238,235)",
+      "moq_pill": "2/12 at MOQ",
+      "ext_beside_tabs": true,
+      "all_hit_under": true,
+      "download_single_line_wxh": "95x24",
+      "rename_prefilled": "Drop 3",
+      "hero_after_rename": "SS27 / Drop 3 — Summer",
+      "sidebar_after_rename": "Drop 3 — Summer",
+      "hero_after_escape": "SS27 / Drop 3 — Summer",
+      "fw27_toggle_and_drop1": true,
+      "setup_shows_SS27": true,
+      "setup_subtitle_ok": "Pre-book collection · 3 drops · 1 open",
+      "sidebar_footer_full_width": {"new_prebook_w": 206, "enable_existing_w": 206, "parent_w": 206},
+      "pb_new_prebook_click_adds_coll": true
+    },
+    "linesheet": {
+      "ls_open_saved": true, "ls_new_top": true,
+      "steps_present": {"1_document": true, "2_pricing": true, "3_styles": true},
+      "field_testids": ["ls-title","ls-notes","ls-ctx","ls-pricelist","ls-toggle-msrp","ls-selected-count","ls-hide-noimg","ls-select-page","ls-select-all"],
+      "hide_noimg_effect": {"before": 26, "after": 17, "label_counter": 12, "spec_expected_after": 14},
+      "card_selection_via_click": true,
+      "save_draft": {"badge_after_save": " Saved just now", "toast_shown": true},
+      "cleanup_deleted_ids": ["4c58ab3f-552c-4f20-a3fe-09c104dfb403","19a48921-d3cc-4fa5-b785-56069a198166"]
+    },
+    "console_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Linesheet ls-hide-noimg's (N) badge uses CATALOG.filter(!image).length (global) while the visible list is season-scoped — small UX/label inconsistency (spec said 26→14 but actual is 26→17 for SS27). Suggest computing (N) from currently-filtered items or clarify label copy.",
+    "PreBookPage.tsx still growing (many concerns: mode seg, rename flow, tree, panel, setup) — consider splitting Review/Setup panels into subcomponents for maintainability.",
+    "Rename toast 'Renamed to “Drop 3 — Summer”' works but there is no dedicated data-testid on the toast; consider adding testid for automated verification of toast content."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "Empty email+password → 'Log in' (demo, per /app/memory/test_credentials.md).",
+  "seed_data_creation": "Created two linesheet drafts named 'TEST_LS_iter59' via real POST /api/linesheets, both DELETE-cleaned (204).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Pre-Book default state loads SS27/Drop 3 hero; SS27 is open by default so pb-drop-SS27-drop3 is directly clickable. Rename input testid pb-rename-input; Enter commits, Escape cancels. Panel subtabs live in .pb-subtabs (grey tray). Linesheet drafts persist to real backend /api/linesheets — always clean up TEST_ drafts via DELETE. Note the ls-hide-noimg small (N) label is the global no-image count across all catalog, not per-season.",
+  "rca of the issue": "N/A — no defects observed; only one minor label/UX inconsistency for ls-hide-noimg counter."
+}

@@ -154,3 +154,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Pre-Book: Review/Setup segment moved into sidebar top (full-width), Export all drops became icon in sidebar head; standalone header row removed.
 - 2026-06 Pre-Book: Rename drop (⋯ menu → inline input in hero, Enter/blur commits, Esc cancels; in-memory). Linesheet rail organized into numbered steps (1 Document, 2 Pricing, 3 Styles), tighter catalog spacing.
 - 2026-06 Pre-Book clean pass (CSS): sidebar spacing + stacked full-width footer buttons, hero chips softened, divided KPI row, table row hover, setup title w/ subtitle, drop rows as cards w/ hover, tag radii 8px.
+- 2026-06 Pre-Book hero: 3 dark channel report panels (Total Combined / US Wholesale / Distributor: accounts, units, wholesale, MOQ rate, MOQ-hit bar) replacing KPI row; Orders table fixed column widths/gaps.

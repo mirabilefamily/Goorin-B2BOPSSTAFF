@@ -304,18 +304,22 @@ export default function PreBookPage({ onNavigate }: Props) {
                     <button className="pbx-chip warn" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details"><Layers size={14} /> Purchasing · 4 standard · 0 consolidated · no POs <ChevronDown size={13} className={previewOpen ? 'flip' : ''} /></button>
                   </div>
                 </div>
-                <div className="pbx-hero-stats" data-testid="pb-stat-combined">
-                  <div className="pb-metric"><small>Units</small><strong>{combined.units.toLocaleString()}</strong></div>
-                  <div className="pb-metric"><small>Wholesale</small><strong className="green">{combined.wholesale}</strong></div>
-                  <div className="pb-metric"><small>MOQ hit</small><strong className={combined.moqTone}>{atOrAbove}<span className="pbx-of">/{skus.length}</span></strong></div>
-                  <div className="pb-metric"><small>Accounts</small><strong>{combined.accounts}</strong></div>
-                  <div className="pbx-mix">
-                    <div className="pbx-split-bar"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div>
-                    <ul className="pbx-mix-legend">
-                      <li data-testid="pb-stat-usw"><i style={{ background: '#16a37a' }} />USW <b>{chan.usw.units.toLocaleString()}</b><em>{chan.usw.wholesale}</em></li>
-                      <li data-testid="pb-stat-dist"><i style={{ background: '#3b82f6' }} />DIST <b>{chan.dist.units.toLocaleString()}</b><em>{chan.dist.wholesale}</em></li>
-                    </ul>
-                  </div>
+                <div className="pbx-report" data-testid="pb-stat-combined">
+                  {[
+                    { key: 'all', name: 'Total Combined', dot: '#fff', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', testId: 'pb-stat-total' },
+                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', testId: 'pb-stat-usw' },
+                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', testId: 'pb-stat-dist' },
+                  ].map((c) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; return (
+                    <div key={c.key} className="pbx-rep" data-testid={c.testId}>
+                      <div className="pbx-rep-head"><i style={{ background: c.dot }} /><strong>{c.name}</strong><small>{c.accounts} accounts</small></div>
+                      <div className="pbx-rep-nums">
+                        <div><small>Units</small><b>{c.units.toLocaleString()}</b></div>
+                        <div><small>Wholesale</small><b className="g">{c.wholesale}</b></div>
+                        <div><small>MOQ rate</small><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b></div>
+                      </div>
+                      <div className="pbx-rep-bar"><small>MOQ hit</small><span><i style={{ width: `${rate}%`, background: c.bar }} /></span><small className="pbx-rep-of">{c.hit}/{c.of}</small></div>
+                    </div>
+                  ); })}
                 </div>
                 <div className="pb-drop-actions">
                   <div className="pb-more-wrap">
@@ -503,7 +507,7 @@ export default function PreBookPage({ onNavigate }: Props) {
           ) : (
             /* ---------- SETUP ---------- */
             <div className="pb-setup">
-              <h1 className="pb-setup-h"><Circle size={12} fill="currentColor" /> {activeColl}<small className="pb-setup-sub">Pre-book collection · {setupDrops.length} drops · {setupDrops.filter((d) => d.status === 'open').length} open</small></h1>
+              <h1 className="pb-setup-h"><Circle size={12} fill="currentColor" /> {activeColl}<small className="pb-setup-sub">Pre-book collection · {setupDrops.length} drops · {setupDrops.filter((d) => d.status !== 'closed').length} open</small></h1>
 
               <section className="pb-card">
                 <div className="pb-card-head"><span className="pb-card-title"><Calendar size={16} /> Pre-book Drops <b className="pb-count dark">{setupDrops.length}</b></span><button className="pb-dark-btn" onClick={addDrop} data-testid="pb-new-drop"><Plus size={15} /> New drop</button></div>
