@@ -175,3 +175,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Removed hero/KPI tiles/progress bars/pills. Open Orders in one card. Regression: iteration_65 PASS.
 - Added dashboard-style 4-tile KPI band above the shipments table (In pipeline w/ stage bar, Released, Awaiting reply, In motion); tiles act as filters.
 - Removed page title/subtitle; Shipments/Open Orders seg + Factories + New Shipment now in a card-style mode bar above the KPI band.
+- Overview card elevated: KPI tiles as inset panels with icon chips, hover lift, stage bar; mode bar merged into same card. Regression iteration_66.

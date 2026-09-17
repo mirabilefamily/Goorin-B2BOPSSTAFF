@@ -1,0 +1,33 @@
+{
+  "summary": "Frontend-only regression for v4 refinement of INTL Shipments page (one overview card with mode bar + 4-tile KPI band, board card with search/customer/factory selects + stage chips + 7-col table + inline quote + Reply/Ignore + footer). All flows from review request pass at 1920x1080 and 390x844 with zero console/page errors and no horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "works (signs in as ryan@mirabile.com, lands on #dashboard)",
+    "testids_present": ["intl-shipments-page","is-kpi-all","is-kpi-released","is-attn-group-message","is-tab-shipments","is-tab-orders","is-factories","is-new-shipment","is-search","is-filter-customer","is-filter-factory","is-stage-all","is-footer"],
+    "kpi_filters": {"initial_rows": 3, "is-kpi-released": 1, "is-attn-group-message": 2, "toggle_back_to_all": true},
+    "tabs": {"is-tab-orders_shows_is-open-orders": true, "is-tab-orders_hides_is-kpi-band": "is-kpi-all count=0 on orders tab", "is-tab-shipments_restores": true},
+    "factories_drawer": "is-factories opens is-factories-drawer, closes via .is-x",
+    "create_modal": "is-new-shipment -> is-create-modal; fill is-form-customer/is-form-factory; is-form-submit navigates to intl-shipment-detail",
+    "detail": {"dtabs": ["overview","booking","chat","docs","activity"], "is-advance": true, "is-back_returns_to_list": true},
+    "attn_flow": {"is-attn-IS-0012_text": "Ryan M: “Prepayment sent via Stripe.”", "is-attn-reply-IS-0012_opens_detail_with_is-chat": true, "is-attn-ignore-IS-0010_decrements_tile": "AWAITING REPLY 2 -> 1; is-attn-IS-0010 removed"},
+    "board_filters": {"stage-prepaid_rows": 1, "search_no_match_shows_is-empty": true, "is-clear-filters_resets": true},
+    "open_orders": {"is-oo-search_P01_rows": 8, "is-oo-groups-toggle_reveals_is-oo-group-create-0": true, "is-oo-row-P0159_expands_is-oo-lines-P0159": true, "is-order-create-P0159_opens_is-create-modal": true},
+    "responsive": {"desktop_1920_overflow_px": 0, "mobile_390_overflow_px": 0},
+    "console_errors": "none",
+    "page_errors": "none"
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx remains a large file combining SEED data, list, detail, factories drawer, and create modal — splitting into modules would improve maintainability (carried over from iteration_65).",
+    "Escape key still does not close the create modal or factories drawer; only .is-x/backdrop closes them (minor UX inconsistency)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "Transient shipment IS-0013 (TEST_Cust / TEST_Fac) via create modal — in-memory only",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "v4 layout verified: single overview card holds mode segmented control (is-tab-shipments/is-tab-orders), Factories/New Shipment buttons, and 4-tile KPI band (all/released/awaiting-reply via is-attn-group-message/in-motion). KPI band hides on Open Orders tab. Board card below with stage chips, search, filters, table, footer. Ignore/Reply on inline quote works and decrements tile."
+}

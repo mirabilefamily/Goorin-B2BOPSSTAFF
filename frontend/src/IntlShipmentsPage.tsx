@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Check, Download, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
@@ -135,19 +135,23 @@ export default function IntlShipmentsPage() {
       </div>
       {tab === 'shipments' && <div className="is-kpis" data-testid="is-priority-strip">
         <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+          <i className="is-kpi-ic"><Ship size={16} /></i>
           <span>In pipeline</span><strong>{active.length}</strong>
           <i className="is-dist">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</i>
           <small>{dist.filter((d) => d.n > 0).map((d) => <em key={d.id} className={d.id}><i />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</em>)}</small>
         </button>
         <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+          <i className="is-kpi-ic g"><CheckCircle2 size={16} /></i>
           <span>Released to factory</span><strong className="g">{released.length}</strong>
           <small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
         </button>
-        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+        <button className={`is-kpi ${fMsg ? 'on' : ''} ${attention.length ? 'alert' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+          <i className={`is-kpi-ic ${attention.length ? 'b' : ''}`}><MessageSquare size={16} /></i>
           <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong>
           <small>{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'Inbox clear'}</small>
         </button>
         <div className="is-kpi">
+          <i className="is-kpi-ic"><Boxes size={16} /></i>
           <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
           <small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small>
         </div>
