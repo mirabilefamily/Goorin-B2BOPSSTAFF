@@ -203,3 +203,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Header actions (Factories, Controls, New Shipment) only on Shipments tab; hidden on Open Orders. Fixed detail more-button icon. Added Controls button (toast placeholder).
 - Final pass: removed duplicate divider under Parties; mobile message quote clamped to 2 lines; mobile verified no horizontal overflow on list.
 - Documents tab: Factory packing list card now has Re-upload (file input; updates packing name + activity entry) beside download.
+- Pipeline table cleanup: 6-col grid with dedicated actions column (Reply/Ignore or chevron), compact SO/PO blocks, units+lines on one line, tighter rows. Regression iteration_84 PASS (testing agent fixed a TS typo in re-upload handler).

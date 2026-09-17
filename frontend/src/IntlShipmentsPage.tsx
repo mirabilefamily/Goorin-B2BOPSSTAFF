@@ -241,6 +241,7 @@ export default function IntlShipmentsPage() {
             <span>Factory</span>
             <button className={`is-sort ${sort.k === 'value' ? 'on' : ''}`} onClick={() => toggleSort('value')} data-testid="is-sort-value">Orders & value <ArrowUpDown size={11} /></button>
             <button className={`is-sort ${sort.k === 'ship' ? 'on' : ''}`} onClick={() => toggleSort('ship')} data-testid="is-sort-ship">Shipping <ArrowUpDown size={11} /></button>
+            <span />
           </div>
           {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); const idx = stepIdx(s.status); return (
             <div key={s.id} className={`is-ptr is-prow ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
@@ -252,9 +253,11 @@ export default function IntlShipmentsPage() {
                 <div><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></div>
               </div>
               <div className="is-pc-shipping">
-                <strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small>
+                <strong>{units(s).toLocaleString()} units <small>· {s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></strong>
                 <span className={`is-ship ${sh.tone}`}>{sh.sub === 'Shipped' ? `Shipped · ${sh.main}` : sh.sub === 'Ship date' ? 'Ship date TBD' : `Ships ${sh.sub} · ${sh.main}`}</span>
-                {m && <span className="is-r-acts"><button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button><button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} aria-label="Ignore" title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button></span>}
+              </div>
+              <div className="is-pc-acts">
+                {m ? <><button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button><button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} aria-label="Ignore" title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button></> : <i className="is-chev" />}
               </div>
             </div>
           ); })}
@@ -456,7 +459,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
             <div className="is-card-head"><h2>Factory packing list</h2><span className="is-muted">source file</span></div>
             <div className="is-docrow">
               <button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing-download"><FileText size={15} /> {s.packing}<Download size={14} /></button>
-              <label className="is-btn is-reupload" data-testid="is-packing-reupload"><Upload size={14} /> Re-upload<input type="file" accept=".xlsx,.xls,.csv" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; update(s.id, (x) => ({ ...x, packing: f.name, activity: [{ title: 'Packing list re-uploaded', detail: `${f.name} replaces ${x.packing}`, at: stamp(), by: 'Ryan Mirabile' }, ...x.activity] })); toast(`Packing list replaced with ${f.name}`); e.target.value = ''; }} /></label>
+              <label className="is-btn is-reupload" data-testid="is-packing-reupload"><Upload size={14} /> Re-upload<input type="file" accept=".xlsx,.xls,.csv" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; update((x) => ({ ...x, packing: f.name, activity: [{ title: 'Packing list re-uploaded', detail: `${f.name} replaces ${x.packing}`, at: stamp(), by: 'Ryan Mirabile' }, ...x.activity] })); toast(`Packing list replaced with ${f.name}`); e.target.value = ''; }} /></label>
             </div>
             <p className="is-dochint">Replacing the file re-parses lines, units and values. Previous versions stay in Activity.</p>
           </section>

@@ -915,3 +915,18 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-reupload { height: 42px; padding: 0 16px; border-radius: 12px; cursor: pointer; white-space: nowrap; }
 .is-dochint { margin-top: 10px; font-size: 12.5px; color: var(--ink-4); }
 @media (max-width: 768px) { .is-docrow { flex-direction: column; align-items: stretch; } .is-reupload { justify-content: center; } }
+
+/* table cleanup */
+.is-ptr { grid-template-columns: 1.9fr 1.15fr 1.4fr 1.6fr 1.25fr 92px; gap: 18px; padding: 16px 26px; }
+.is-pc-ship .is-mono-av { width: 42px; height: 42px; border-radius: 12px; font-size: 13px; }
+.is-pc-ship strong { font-size: 15px; } .is-pc-ship small { font-size: 12.5px; }
+.is-pc-stage { gap: 7px; } .is-status.pill { font-size: 12.5px; padding: 5px 12px 5px 10px; } .is-pc-stage .is-prog b { width: 16px; height: 4px; }
+.is-pc-fac strong { font-size: 14px; } .is-pc-fac small { font-size: 12.5px; }
+.is-pc-orders { gap: 22px; } .is-pc-orders > div { display: grid; grid-template-columns: 22px auto; grid-template-areas: 'l code' 'l amt'; column-gap: 8px; row-gap: 3px; align-items: center; }
+.is-pc-orders small { grid-area: l; font-size: 10.5px; } .is-pc-orders code { grid-area: code; font-size: 12px; padding: 3px 8px; } .is-pc-orders b { grid-area: amt; font-size: 15px; }
+.is-pc-shipping { flex-direction: column; align-items: flex-start; gap: 6px; } .is-pc-shipping strong { font-size: 14px; width: auto; } .is-pc-shipping strong small { font-weight: 500; color: var(--ink-4); font-size: 12.5px; }
+.is-pc-shipping .is-ship { font-size: 12px; padding: 5px 10px; }
+.is-pc-acts { display: flex; justify-content: flex-end; align-items: center; gap: 6px; }
+.is-pc-acts .is-chev { margin-right: 6px; } .is-prow:hover .is-pc-acts .is-chev { opacity: 1; transform: translateX(3px) rotate(45deg); }
+@media (max-width: 1280px) { .is-ptr { grid-template-columns: 1fr 1fr; } .is-pc-acts { justify-content: flex-start; } }
+@media (max-width: 768px) { .is-ptr { grid-template-columns: 1fr; } }
