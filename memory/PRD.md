@@ -163,3 +163,8 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Mobile pass (≤768/900px): Intl Shipments (stacked strip/KPIs, card rows, scrollable stepper/tabs, single-column detail), Pre-Book (sidebar-first single column, wrapped chips, scrollable tables), Linesheet (builder first, 2-col grid, wrapped toolbar, full-width drawer, 2-col print doc). Verified no horizontal overflow at 390px.
 - 2026-06 Linesheet fixes: MultiSelect popover no longer clipped (.ls-catalog overflow visible, z-index); nested search inputs stripped of field styling/outline (single border, focus-within on container).
 - 2026-06 Intl Shipments: floating header row replaced by integrated card-style mode bar (icon segmented Shipments/Open Orders + New Shipment) matching other page chrome.
+
+## 2026-06 — INTL Shipments de-segmentation
+- Mode bar (tabs + New Shipment) no longer a card; floats as toolbar.
+- Stage chips + customer/factory filters merged into one `.is-controls` row; tinted filter band and dividers removed.
+- Table header/footer restyled for one continuous surface. Regression: iteration_63 PASS.
