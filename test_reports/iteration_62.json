@@ -1,0 +1,49 @@
+{
+  "summary": "Frontend-only verification of two Linesheet visual bug fixes at 1920x800. Login (empty fields) → Linesheet via sidebar nav. Both bugs verified fixed; regressions clean; no console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_details": {
+    "bug1_collection_menu_clipping": {
+      "status": "FIXED",
+      "ls-catalog_overflow_computed": "visible (was hidden)",
+      "collection_menu_visible": true,
+      "menu_bbox": {"x": 919, "y": 194.375, "width": 260, "height": 292.5},
+      "catalog_bbox": {"x": 338, "y": 92, "width": 1124, "height": 1138.95},
+      "menu_within_viewport": true,
+      "options_visible": ["The Farm", "Suede", "Core", "Heritage", "Fedoras"],
+      "search_input_inside_menu_visible": true,
+      "season_menu_visible": true,
+      "outside_click_closes_menu": true
+    },
+    "bug2_customer_search_double_border": {
+      "status": "FIXED",
+      "input_styles_default": {"borderTopWidth": "0px", "borderRightWidth": "0px", "outlineWidth": "0px", "boxShadow": "none", "backgroundColor": "transparent"},
+      "input_styles_on_focus": {"borderTopWidth": "0px", "outlineWidth": "0px", "boxShadow": "none"},
+      "container_class": "ls-search block",
+      "container_border_width": "1px",
+      "container_border_radius": "12px",
+      "typing_lids_filters_to_Lids": true
+    },
+    "regressions": {
+      "toolbar_ls_search_input_no_inner_border": {"borderTopWidth": "0px", "outlineWidth": "0px", "boxShadow": "none"},
+      "catalog_grid_bottom_radius": "22px/22px",
+      "catalog_pager_bottom_radius": "22px/22px",
+      "console_errors": "none (only unrelated Recharts warnings on Dashboard)"
+    }
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Login with empty email/password (demo one-click) as per /app/memory/test_credentials.md",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Linesheet BUG 1 (MultiSelect clipped by .ls-catalog overflow:hidden) and BUG 2 (nested input border in customer search) are fixed. .ls-catalog now overflow:visible; .ls-search input and .ls-ms-search input have border/outline/box-shadow reset via linesheet.css tail rules. Catalog rounded bottom-corner preserved on .ls-grid/.ls-pager (22px). Route to Linesheet: click sidebar nav-item 'Linesheet' (hash-based #linesheet requires history state).",
+  "rca of the issue": "BUG1 RCA: .ls-catalog had overflow:hidden to clip the grid into its rounded card, but this also clipped absolute-positioned MultiSelect popovers inside the toolbar. Fix moved overflow to descendants (grid/pager get rounded bottom corners; .ls-catalog is overflow:visible). BUG2 RCA: input inherited default browser border/box-shadow and .ls-search wrapper also had border, causing double outline; tail CSS resets input styles to none and lets container render the single rounded border with focus-within state."
+}
