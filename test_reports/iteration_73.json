@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend regression of Intl Shipments Action Center (iteration_73). Verified 3 action cards (prepay, msg, next) on load; late/pack hidden. Focus filters (is-kpi-released -> 1 row + 'Focused'; is-kpi-all -> 'Clear focus' -> 3 rows; is-attn-group-message -> 2 rows). Actions: is-act-remind toast, is-act-reply opens IS-0012 with is-chat + is-back, is-act-mark-prepaid removes prepay card + IS-0011 row status = Prepaid + rail Prepaid count 2 (702 units), is-act-ignore-all removes msg card and figure drops to 0, is-next-IS-0011 opens detail. Open Orders tab shows is-oo-kpi-overdue/due/groups. Regression: is-stage-shipped filters to 1 row. Zero console errors, zero page errors, 0 horizontal overflow at 1920x900, 1280x800, 390x844.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty email/password -> ryan@mirabile.com",
+    "cards_visible_initial": {"prepay": true, "msg": true, "next": true, "late": false, "pack": false},
+    "focus_filters": {"initial_rows": 3, "is-kpi-released": 1, "is-kpi-all_label": "Clear focus", "cleared_rows": 3, "is-attn-group-message": 2},
+    "actions": {
+      "is-act-remind": "toast shown (contains 'reminder')",
+      "is-act-reply": "opened IS-0012 with is-chat visible; is-back returns",
+      "is-act-mark-prepaid": "prepay card removed; IS-0011 row status Prepaid; rail Prepaid = 2 (702 units)",
+      "is-act-ignore-all": "msg card removed; figure 3 -> 0",
+      "is-next-IS-0011": "opens intl-shipment-detail"
+    },
+    "orders_tab_kpis": {"overdue": true, "due": true, "groups": true},
+    "regression": {"is-stage-shipped": 1},
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 520 lines; hero cards logic (~40 lines of inline IIFE at ln 150-193) should extract into IntlActionCards.tsx to improve readability.",
+    "Card `late` uses same `warn` tone as `prepay`/`pack` but review specifies tone `danger` for late (Icon AlertTriangle) — code sets tone='danger' for late (correct). No action needed.",
+    "`is-act-mark-prepaid` marks ALL prepayment shipments at once with a single toast; consider per-shipment confirmation for real-world safety.",
+    "`ignored` state uses `${id}:${msgId}` keys but attention memo doesn't include `ignored` in useMemo deps — relies on eslint-disable; would be cleaner to add explicitly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "None (in-memory only)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Shipments Action Center cards render only when relevant (prepay/msg/late/pack/next). Each card has Focus btn (is-kpi-released/is-attn-group-message/is-queue-overdue/is-queue-nopack/is-queue-soon), primary+secondary actions. is-kpi-all label toggles 'Showing all' <-> 'Clear focus'. is-act-mark-prepaid moves all prepayment->prepaid; is-act-ignore-all dismisses last unanswered msgs per shipment. All flows PASS; 0 console errors; 0 overflow at all viewports."
+}
