@@ -158,3 +158,5 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - 2026-06 Pre-Book report v2: unified dark band (Total Combined primary w/ 34px units + delta pill, USW/DIST with share-of-units chip), MOQ-rate rings, thin hit bars; hero body white.
 - Note: dev harness wraps dynamic text in <span display:contents>; avoid bare descendant `span` selectors on number containers (fixed .pbx-rep-ring).
 - 2026-06 Pre-Book report v3 (user disliked dark band): light comparison table — Channel | Accounts | Units·share bar | Wholesale | MOQ hit rate bar | vs Drop 2 delta; Total row emphasized.
+- 2026-06 Pre-Book report v4: light bento tiles on sub bg (Total white/elevated w/ USW·DIST mix bar; channel tiles w/ MOQ bar), delta pill top-right, big units, Wholesale/MOQ hit/Share grid.
+- 2026-06 Pre-Book tiles v2: tiles are buttons — channel tile filters Orders tab by channel (active ring, "X only" chip to clear; Total clears); Total tile shows Avg/account + mix bar legend.

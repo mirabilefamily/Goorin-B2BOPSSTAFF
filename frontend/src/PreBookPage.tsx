@@ -140,6 +140,8 @@ export default function PreBookPage({ onNavigate }: Props) {
   const [tab, setTab] = useState<'review' | 'setup'>('review');
   const [showArchived, setShowArchived] = useState(false);
   const [subTab, setSubTab] = useState<'demand' | 'orders'>('demand');
+  const [chanFilter, setChanFilter] = useState<'all' | 'USW' | 'DIST'>('all');
+  const pickChannel = (k: string) => { const next = k === 'usw' ? 'USW' : k === 'dist' ? 'DIST' : 'all'; const same = chanFilter === next || next === 'all'; setChanFilter(same ? 'all' : next); if (!same) { setSubTab('orders'); toast(`Showing ${next === 'USW' ? 'US Wholesale' : 'Distributor'} orders`); } };
   const [demandFilter, setDemandFilter] = useState<'all' | 'hit' | 'under'>('under');
   const [orderFilter, setOrderFilter] = useState<'All' | 'Draft' | 'Submitted' | 'Confirmed' | 'Released'>('All');
   const [actionsOpen, setActionsOpen] = useState(false);
@@ -194,10 +196,11 @@ export default function PreBookPage({ onNavigate }: Props) {
     const q = orderQuery.trim().toLowerCase();
     return orders.filter((o) => {
       if (orderFilter !== 'All' && o.status !== orderFilter) return false;
+      if (chanFilter !== 'all' && o.channel !== chanFilter) return false;
       if (q && !o.customer.toLowerCase().includes(q) && !o.id.includes(q)) return false;
       return true;
     });
-  }, [orderFilter, orderQuery]);
+  }, [orderFilter, orderQuery, chanFilter]);
 
   const totalUnits = skus.reduce((t, s) => t + s.total, 0);
   const atOrAbove = skus.filter((s) => s.total >= s.moq).length;
@@ -304,21 +307,24 @@ export default function PreBookPage({ onNavigate }: Props) {
                     <button className="pbx-chip warn" onClick={() => setPreviewOpen((v) => !v)} data-testid="pb-preview-details"><Layers size={14} /> Purchasing · 4 standard · 0 consolidated · no POs <ChevronDown size={13} className={previewOpen ? 'flip' : ''} /></button>
                   </div>
                 </div>
-                <div className="pbx-report pbx-report--table" data-testid="pb-stat-combined">
-                  <div className="pbx-rt-row pbx-rt-head"><span>Channel</span><span className="r">Accounts</span><span>Units · share</span><span className="r">Wholesale</span><span>MOQ hit</span><span className="r">vs Drop 2</span></div>
+                <div className="pbx-report pbx-report--tiles" data-testid="pb-stat-combined">
                   {[
-                    { key: 'all', name: 'Total Combined', dot: '#0f1f18', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#0f1f18', share: 100, delta: 12, testId: 'pb-stat-total' },
-                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', share: Math.round((chan.usw.units / combined.units) * 100), delta: -4, testId: 'pb-stat-usw' },
-                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', share: Math.round((chan.dist.units / combined.units) * 100), delta: 18, testId: 'pb-stat-dist' },
-                  ].map((c, i) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; return (
-                    <div key={c.key} className={`pbx-rt-row ${i === 0 ? 'total' : ''}`} data-testid={c.testId}>
-                      <span className="pbx-rt-ch"><i style={{ background: c.dot }} />{c.name}</span>
-                      <span className="r">{c.accounts}</span>
-                      <span className="pbx-rt-units"><b>{c.units.toLocaleString()}</b><i className="pbx-rt-share"><u style={{ width: `${c.share}%`, background: c.bar }} /></i><small>{c.share}%</small></span>
-                      <span className="r g">{c.wholesale}</span>
-                      <span className="pbx-rt-moq"><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b><i className="pbx-rt-share"><u style={{ width: `${rate}%`, background: rate >= 90 ? '#16a37a' : '#e39a1c' }} /></i><small>{c.hit}/{c.of}</small></span>
-                      <span className="r"><em className={`pbx-rt-delta ${c.delta >= 0 ? 'up' : 'down'}`}>{c.delta >= 0 ? '+' : ''}{c.delta}%</em></span>
-                    </div>
+                    { key: 'all', name: 'Total Combined', dot: '#0f1f18', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, delta: 12, testId: 'pb-stat-total' },
+                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, delta: -4, testId: 'pb-stat-usw' },
+                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, delta: 18, testId: 'pb-stat-dist' },
+                  ].map((c, i) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; const share = Math.round((c.units / combined.units) * 100); return (
+                    <button type="button" key={c.key} className={`pbx-tile ${i === 0 ? 'total' : ''} ${chanFilter !== 'all' && ((c.key === 'usw' && chanFilter === 'USW') || (c.key === 'dist' && chanFilter === 'DIST')) ? 'on' : ''}`} onClick={() => pickChannel(c.key)} data-testid={c.testId} title={i === 0 ? 'Clear channel filter' : `Filter orders to ${c.name}`}>
+                      <div className="pbx-tile-head"><span><i style={{ background: c.dot }} />{c.name}</span><em className={c.delta >= 0 ? 'up' : 'down'}>{c.delta >= 0 ? '↑' : '↓'} {Math.abs(c.delta)}%</em></div>
+                      <div className="pbx-tile-big"><strong>{c.units.toLocaleString()}</strong><small>units · {c.accounts} accounts</small></div>
+                      <div className="pbx-tile-grid">
+                        <div><small>Wholesale</small><b className="g">{c.wholesale}</b></div>
+                        <div><small>MOQ hit</small><b className={rate >= 90 ? 'g' : 'a'}>{c.hit}<span>/{c.of}</span></b></div>
+                        <div><small>{i === 0 ? 'Avg / account' : 'Share'}</small><b>{i === 0 ? Math.round(c.units / c.accounts).toLocaleString() : `${share}%`}</b></div>
+                      </div>
+                      {i === 0
+                        ? <div className="pbx-tile-mix"><div className="pbx-tile-bar mix"><i style={{ width: `${(chan.usw.units / combined.units) * 100}%`, background: '#16a37a' }} /><i style={{ width: `${(chan.dist.units / combined.units) * 100}%`, background: '#3b82f6' }} /></div><small><i style={{ background: '#16a37a' }} />USW {Math.round((chan.usw.units / combined.units) * 100)}%<i style={{ background: '#3b82f6' }} />DIST {Math.round((chan.dist.units / combined.units) * 100)}%</small></div>
+                        : <div className="pbx-tile-bar"><i style={{ width: `${rate}%`, background: rate >= 90 ? '#16a37a' : '#e39a1c' }} /></div>}
+                    </button>
                   ); })}
                 </div>
                 <div className="pb-drop-actions">
@@ -382,8 +388,9 @@ export default function PreBookPage({ onNavigate }: Props) {
                   <div className="pb-panel-left">
                     <div className="pb-panel-tabs">
                       <button className={subTab === 'demand' ? 'active' : ''} onClick={() => setSubTab('demand')} data-testid="pb-subtab-demand">SKU Demand <b className="pb-count">{skus.length}</b></button>
-                      <button className={subTab === 'orders' ? 'active' : ''} onClick={() => setSubTab('orders')} data-testid="pb-subtab-orders">Orders <b className="pb-count">{orders.length}</b></button>
+                      <button className={subTab === 'orders' ? 'active' : ''} onClick={() => setSubTab('orders')} data-testid="pb-subtab-orders">Orders <b className="pb-count">{orderRows.length}</b></button>
                     </div>
+                    {subTab === 'orders' && chanFilter !== 'all' && <button className="pbx-chanchip" onClick={() => setChanFilter('all')} data-testid="pb-chan-clear"><i style={{ background: chanFilter === 'USW' ? '#16a37a' : '#3b82f6' }} />{chanFilter === 'USW' ? 'US Wholesale' : 'Distributor'} only <X size={12} /></button>}
                     {subTab === 'demand' && <><span className="pb-panel-num">{atOrAbove}/{skus.length} at MOQ</span><button className="pb-ext" onClick={() => toast('Import external volume')} data-testid="pb-ext-btn"><Upload size={14} /> External volume</button></>}
                   </div>
                   <div className="pb-panel-tools">
