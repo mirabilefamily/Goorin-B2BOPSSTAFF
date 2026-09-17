@@ -129,8 +129,6 @@ export default function IntlShipmentsPage() {
   const setQueue = (k: typeof fQueue) => { setFQueue(fQueue === k ? '' : k); setFStatus('all'); setFMsg(false); };
   const nextUp = list.filter((s) => s.status !== 'shipped' && s.status !== 'invoiced' && daysTo(s.ship) !== null).sort((a, b) => daysTo(a.ship)! - daysTo(b.ship)!)[0];
   const needInstr = list.filter((s) => s.status === 'ready' || s.status === 'draft');
-  const sendAllInstr = () => { needInstr.forEach((p) => update(p.id, (x) => ({ ...x, status: 'instructions', activity: [{ title: 'Shipping instructions sent', detail: 'sent to factory from action center', at: stampNow(), by: 'Ryan Mirabile' }, ...x.activity] }))); toast(`Shipping instructions sent for ${needInstr.length} shipment${needInstr.length === 1 ? '' : 's'}`); };
-  const markAllPrepaid = () => { prepayDue.forEach((p) => update(p.id, (x) => ({ ...x, status: 'prepaid', activity: [{ title: 'Status changed', detail: 'awaiting prepayment → prepaid — marked from action center', at: stampNow(), by: 'Ryan Mirabile' }, ...x.activity] }))); toast(`${prepayDue.length} shipment${prepayDue.length === 1 ? '' : 's'} marked prepaid`); };
   const shipText = (s: Shipment) => {
     if (s.status === 'shipped' || s.status === 'invoiced') return { main: s.ship, sub: 'Shipped', tone: 'ok' };
     const d = daysTo(s.ship);
@@ -156,29 +154,37 @@ export default function IntlShipmentsPage() {
         {tab === 'shipments' ? (
         <div className="is-tiles">
           <button className={`is-tile ${!filtered ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); setQ(''); setFCustomer(new Set()); setFFactory(new Set()); }} data-testid="is-kpi-all">
-            <header><i className="ink"><Ship size={15} /></i><span>In pipeline</span></header>
-            <strong>{active.length}</strong>
+            <header><i className="ink"><Ship size={15} /></i><span>In pipeline</span><em className="is-tile-hint">{filtered ? 'Show all' : 'All'}</em></header>
+            <strong>{active.length}<small>active</small></strong>
             <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
-            <small className="is-legend">{dist.filter((d) => d.n > 0).map((d) => <span key={d.id}><i className={`is-tile-dot ${d.id}`} />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</span>)}</small>
-            {nextUp && <em className="is-tile-link" onClick={(e) => { e.stopPropagation(); setOpenId(nextUp.id); }} data-testid={`is-next-${nextUp.id}`}>Next ship in {daysTo(nextUp.ship)}d · {nextUp.customer} <ChevronRight size={13} /></em>}
+            <ul className="is-tile-list">
+              {dist.filter((d) => d.n > 0).map((d) => <li key={d.id}><i className={`is-tile-dot ${d.id}`} /><span>{STATUS_LABEL[d.id]}</span><b>{d.n}</b></li>)}
+              {nextUp && <li className="is-tile-next"><CalendarClock size={12} /><span>Next ship · {nextUp.customer}</span><b>{daysTo(nextUp.ship)}d</b></li>}
+            </ul>
           </button>
           <button className={`is-tile ${fMsg ? 'on' : ''}`} onClick={() => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); }} disabled={attention.length === 0} data-testid="is-attn-group-message">
-            <header><i className="blue"><MessageSquare size={15} /></i><span>Messages</span></header>
-            <strong>{attention.length}</strong>
-            <small>{attention.length ? `${attention[0].msgs[attention[0].msgs.length - 1].who}: “${attention[0].msgs[attention[0].msgs.length - 1].text}”` : 'Inbox clear — every message answered'}</small>
-            {attention.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(attention[0].id); }} data-testid="is-act-reply"><MessageSquare size={13} /> Reply · {attention[0].id}</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); attention.forEach(ignoreMsg); }} data-testid="is-act-ignore-all">Ignore all</em></span>}
+            <header><i className="blue"><MessageSquare size={15} /></i><span>Messages</span><em className="is-tile-hint">{fMsg ? 'Focused' : 'Focus'}</em></header>
+            <strong>{attention.length}<small>awaiting reply</small></strong>
+            <ul className="is-tile-list">
+              {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return <li key={s.id}><i className="is-mono-av xs">{mono(m.who)}</i><span><b>{m.who}</b> {m.text}</span><small>{s.id}</small></li>; })}
+              {attention.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Inbox clear — every message answered</span></li>}
+            </ul>
           </button>
           <button className={`is-tile ${fStatus === 'prepayment' ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); }} disabled={prepayDue.length === 0} data-testid="is-kpi-released">
-            <header><i className="amber"><CreditCard size={15} /></i><span>Needing payment</span></header>
-            <strong>{prepayDue.length}</strong>
-            <small>{prepayDue.length ? `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}` : `${money(released.reduce((a, s) => a + s.prepay, 0))} received · ${released.length} released`}</small>
-            {prepayDue.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); markAllPrepaid(); }} data-testid="is-act-mark-prepaid"><Check size={13} /> Mark prepaid</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); toast(`Payment reminder sent to ${prepayDue.map((s) => s.buyer).join(', ')}`); }} data-testid="is-act-remind">Send reminder</em></span>}
+            <header><i className="amber"><CreditCard size={15} /></i><span>Needing payment</span><em className="is-tile-hint">{fStatus === 'prepayment' ? 'Focused' : 'Focus'}</em></header>
+            <strong>{money(prepayDue.reduce((a, s) => a + s.prepay, 0))}<small>{prepayDue.length} shipment{prepayDue.length === 1 ? '' : 's'} due</small></strong>
+            <ul className="is-tile-list">
+              {prepayDue.slice(0, 3).map((s) => <li key={s.id}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{money(s.prepay)}</small></li>)}
+              {prepayDue.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>{money(released.reduce((a, s) => a + s.prepay, 0))} received · {released.length} released</span></li>}
+            </ul>
           </button>
           <button className={`is-tile ${fQueue === 'instr' ? 'on' : ''}`} onClick={() => setQueue('instr')} disabled={needInstr.length === 0} data-testid="is-tile-instructions">
-            <header><i className="violet"><Send size={15} /></i><span>Needing shipping instructions</span></header>
-            <strong>{needInstr.length}</strong>
-            <small>{needInstr.length ? `${needInstr.map((s) => `${s.customer.split(' ')[0]} · ${s.id}`).join(', ')}` : `All instructions sent · ${list.filter((s) => s.status === 'instructions').length} awaiting factory confirmation`}</small>
-            {needInstr.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); sendAllInstr(); }} data-testid="is-act-send-instr"><Send size={13} /> Send instructions</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); setOpenId(needInstr[0].id); }} data-testid="is-act-open-instr">Open · {needInstr[0].id}</em></span>}
+            <header><i className="violet"><Send size={15} /></i><span>Shipping instructions</span><em className="is-tile-hint">{fQueue === 'instr' ? 'Focused' : 'Focus'}</em></header>
+            <strong>{needInstr.length}<small>to send</small></strong>
+            <ul className="is-tile-list">
+              {needInstr.slice(0, 3).map((s) => <li key={s.id}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{STATUS_LABEL[s.status]}</small></li>)}
+              {needInstr.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>All sent · {list.filter((s) => s.status === 'instructions').length} awaiting factory confirmation</span></li>}
+            </ul>
           </button>
         </div>
         ) : (() => {
