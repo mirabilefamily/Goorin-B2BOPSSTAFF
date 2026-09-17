@@ -1,0 +1,49 @@
+{
+  "summary": "Verified Intl Shipments sortable table headers, clickable tile row shortcuts, and Activity timeline formatting per iteration_81 spec. All targeted behaviors pass and no regressions observed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty creds -> ryan@mirabile.com, navigated to Intl Shipments",
+    "sorting": {
+      "default_ship_asc": ["IS-0010", "IS-0011", "IS-0012"],
+      "is-sort-value_asc": ["IS-0012", "IS-0011", "IS-0010"],
+      "is-sort-value_desc": ["IS-0010", "IS-0011", "IS-0012"],
+      "is-sort-customer_asc": ["IS-0010 (Industrias)", "IS-0012 (Mirabile)", "IS-0011 (SASAtrend)"],
+      "is-sort-ship_asc": ["IS-0010", "IS-0011", "IS-0012"]
+    },
+    "tile_shortcuts": {
+      "is-tile-msg-IS-0012": "opens detail with is-chat visible; after is-back parent Messages filter NOT activated (3 rows visible)",
+      "is-tile-pay-IS-0011": "opens IS-0011 detail correctly (stopPropagation prevents Needing payment tile toggle)",
+      "is-next-IS-0011": "opens IS-0011 detail correctly"
+    },
+    "activity_tab": {
+      "is-dtab-activity": "renders is-activity with is-tl-list items",
+      "date_format_sample": "Aug 29, 2026, 10:02 AM · Ryan Mirabile",
+      "items_count_IS-0011": 2
+    },
+    "regression": {
+      "is-stage-msg": "2 rows (IS-0010, IS-0012)",
+      "is-kpi-released tile (prepayment filter)": "1 row (IS-0011)",
+      "is-search 'SASA'": "1 row (IS-0011)",
+      "is-filter-customer-toggle": "menu visible",
+      "is-tab-orders/is-tab-shipments": "switch works"
+    },
+    "responsive": {"1920x900_overflow_px": 0, "390x844_overflow_px": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx (~490 lines) still combines list + Detail — extraction into IntlShipmentDetail.tsx recommended.",
+    "fmtAt only formats MM-DD-YYYY timestamps; entries created via `create()` use a locale string ('MM/DD/YYYY, h:mm A') so their activity dates will fall through unformatted in the timeline. Consider normalizing.",
+    "Sort dependency array uses eslint-disable — safe today but hides potential missed deps in future refactors."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "v15: is-sort-{customer,status,ship,units,value} headers implemented (default ship asc). Tile row items in is-kpi-all/is-attn-group-message/is-kpi-released stop propagation so the tile filter is not toggled when clicking child rows (is-next-*, is-tile-msg-*, is-tile-pay-*). Detail Activity tab uses fmtAt() to render 'Mon D, YYYY, h:mm AM/PM' style dates."
+}
