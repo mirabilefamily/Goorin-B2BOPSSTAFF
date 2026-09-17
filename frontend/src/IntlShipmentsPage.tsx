@@ -116,14 +116,12 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <div className="ops-head ops-head-slim">
-        <div className="ops-head-r">
-          <div className="ops-seg" role="tablist">
-            <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>
-            <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
-          </div>
-          <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
+      <div className="is-modebar" data-testid="is-modebar">
+        <div className="ops-seg is-mode-seg" role="tablist">
+          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments"><Ship size={15} /> Shipments <b>{list.filter((s) => s.status !== 'invoiced').length}</b></button>
+          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders"><FileText size={15} /> Open Orders <b>{OPEN_ORDERS.length}</b></button>
         </div>
+        <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
       </div>
 
       {tab === 'orders' && (

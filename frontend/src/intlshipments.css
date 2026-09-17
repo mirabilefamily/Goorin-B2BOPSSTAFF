@@ -405,3 +405,9 @@ button.is-kpi:hover { background: var(--sub); } button.is-kpi.on { background: v
   .is-lines { overflow-x: auto; } .is-ltr { min-width: 560px; }
   .is-modal { width: calc(100vw - 24px); }
 }
+/* integrated mode bar (card-style, matches other page chrome) */
+.is-modebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 10px 12px 10px 10px; box-shadow: 0 2px 4px rgba(15,31,24,.03), 0 18px 40px -28px rgba(15,31,24,.22); }
+.is-mode-seg { background: var(--sub) !important; }
+.is-mode-seg button { padding: 9px 18px !important; font-size: 14px !important; gap: 8px; } .is-mode-seg button svg { color: #8a958f; } .is-mode-seg button.active svg { color: var(--ink); }
+.is-modebar .ops-btn { padding: 9px 16px; }
+@media (max-width: 768px) { .is-modebar { flex-direction: column; align-items: stretch; border-radius: 16px; } .is-mode-seg { display: grid !important; grid-template-columns: 1fr 1fr; } .is-mode-seg button { justify-content: center; } }
