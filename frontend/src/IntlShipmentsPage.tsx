@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, ArrowLeft, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowLeft, ArrowUpDown, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
 import { IntlOpenOrders, OPEN_POS, daysOut, poUnits, poValue, type PO } from './IntlOpenOrders';
@@ -76,6 +76,8 @@ export default function IntlShipmentsPage() {
   const [form, setForm] = useState({ customer: '', factory: '', so: '', po: '', ship: '' });
   const [ignored, setIgnored] = useState<Set<string>>(new Set());
   const [fMsg, setFMsg] = useState(false);
+  const [sort, setSort] = useState<{ k: 'customer' | 'status' | 'ship' | 'units' | 'value'; d: 1 | -1 }>({ k: 'ship', d: 1 });
+  const toggleSort = (k: typeof sort.k) => setSort((p) => p.k === k ? { k, d: p.d === 1 ? -1 : 1 } : { k, d: 1 });
   const [fQueue, setFQueue] = useState<'' | 'soon' | 'overdue' | 'nopack' | 'instr'>('');
   const dueSoon = (s: Shipment) => { const d = daysTo(s.ship); return d !== null && d >= 0 && d <= 30 && s.status !== 'shipped' && s.status !== 'invoiced'; };
   const isOverdue = (s: Shipment) => { const d = daysTo(s.ship); return d !== null && d < 0 && s.status !== 'shipped' && s.status !== 'invoiced'; };
@@ -94,7 +96,7 @@ export default function IntlShipmentsPage() {
     if (fCustomer.size && !fCustomer.has(s.customer)) return false;
     if (fFactory.size && !fFactory.has(s.factory)) return false;
     return true;
-  }), [list, q, fStatus, fCustomer, fFactory, fMsg, fQueue, ignored]); // eslint-disable-line react-hooks/exhaustive-deps
+  }).sort((a, b) => { const v = (x: Shipment) => sort.k === 'customer' ? x.customer : sort.k === 'status' ? stepIdx(x.status) : sort.k === 'ship' ? (daysTo(x.ship) ?? 9999) : sort.k === 'units' ? units(x) : soTotal(x); const va = v(a), vb = v(b); return (va < vb ? -1 : va > vb ? 1 : 0) * sort.d; }), [list, q, fStatus, fCustomer, fFactory, fMsg, fQueue, ignored, sort]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const attention = list.filter((s) => unanswered(s)).sort((a, b) => Date.parse(b.msgs[b.msgs.length - 1].at) - Date.parse(a.msgs[a.msgs.length - 1].at));
   const ignoreMsg = (s: Shipment) => { const m = s.msgs[s.msgs.length - 1]; setIgnored((x) => new Set(x).add(`${s.id}:${m.id}`)); toast(`Message alert dismissed for ${s.id}`); };
@@ -159,7 +161,7 @@ export default function IntlShipmentsPage() {
             <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
             <small className="is-legend">{dist.filter((d) => d.n > 0).map((d) => <span key={d.id}><i className={`is-tile-dot ${d.id}`} />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</span>)}</small>
             <ul className="is-tile-list">
-              {nextUp && <li className="is-tile-next"><CalendarClock size={12} /><span>Next ship · {nextUp.customer} · {nextUp.id}</span><b>{daysTo(nextUp.ship)}d</b></li>}
+              {nextUp && <li className="is-tile-next go" role="link" onClick={(e) => { e.stopPropagation(); setOpenId(nextUp.id); }} data-testid={`is-next-${nextUp.id}`}><CalendarClock size={12} /><span>Next ship · {nextUp.customer} · {nextUp.id}</span><b>{daysTo(nextUp.ship)}d</b></li>}
               {late.length > 0 && <li className="is-tile-late"><AlertTriangle size={12} /><span>{late.length} overdue · {late.map((s) => s.id).join(', ')}</span></li>}
             </ul>
           </button>
@@ -167,7 +169,7 @@ export default function IntlShipmentsPage() {
             <header><i className="blue"><MessageSquare size={15} /></i><span>Messages</span><em className="is-tile-hint">{fMsg ? 'Focused' : 'Focus'}</em></header>
             <strong>{attention.length}<small>awaiting reply</small></strong>
             <ul className="is-tile-list">
-              {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return <li key={s.id}><i className="is-mono-av xs">{mono(m.who)}</i><span><b>{m.who}</b> {m.text}</span><small>{s.id}</small></li>; })}
+              {attention.slice(0, 3).map((s) => { const m = s.msgs[s.msgs.length - 1]; return <li key={s.id} className="go" role="link" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-tile-msg-${s.id}`}><i className="is-mono-av xs">{mono(m.who)}</i><span><b>{m.who}</b> {m.text}</span><small>{s.id}</small></li>; })}
               {attention.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Inbox clear — every message answered</span></li>}
             </ul>
           </button>
@@ -175,7 +177,7 @@ export default function IntlShipmentsPage() {
             <header><i className="amber"><CreditCard size={15} /></i><span>Needing payment</span><em className="is-tile-hint">{fStatus === 'prepayment' ? 'Focused' : 'Focus'}</em></header>
             <strong>{money(prepayDue.reduce((a, s) => a + s.prepay, 0))}<small>{prepayDue.length} shipment{prepayDue.length === 1 ? '' : 's'} due</small></strong>
             <ul className="is-tile-list">
-              {prepayDue.slice(0, 3).map((s) => <li key={s.id}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{money(s.prepay)}</small></li>)}
+              {prepayDue.slice(0, 3).map((s) => <li key={s.id} className="go" role="link" onClick={(e) => { e.stopPropagation(); setOpenId(s.id); }} data-testid={`is-tile-pay-${s.id}`}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{money(s.prepay)}</small></li>)}
               {prepayDue.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>{money(released.reduce((a, s) => a + s.prepay, 0))} received · {released.length} released</span></li>}
             </ul>
           </button>
@@ -183,7 +185,7 @@ export default function IntlShipmentsPage() {
             <header><i className="violet"><Send size={15} /></i><span>Needs shipping instructions</span><em className="is-tile-hint">{fQueue === 'instr' ? 'Focused' : 'Focus'}</em></header>
             <strong>{needInstr.length}<small>shipment{needInstr.length === 1 ? '' : 's'} waiting</small></strong>
             <ul className="is-tile-list">
-              {needInstr.slice(0, 3).map((s) => <li key={s.id}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{STATUS_LABEL[s.status]}</small></li>)}
+              {needInstr.slice(0, 3).map((s) => <li key={s.id} className="go" role="link" onClick={(e) => { e.stopPropagation(); setOpenId(s.id); }} data-testid={`is-tile-instr-${s.id}`}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{STATUS_LABEL[s.status]}</small></li>)}
               {needInstr.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>All instructions sent</span></li>}
             </ul>
           </button>
@@ -242,7 +244,12 @@ export default function IntlShipmentsPage() {
           {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => { setFMsg(false); setFQueue(''); setFStatus(fStatus === d.id ? 'all' : d.id); }} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]} <b>{d.n}</b></button>)}
         </div>
         <div className="is-table" role="table">
-          <div className="is-tr is-th"><span>Customer</span><span>Status</span><span>Factory</span><span>Ship date</span><span className="r">Units</span><span className="r">Value</span><span /></div>
+          <div className="is-tr is-th">
+            {([['customer', 'Customer', ''], ['status', 'Status', ''], [null, 'Factory', ''], ['ship', 'Ship date', ''], ['units', 'Units', 'r'], ['value', 'Value', 'r']] as [typeof sort.k | null, string, string][]).map(([k, label, cls]) => k
+              ? <button key={label} className={`is-sort ${cls} ${sort.k === k ? 'on' : ''}`} onClick={() => toggleSort(k)} data-testid={`is-sort-${k}`}>{label} <ArrowUpDown size={11} />{sort.k === k && <em>{sort.d === 1 ? '↑' : '↓'}</em>}</button>
+              : <span key={label} className={cls}>{label}</span>)}
+            <span />
+          </div>
           {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); return (
             <div key={s.id} className={`is-tr is-row ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
               <span className="is-c1">
@@ -305,6 +312,8 @@ export default function IntlShipmentsPage() {
 const mono = (n: string) => { const w = n.split(/\s+/).filter((x) => /^[A-Za-z]/.test(x)); return (w.length > 1 ? w.slice(0, 2).map((x) => x[0]).join('') : (w[0] ?? '?').slice(0, 2)).toUpperCase(); };
 
 type DTab = 'overview' | 'booking' | 'chat' | 'docs' | 'activity';
+const fmtAt = (at: string) => { const m = at.match(/^(\d{2})-(\d{2})-(\d{4}),?\s*(.*)$/); if (!m) return at; const d = new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2])); return `${d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}${m[4] ? `, ${m[4]}` : ''}`; };
+
 function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; onBack: () => void; update: (fn: (s: Shipment) => Shipment) => void; initialTab?: DTab }) {
   const toast = useToast();
   const [msg, setMsg] = useState('');
@@ -473,7 +482,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
             {s.activity.map((a, i) => { const t = a.title.toLowerCase(); const Icon = t.includes('prepay') || t.includes('payment') ? CreditCard : t.includes('instruction') || t.includes('booking') ? Truck : t.includes('message') ? MessageSquare : t.includes('upload') || t.includes('document') ? FileText : t.includes('status') ? Check : Ship; return (
               <li key={i} className={i === 0 ? 'latest' : ''}>
                 <i><Icon size={18} strokeWidth={1.8} /></i>
-                <div><strong>{a.title}</strong>{a.detail && <span>{a.detail}</span>}<small>{a.at} · {a.by}</small></div>
+                <div><strong>{a.title}</strong>{a.detail && <span>{a.detail}</span>}<small>{fmtAt(a.at)} · {a.by}</small></div>
               </li>
             ); })}
           </ol>
