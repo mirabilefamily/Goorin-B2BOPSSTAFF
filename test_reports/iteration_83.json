@@ -1,0 +1,61 @@
+{
+  "summary": "Iteration 83 verifies the compact 'Shipment pipeline' + 'Open Orders' rework in IntlShipmentsPage.tsx. All targeted flows PASS. 0 console errors, 0 horizontal overflow at 1920x900 / 1280x800 / 390x844.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty creds -> logs in as ryan@mirabile.com; Intl Shipments loads (data-testid=intl-shipments-page).",
+    "pipeline_stages": {
+      "is-stage-prepaid": ["IS-0012"],
+      "is-stage-msg": ["IS-0010", "IS-0012"],
+      "is-stage-all": ["IS-0010", "IS-0011", "IS-0012"]
+    },
+    "search": {"'Hangzhou'": ["IS-0011"]},
+    "filters": {
+      "is-filter-customer-toggle_menu_visible": true,
+      "menu_bounding_box_within_viewport": true,
+      "options_render": ["is-filter-customer-opt-Mirabile Distribution","is-filter-customer-opt-SASAtrend","is-filter-customer-opt-Industrias Mercury, S.A."],
+      "click_Mirabile_rows": ["IS-0012"],
+      "is-clear-filters_resets_to": 3
+    },
+    "footer": "3 shipments · Units 2,670 · SO total $24,099 · PO total $9,822.75",
+    "sort_is-sort-value_toggles": ["IS-0012,IS-0011,IS-0010","IS-0010,IS-0011,IS-0012"],
+    "row_flow": {
+      "is-row-IS-0012": "opens intl-shipment-detail; h1='IS-0012'; stepper visible; 5 dtabs incl. is-dtab-activity",
+      "is-dtab-activity": "activity timeline (is-activity) visible",
+      "is-back": "returns to board (is-board visible)",
+      "is-attn-reply-IS-0012": "opens chat view (is-chat)",
+      "is-attn-ignore-IS-0010": "dismisses attention row (before=1, after=0), toast shown"
+    },
+    "overview_tiles": {
+      "is-kpi-released": "filters status=prepayment -> ['IS-0011'] (Needing payment card correctly maps to Awaiting-prepayment stage; Prepaid stage exposed separately via is-stage-prepaid).",
+      "is-tile-msg-IS-0012": "opens chat tab in detail",
+      "is-factories_only_no_is-factories-2": "is-factories-2 count=0, is-factories opens is-factories-drawer",
+      "is-new-shipment": "modal opens, form submit creates new shipment and routes to intl-shipment-detail"
+    },
+    "orders_tab": {
+      "is-tab-orders": "renders 4 simplified tiles (is-oo-kpi-open/overdue/due/groups) each with figure + caption only",
+      "is-oo-kpi-open_text_sample": "Open purchase orders · 8 · 9,608 units · $84,777 · Across 3 factories · 6 customers",
+      "is-open-orders_board": "renders",
+      "is-oo-customer-toggle_menu_visible": true,
+      "is-oo-customer-opt_options": 6,
+      "is-tab-shipments_back": "returns to is-board"
+    },
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 481 lines (right at limit); consider extracting IntlShipmentDetail into its own file for maintainability.",
+    "is-drawer (Factories) and is-modal (New shipment) still lack Escape-to-close handler; only Detail listens for Escape. Adding a shared overlay Escape handler would match the tooltip 'Back (Esc)' UX.",
+    "The 'Needing payment' overview tile (is-kpi-released) maps to status='prepayment' (Awaiting-prepayment stage) while the pipeline pill labelled 'Prepaid' (is-stage-prepaid) is a different downstream stage. The two look semantically similar and could confuse users — consider aligning the copy or grouping their tooltips."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth)",
+  "seed_data_creation": "Created a TEST_C / TEST_F shipment via is-new-shipment flow (client-side only, resets on reload).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "v17 layout verified: compact pipeline header (is-search inside header), stage pills is-stage-all/is-stage-<status>/is-stage-instr/is-stage-msg, MultiSelects is-filter-customer/is-filter-factory (menus fully visible and non-clipped), is-clear-filters, sortable is-sort-customer/status/value/ship, footer totals correct. Detail hero: h1=shipment id, 6 flat facts, is-stepper, 5 is-dtab-* tabs, is-activity timeline. Overview keeps single is-factories button (is-factories-2 removed). Orders tab has 4 simplified is-oo-kpi-* tiles (figure+caption only) + is-open-orders board with is-oo-customer MultiSelect. 0 console errors, 0 overflow across 1920/1280/390 widths."
+}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, ArrowLeft, ArrowUpDown, Filter, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowLeft, ArrowUpDown, Filter, SlidersHorizontal, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
 import { IntlOpenOrders, OPEN_POS, daysOut, poUnits, poValue, type PO } from './IntlOpenOrders';
@@ -148,10 +148,11 @@ export default function IntlShipmentsPage() {
             <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
             <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
           </div>
-          <div className="is-ov-actions">
+          {tab === 'shipments' && <div className="is-ov-actions">
             <button className="ops-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
+            <button className="ops-btn" onClick={() => toast('Pipeline controls — stage rules, notifications and defaults coming soon')} data-testid="is-controls"><SlidersHorizontal size={15} /> Controls</button>
             <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
-          </div>
+          </div>}
         </div>
         {tab === 'shipments' ? (
         <div className="is-tiles">
