@@ -908,3 +908,10 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-detail .is-dactions .is-btn.is-icon svg { width: 18px; height: 18px; display: block; color: var(--ink); }
 .is-detail .is-dactions .is-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 @media (max-width: 768px) { .is-ov-actions { grid-template-columns: 1fr 1fr 1fr; } .is-ov-actions .ops-btn.dark { grid-column: 1 / -1; } }
+.is-parties .is-party:last-of-type { border-bottom: 1px solid var(--line); }
+.is-kicker--pack { margin-top: 16px; }
+@media (max-width: 768px) { .is-pc-ship .is-attn { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } .is-pc-ship > div { min-width: 0; flex: 1; } .is-pc-orders { gap: 20px; } .is-tile > small.is-legend { gap: 4px 10px; } }
+.is-docrow { display: flex; align-items: center; gap: 10px; } .is-docrow .is-docbtn { flex: 1; min-width: 0; }
+.is-reupload { height: 42px; padding: 0 16px; border-radius: 12px; cursor: pointer; white-space: nowrap; }
+.is-dochint { margin-top: 10px; font-size: 12.5px; color: var(--ink-4); }
+@media (max-width: 768px) { .is-docrow { flex-direction: column; align-items: stretch; } .is-reupload { justify-content: center; } }

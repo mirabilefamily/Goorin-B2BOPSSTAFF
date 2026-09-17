@@ -398,8 +398,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
               <h2>Parties</h2>
               <div className="is-party"><i className="is-mono-av">{mono(s.customer)}</i><div><small>Customer</small><strong>{s.customer}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.buyer); toast('Email copied'); }} data-testid="is-copy-buyer">{s.buyer}</button></div><button className="is-btn is-icon sm" onClick={() => { setDtab('chat'); }} aria-label="Message customer"><MessageSquare size={14} /></button></div>
               <div className="is-party"><i className="is-mono-av fac">{mono(s.factory)}</i><div><small>Factory</small><strong>{s.factory}</strong><button className="is-copy" onClick={() => { navigator.clipboard?.writeText(s.factoryEmail); toast('Email copied'); }}>{s.factoryEmail}</button></div><button className="is-btn is-icon sm" onClick={() => toast('Resent to factory')} aria-label="Email factory"><Send size={14} /></button></div>
-              <div className="is-divider" />
-              <p className="is-kicker">Packing list</p><button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing"><FileText size={15} /> {s.packing}<Download size={14} /></button>
+              <p className="is-kicker is-kicker--pack">Packing list</p><button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing"><FileText size={15} /> {s.packing}<Download size={14} /></button>
             </section>
             <section className="is-card is-facts" data-testid="is-recent">
               <div className="is-card-head"><h2>Recent activity</h2><button className="is-link" onClick={() => setDtab('activity')}>View all</button></div>
@@ -453,9 +452,13 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
 
       {dtab === 'docs' && (
         <div className="is-grid is-grid--even">
-          <section className="is-card is-facts">
+          <section className="is-card is-facts" data-testid="is-packing-card">
             <div className="is-card-head"><h2>Factory packing list</h2><span className="is-muted">source file</span></div>
-            <button className="is-docbtn" onClick={() => toast('Downloading packing list')}><FileText size={15} /> {s.packing}<Download size={14} /></button>
+            <div className="is-docrow">
+              <button className="is-docbtn" onClick={() => toast('Downloading packing list')} data-testid="is-packing-download"><FileText size={15} /> {s.packing}<Download size={14} /></button>
+              <label className="is-btn is-reupload" data-testid="is-packing-reupload"><Upload size={14} /> Re-upload<input type="file" accept=".xlsx,.xls,.csv" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; update(s.id, (x) => ({ ...x, packing: f.name, activity: [{ title: 'Packing list re-uploaded', detail: `${f.name} replaces ${x.packing}`, at: stamp(), by: 'Ryan Mirabile' }, ...x.activity] })); toast(`Packing list replaced with ${f.name}`); e.target.value = ''; }} /></label>
+            </div>
+            <p className="is-dochint">Replacing the file re-parses lines, units and values. Previous versions stay in Activity.</p>
           </section>
           <section className="is-card is-facts" data-testid="is-docs">
             <h2>Generated documents</h2>
