@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, CheckSquare, ChevronLeft, ChevronRight, Copy, Download, Eye, FilePlus2, FolderOpen, ImageOff, Link2, Loader2, Printer, Save, Search, Square, Trash2, X, Box, Files } from 'lucide-react';
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Copy, Download, Eye, FilePlus2, FolderOpen, ImageOff, Link2, Loader2, Printer, Save, Search, Trash2, X, Box, Files } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { CATALOG, LS_CUSTOMERS, PRICE_LISTS, SEASONS, fmt, priceFor, type PriceList } from './lib/linesheet';
 import { linesheetApi, shareUrl, type LinesheetInput, type SavedLinesheet } from './lib/linesheetApi';
@@ -30,8 +30,9 @@ export default function LinesheetPage() {
   const [drawer, setDrawer] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const [hideNoImg, setHideNoImg] = useState(false);
   const collections = Array.from(new Set(CATALOG.map((i) => i.collection)));
-  const items = useMemo(() => CATALOG.filter((i) => (seasons.size === 0 || seasons.has(i.season)) && (colls.size === 0 || colls.has(i.collection)) && (!q || `${i.name} ${i.color} ${i.sku}`.toLowerCase().includes(q.toLowerCase()))), [seasons, colls, q]);
+  const items = useMemo(() => CATALOG.filter((i) => (seasons.size === 0 || seasons.has(i.season)) && (colls.size === 0 || colls.has(i.collection)) && (!hideNoImg || !!i.image) && (!q || `${i.name} ${i.color} ${i.sku}`.toLowerCase().includes(q.toLowerCase()))), [seasons, colls, q, hideNoImg]);
   const season = seasons.size === 0 ? 'all' : Array.from(seasons).join(',');
   const pages = Math.max(1, Math.ceil(items.length / PAGE));
   const visible = items.slice((page - 1) * PAGE, page * PAGE);
@@ -45,7 +46,7 @@ export default function LinesheetPage() {
 
   const refresh = () => linesheetApi.list().then(setSaved).catch(() => toast('Could not load saved linesheets', 'error'));
   useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { setPage(1); }, [seasons, colls, q]);
+  useEffect(() => { setPage(1); }, [seasons, colls, q, hideNoImg]);
   useEffect(() => { if (!priced) return; setResolving(true); const t = setTimeout(() => setResolving(false), 650); return () => clearTimeout(t); }, [doc.ctx, doc.customerId, doc.priceListId, priced]);
 
   const toggle = (id: string) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else if (n.size >= MAX_SEL) { toast(`Limit of ${MAX_SEL} styles per linesheet`, 'error'); return s; } else n.add(id); return n; });
@@ -88,15 +89,15 @@ export default function LinesheetPage() {
 
   return (
     <div className="ls" data-testid="linesheet-page">
-      <div className="ops-head ops-head-slim">
-        <div className="ops-head-r">
-          <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
-          <button className="ops-btn dark" onClick={startNew} data-testid="ls-new-top"><FilePlus2 size={15} /> New Linesheet</button>
-        </div>
-      </div>
       <div className="ls-body">
         <section className="ls-card ls-catalog">
-          <div className="ls-pipe-head"><h2>Catalog <span className="ls-muted">{items.length} shown{sel.size > 0 ? ` · ${sel.size} selected` : ''}</span></h2></div>
+          <div className="ls-pipe-head">
+            <h2>Catalog <span className="ls-muted">{items.length} shown{sel.size > 0 ? ` · ${sel.size} selected` : ''}</span></h2>
+            <div className="ls-head-actions">
+              <button className="ops-btn" onClick={() => setDrawer(true)} data-testid="ls-open-saved"><FolderOpen size={15} /> Saved <b className="ls-count sm">{saved.length}</b></button>
+              <button className="ops-btn dark" onClick={startNew} data-testid="ls-new-top"><FilePlus2 size={15} /> New Linesheet</button>
+            </div>
+          </div>
           <div className="ls-toolbar">
             <MultiSelect label="Seasons" testId="ls-season" value={seasons} onChange={setSeasons} options={SEASONS.map((s) => ({ value: s, label: s, count: CATALOG.filter((i) => i.season === s).length }))} />
             <label className="ls-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search product code or name…" data-testid="ls-search" />{q && <button onClick={() => setQ('')} aria-label="Clear"><X size={13} /></button>}</label>
@@ -105,8 +106,9 @@ export default function LinesheetPage() {
           <div className="ls-toolbar sub">
             <span className="ls-found" data-testid="ls-found"><b>{items.length}</b> products found{sel.size > 0 && <em> · {sel.size} selected</em>}</span>
             <span className="ls-spacer" />
-            <button className="ls-link" onClick={selectPage} data-testid="ls-select-page">{pageAllOn ? <CheckSquare size={15} /> : <Square size={15} />} {pageAllOn ? 'Deselect visible page' : 'Select visible page'}</button>
-            <button className="ls-link" onClick={selectAll} data-testid="ls-select-all" disabled={items.length === 0}>{allOn ? <CheckSquare size={15} /> : <Square size={15} />} {allOn ? `Deselect all ${items.length}` : `Select all ${items.length}`}</button>
+            <label className="ls-chk" data-testid="ls-hide-noimg"><input type="checkbox" checked={hideNoImg} onChange={(e) => setHideNoImg(e.target.checked)} /><i className="ls-chk-box"><Check size={12} strokeWidth={3} /></i><ImageOff size={14} /> Hide items missing images <small>({CATALOG.filter((i) => !i.image).length})</small></label>
+            <label className="ls-chk" data-testid="ls-select-page"><input type="checkbox" checked={pageAllOn} onChange={selectPage} /><i className="ls-chk-box"><Check size={12} strokeWidth={3} /></i> Select visible page</label>
+            <label className="ls-chk" data-testid="ls-select-all"><input type="checkbox" checked={allOn} onChange={selectAll} disabled={items.length === 0} /><i className="ls-chk-box"><Check size={12} strokeWidth={3} /></i> Select all {items.length}</label>
             {sel.size > 0 && <button className="ls-link danger" onClick={() => setSel(new Set())} data-testid="ls-clear"><X size={14} /> Clear selection</button>}
           </div>
           {items.length === 0 && <p className="ls-empty">No styles match these filters.</p>}
