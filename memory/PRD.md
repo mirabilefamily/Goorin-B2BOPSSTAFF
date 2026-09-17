@@ -176,3 +176,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Added dashboard-style 4-tile KPI band above the shipments table (In pipeline w/ stage bar, Released, Awaiting reply, In motion); tiles act as filters.
 - Removed page title/subtitle; Shipments/Open Orders seg + Factories + New Shipment now in a card-style mode bar above the KPI band.
 - Overview card elevated: KPI tiles as inset panels with icon chips, hover lift, stage bar; mode bar merged into same card. Regression iteration_66.
+- Overview band rebuilt to mirror Dashboard KPI strip exactly (icon chip + label, 32px figure, caption, hairline dividers); active tile = tinted bg + dark chip. Filters use MultiSelect (searchable) like Linesheet.

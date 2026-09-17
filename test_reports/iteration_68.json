@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend-only regression for INTL Shipments redesigned dark 'ink' pipeline hero (big active count + 7-step stage flow) with right rail (Released ring, Awaiting reply avatars, In motion mini bars). All review-request flows pass at 1920x900 and 390x844 with zero console/page errors and no horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "empty email/password logs in as ryan@mirabile.com",
+    "hero": {
+      "active_count": 3,
+      "seven_step_flow_counts": "DRAFT 0 / READY 0 / INSTRUCTIONS 0 / PREPAYMENT 1 / PREPAID 1 / SHIPPED 1 / INVOICED 0",
+      "right_rail": {"released": "1 / 3 ($8.50 prepay received)", "awaiting_reply": 2, "in_motion": "2,670 units across 3 shipments"}
+    },
+    "kpi_filters": {
+      "is-kpi-all_reset": true,
+      "is-kpi-released_filter_rows": "3 -> 1 -> toggle back 3",
+      "is-attn-group-message_rows": "3 -> 2 (unanswered) -> toggle back",
+      "is-attn-ignore-IS-0010": "Awaiting reply 2 -> 1 and MD/IM avatar stack reduced to MD only"
+    },
+    "tabs": {"is-tab-orders": "hides hero, shows is-open-orders", "is-tab-shipments": "restores hero"},
+    "regression": {"is-stage-shipped": "clickable filter", "is-filter-customer-toggle": "opens is-filter-customer-menu", "is-search": "IS-0012 -> 1 row", "row -> detail -> is-back": "works", "is-new-shipment": "opens is-create-modal"},
+    "responsive": {"desktop_1920x900_overflow_px": 0, "mobile_390x844_overflow_px": 0, "hero_bbox_mobile": "x=25 w=340 h=161 (not clipped)", "stage_flow_readable_mobile": "counts + colored progress bars visible; labels condense but still shown"},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx remains large (list + detail + drawer + create modal in one file); consider splitting for maintainability (carried over from iter_67).",
+    "Escape closes MultiSelect popovers but not the create modal or factories drawer (minor UX inconsistency, carried over)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Redesigned dark 'ink' hero on Intl Shipments: is-kpi-all is the big hero pipeline button (containing 7 stage bars), is-kpi-released and is-attn-group-message are on the right rail alongside a non-clickable In motion tile. is-attn-ignore-<id> still decrements awaiting count and updates the avatar stack. All existing testids preserved from iter_67."
+}

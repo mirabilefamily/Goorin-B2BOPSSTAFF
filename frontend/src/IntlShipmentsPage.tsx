@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Check, Download, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
@@ -134,30 +134,26 @@ export default function IntlShipmentsPage() {
           <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
       </div>
-      {tab === 'shipments' && <div className="is-kpis" data-testid="is-priority-strip">
-        <button className={`is-hero ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-          <span className="is-hero-kicker"><i className="is-dot" /> Pipeline · live</span>
-          <div className="is-hero-fig"><strong>{active.length}</strong><div><em>active shipment{active.length === 1 ? '' : 's'}</em><small>{list.reduce((a, s) => a + units(s), 0).toLocaleString()} units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div></div>
-          <div className="is-flow">
-            {STEPS.map((st, i) => { const n = list.filter((s) => s.status === st.id).length; return <span key={st.id} className={`is-flow-step ${st.id} ${n ? 'has' : ''}`}><b>{n}</b><small>{st.id === 'prepayment' ? 'Prepayment' : STATUS_LABEL[st.id]}</small>{i < STEPS.length - 1 && <i />}</span>; })}
-          </div>
-        </button>
-        <div className="is-kpi-rail">
-          <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-            <svg className="is-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5" /><circle cx="18" cy="18" r="15.5" className="v" style={{ strokeDasharray: `${active.length ? (released.length / active.length) * 97.4 : 0} 97.4` }} /></svg>
-            <span>Released to factory</span><strong className="g">{released.length}<small>/ {active.length}</small></strong><small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
-          </button>
-          <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
-            <span className="is-avs">{attention.slice(0, 3).map((s) => <i key={s.id} className="is-mono-av">{mono(s.customer)}</i>)}{attention.length === 0 && <i className="is-mono-av ok"><Check size={13} strokeWidth={3} /></i>}</span>
-            <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong><small>{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'Inbox clear'}</small>
-          </button>
-          <div className="is-kpi">
-            <span className="is-bars" aria-hidden="true">{list.slice(0, 6).map((s) => { const mx = Math.max(...list.map(units)) || 1; return <i key={s.id} className={s.status} style={{ height: `${Math.max(14, (units(s) / mx) * 100)}%` }} />; })}</span>
-            <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>units across {list.length} shipment{list.length === 1 ? '' : 's'}</small>
-          </div>
-        </div>
-      </div>}
       </section>
+
+      {tab === 'shipments' && <section className="is-card is-kpis" data-testid="is-priority-strip">
+        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+          <div className="is-kpi-head"><span className="is-chip"><Ship size={16} /></span><span className="is-kpi-k">In pipeline</span></div>
+          <div><strong className="is-kpi-v">{active.length}</strong><small className="is-kpi-cap">{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'no shipments yet'}</small></div>
+        </button>
+        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+          <div className="is-kpi-head"><span className="is-chip"><CheckCircle2 size={16} /></span><span className="is-kpi-k">Released to factory</span></div>
+          <div><strong className="is-kpi-v">{released.length}</strong><small className="is-kpi-cap">{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small></div>
+        </button>
+        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+          <div className="is-kpi-head"><span className="is-chip"><MessageSquare size={16} /></span><span className="is-kpi-k">Awaiting reply</span></div>
+          <div><strong className="is-kpi-v">{attention.length}</strong><small className="is-kpi-cap">{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'inbox clear'}</small></div>
+        </button>
+        <div className="is-kpi">
+          <div className="is-kpi-head"><span className="is-chip"><Boxes size={16} /></span><span className="is-kpi-k">In motion</span></div>
+          <div><strong className="is-kpi-v">{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small className="is-kpi-cap">units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div>
+        </div>
+      </section>}
 
       {tab === 'orders' && (
         <IntlOpenOrders
