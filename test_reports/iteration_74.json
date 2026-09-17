@@ -1,0 +1,35 @@
+{
+  "summary": "Frontend regression of redesigned Intl Shipments workspace (list + inspector). Empty-creds login -> Intl Shipments loads with 4 active shipments; inspector auto-populates. Selecting IS-0011 shows SASAtrend + 'Awaiting prepayment' + CTA 'Mark prepaid'; is-insp-advance -> Prepaid status in row & inspector, CTA becomes 'Mark shipped'. is-insp-open opens intl-shipment-detail; is-back returns. Double-click IS-0012 opens detail. Filters: is-stage-shipped=1 row, is-kpi-released=0 (IS-0011 advanced), is-kpi-all resets to 3, is-attn-group-message=2 rows, is-search 'SASA'=1 row, is-clear-filters restores 3, customer MultiSelect toggle opens with 3 options, is-empty shown when no match, footer totals update (3 shipments / 2,670 units / $24,099 SO / $9,822.75 PO). Messages: is-attn-reply-IS-0012 opens is-chat + is-back; is-attn-ignore-IS-0010 decrements Needs reply 2->1. is-tab-orders shows is-open-orders and hides shipment toolbar filters; back restores search. New Shipment create flow creates IS-0013 and opens detail. is-factories drawer renders 3 factories. Responsive: 0 horizontal overflow at 1920x900 / 1280x800 / 390x844. 0 console errors, 0 page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty creds -> ryan@mirabile.com",
+    "inspector_autoselect": true,
+    "IS-0011": {"customer": "SASAtrend", "status": "Awaiting prepayment", "cta": "Mark prepaid", "after_advance_row_status": "Prepaid", "after_advance_cta": "Mark shipped"},
+    "detail_nav": {"is-insp-open": "opens", "is-back": "returns", "double-click": "opens"},
+    "filters": {"is-stage-shipped": 1, "is-kpi-released_after_advance": 0, "is-kpi-all_reset": 3, "is-attn-group-message": 2, "is-search_SASA": 1, "is-empty_visible": true, "footer": "3 shipments / 2,670 units / $24,099 SO / $9,822.75 PO"},
+    "messages": {"attn-reply-IS-0012": "opens is-chat", "attn-ignore-IS-0010": "Needs reply 2->1"},
+    "orders_tab": {"is-open-orders_present": true, "is-search_hidden": true, "restore_on_back": true},
+    "new_shipment": "IS-0013 created and opens detail",
+    "factories_drawer": 3,
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 445 lines; Detail component (~180 lines) should be extracted to its own file for readability/maintainability.",
+    "useMemo for rows lists 'ignored' state only via eslint-disable; add ignored explicitly to deps to avoid stale-closure risk.",
+    "advanceOne toast uses STATUS_LABEL directly (fine), but detail Detail.advance() emits 'Released to factory' only for prepaid; consider consistent labelling with list advance.",
+    "Inspector shows 'Mark prepaid' when status is 'prepayment' but the KPI is labelled 'payment due' while data-testid is 'is-kpi-released' — the testid semantics mismatch label ('released'/'payment due').",
+    "Customer MultiSelect toggle test-id is 'is-filter-customer-toggle' (present) but review request also references generic 'is-filter-customer' — verified working."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com",
+  "seed_data_creation": "IS-0013 created transiently during New Shipment flow (client-only state)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "New list+inspector workspace works end-to-end. Advancing IS-0011 in inspector removes it from is-kpi-released count. Needs reply chip disables when count=0. MultiSelect toggle testid is 'is-filter-{customer|factory}-toggle' with options 'is-filter-customer-opt-*'. is-clear-filters only rendered when a filter is applied. On <=narrow viewports, inspector stacks under the list (no overflow). All flows PASS."
+}
