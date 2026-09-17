@@ -173,3 +173,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Slim header: title + text stats (active/released/units/declared/awaiting reply, clickable filters), seg tabs, Factories + New Shipment.
 - Single board card: borderless search, ghost selects, quiet stage chips, 7-col table (customer+ID/SO, status dot, factory, ship date, units, value, hover Reply/Ignore). Inline unanswered-message line on rows.
 - Removed hero/KPI tiles/progress bars/pills. Open Orders in one card. Regression: iteration_65 PASS.
+- Added dashboard-style 4-tile KPI band above the shipments table (In pipeline w/ stage bar, Released, Awaiting reply, In motion); tiles act as filters.

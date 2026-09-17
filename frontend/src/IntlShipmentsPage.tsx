@@ -125,13 +125,7 @@ export default function IntlShipmentsPage() {
       <header className="is-top" data-testid="is-modebar">
         <div className="is-top-l">
           <h1>International Shipments</h1>
-          <p className="is-sub" data-testid="is-priority-strip">
-            <button className={fStatus === 'all' ? 'on' : ''} onClick={() => setFStatus('all')} data-testid="is-kpi-all">{active.length} active</button>
-            <button className={fStatus === 'prepaid' ? 'on' : ''} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">{released.length} released</button>
-            <span>{list.reduce((a, s) => a + units(s), 0).toLocaleString()} units</span>
-            <span>{money(list.reduce((a, s) => a + soTotal(s), 0))} declared</span>
-            {attention.length > 0 && <button className={`msg ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} data-testid="is-attn-group-message"><i />{attention.length} awaiting reply</button>}
-          </p>
+          <p className="is-sub">Factory-direct international orders, bookings and prepayments.</p>
         </div>
         <div className="is-top-r">
           <div className="ops-seg is-mode-seg" role="tablist">
@@ -151,6 +145,26 @@ export default function IntlShipmentsPage() {
       )}
 
       {tab === 'shipments' && <>
+      <section className="is-card is-kpis" data-testid="is-priority-strip">
+        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+          <span>In pipeline</span><strong>{active.length}</strong>
+          <i className="is-dist">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</i>
+          <small>{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'No shipments'}</small>
+        </button>
+        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+          <span>Released to factory</span><strong className="g">{released.length}</strong>
+          <small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
+        </button>
+        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+          <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong>
+          <small>{attention.length ? `${list.filter((s) => { const d = daysTo(s.ship); return d !== null && d < 0 && s.status !== 'shipped' && s.status !== 'invoiced'; }).length} overdue · ${attention.map((s) => s.customer.split(' ')[0]).join(', ')}` : 'Inbox clear'}</small>
+        </button>
+        <div className="is-kpi">
+          <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
+          <small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared value</small>
+        </div>
+      </section>
+
       <section className="is-card is-board">
         <div className="is-board-head">
           <label className="is-search"><Search size={16} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipments, customers, SO or PO" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
