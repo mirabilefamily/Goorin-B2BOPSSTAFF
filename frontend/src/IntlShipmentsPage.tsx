@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertTriangle, ArrowLeft, ArrowUpDown, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowLeft, ArrowUpDown, Filter, CalendarClock, Check, ChevronRight, CreditCard, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
 import { IntlOpenOrders, OPEN_POS, daysOut, poUnits, poValue, type PO } from './IntlOpenOrders';
@@ -229,49 +229,54 @@ export default function IntlShipmentsPage() {
       )}
 
       {tab === 'shipments' && (
-      <section className="is-card is-board">
-        <div className="is-board-head">
-          <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO or PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
-          <MultiSelect label="Customers" testId="is-filter-customer" value={fCustomer} onChange={setFCustomer} options={customers.map((c) => ({ value: c, label: c, count: list.filter((s) => s.customer === c).length }))} />
-          <MultiSelect label="Factories" testId="is-filter-factory" value={fFactory} onChange={setFFactory} options={factories.map((c) => ({ value: c, label: c, count: list.filter((s) => s.factory === c).length }))} />
+      <section className="is-card is-pipe" data-testid="is-board">
+        <div className="is-pipe-top">
+          <h2>Shipment pipeline <span className="is-muted">{rows.length} shown</span></h2>
+          <div className="is-pipe-tools">
+            <label className="is-search"><Search size={16} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO, PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
+            <button className="is-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories-2"><Folder size={15} /> Factories</button>
+          </div>
+        </div>
+        <div className="is-stages is-pills" role="tablist" data-testid="is-stages">
+          <button className={`is-stage ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFStatus('all'); setFMsg(false); setFQueue(''); }} data-testid="is-stage-all">All <b>{list.length}</b></button>
+          {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => { setFMsg(false); setFQueue(''); setFStatus(fStatus === d.id ? 'all' : d.id); }} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]} <b>{d.n}</b></button>)}
+          <span className="is-stages-sep" />
+          <button className={`is-stage ${fQueue === 'instr' ? 'on' : ''} ${needInstr.length === 0 ? 'zero' : ''}`} onClick={() => setQueue('instr')} data-testid="is-stage-instr"><Send size={11} /> Missing instructions <b>{needInstr.length}</b></button>
+          <button className={`is-stage ${fMsg ? 'on' : ''} ${attention.length === 0 ? 'zero' : ''}`} onClick={() => { setFStatus('all'); setFQueue(''); setFMsg((v) => !v); }} data-testid="is-stage-msg"><MessageSquare size={11} /> Needs reply <b>{attention.length}</b></button>
+        </div>
+        <div className="is-filters">
+          <span className="is-flabel"><Filter size={14} /> Filters</span>
+          <MultiSelect label="customers" testId="is-filter-customer" value={fCustomer} onChange={setFCustomer} options={customers.map((c) => ({ value: c, label: c, count: list.filter((s) => s.customer === c).length }))} />
+          <MultiSelect label="factories" testId="is-filter-factory" value={fFactory} onChange={setFFactory} options={factories.map((c) => ({ value: c, label: c, count: list.filter((s) => s.factory === c).length }))} />
           {filtered && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer(new Set()); setFFactory(new Set()); setFMsg(false); setFQueue(''); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
         </div>
-        <div className="is-stages" role="tablist" data-testid="is-stages">
-          <button className={`is-stage ${fStatus === 'all' && !fMsg && !fQueue ? 'on' : ''}`} onClick={() => { setFStatus('all'); setFMsg(false); setFQueue(''); }} data-testid="is-stage-all">All <b>{list.length}</b></button>
-          <button className={`is-stage ${fQueue === 'instr' ? 'on' : ''} ${needInstr.length === 0 ? 'zero' : ''}`} onClick={() => setQueue('instr')} data-testid="is-stage-instr"><Send size={11} /> Missing shipping instructions <b>{needInstr.length}</b></button>
-          <button className={`is-stage ${fMsg ? 'on' : ''} ${attention.length === 0 ? 'zero' : ''}`} onClick={() => { setFStatus('all'); setFQueue(''); setFMsg((v) => !v); }} data-testid="is-stage-msg"><MessageSquare size={11} /> Needs reply <b>{attention.length}</b></button>
-          <span className="is-stages-sep" />
-          {dist.map((d) => <button key={d.id} className={`is-stage ${fStatus === d.id ? 'on' : ''} ${d.n === 0 ? 'zero' : ''}`} onClick={() => { setFMsg(false); setFQueue(''); setFStatus(fStatus === d.id ? 'all' : d.id); }} data-testid={`is-stage-${d.id}`}>{STATUS_LABEL[d.id]} <b>{d.n}</b></button>)}
-        </div>
         <div className="is-table" role="table">
-          <div className="is-tr is-th">
-            {([['customer', 'Customer', ''], ['status', 'Status', ''], [null, 'Factory', ''], ['ship', 'Ship date', ''], ['units', 'Units', 'r'], ['value', 'Value', 'r']] as [typeof sort.k | null, string, string][]).map(([k, label, cls]) => k
-              ? <button key={label} className={`is-sort ${cls} ${sort.k === k ? 'on' : ''}`} onClick={() => toggleSort(k)} data-testid={`is-sort-${k}`}>{label} <ArrowUpDown size={11} />{sort.k === k && <em>{sort.d === 1 ? '↑' : '↓'}</em>}</button>
-              : <span key={label} className={cls}>{label}</span>)}
-            <span />
+          <div className="is-ptr is-pth">
+            <button className={`is-sort ${sort.k === 'customer' ? 'on' : ''}`} onClick={() => toggleSort('customer')} data-testid="is-sort-customer">Shipment <ArrowUpDown size={11} /></button>
+            <button className={`is-sort ${sort.k === 'status' ? 'on' : ''}`} onClick={() => toggleSort('status')} data-testid="is-sort-status">Stage <ArrowUpDown size={11} /></button>
+            <span>Factory</span>
+            <button className={`is-sort ${sort.k === 'value' ? 'on' : ''}`} onClick={() => toggleSort('value')} data-testid="is-sort-value">Orders & value <ArrowUpDown size={11} /></button>
+            <button className={`is-sort ${sort.k === 'ship' ? 'on' : ''}`} onClick={() => toggleSort('ship')} data-testid="is-sort-ship">Shipping <ArrowUpDown size={11} /></button>
           </div>
-          {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); return (
-            <div key={s.id} className={`is-tr is-row ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
-              <span className="is-c1">
-                <strong>{s.customer}</strong>
-                <small><b className="is-id">{s.id}</b><i className="is-sep" />{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}{m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><MessageSquare size={11} /> {m.who}: “{m.text}”</span>}</small>
-              </span>
-              <span className="is-c2"><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><small>Created {s.created}</small></span>
-              <span className="is-c2"><strong>{s.factory.replace(/\s*\(.*\)$/, '')}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
-              <span className={`is-c2 is-date ${sh.tone}`}><strong>{sh.main}</strong><small>{sh.sub}</small></span>
-              <span className="is-c4 r"><strong>{units(s).toLocaleString()}</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></span>
-              <span className="is-c4 r"><strong>{money(soTotal(s))}</strong><small>PO {money(poTotal(s))}</small></span>
-              <span className="is-c5">
-                {m ? <>
-                  <button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button>
-                  <button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" aria-label="Ignore" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button>
-                </> : <i className="is-chev" />}
-              </span>
+          {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); const idx = stepIdx(s.status); return (
+            <div key={s.id} className={`is-ptr is-prow ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
+              <div className="is-pc-ship"><i className="is-mono-av">{mono(s.customer)}</i><div><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b> · Created {s.created}</small>{m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><MessageSquare size={11} /> {m.who}: “{m.text}”</span>}</div></div>
+              <div className="is-pc-stage"><em className={`is-status pill ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><i className="is-prog">{STEPS.map((st, i) => <b key={st.id} className={i < idx ? 'd' : i === idx ? 'n' : ''} />)}</i></div>
+              <div className="is-pc-fac"><strong>{s.factory}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></div>
+              <div className="is-pc-orders">
+                <div><small>SO</small><code>{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || '—'}</code><b>{money(soTotal(s))}</b></div>
+                <div><small>PO</small><code>{Array.from(new Set(s.lines.map((l) => l.po))).join(', ') || '—'}</code><b>{money(poTotal(s))}</b></div>
+              </div>
+              <div className="is-pc-shipping">
+                <strong>{units(s).toLocaleString()} units</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small>
+                <span className={`is-ship ${sh.tone}`}>{sh.sub === 'Shipped' ? `Shipped · ${sh.main}` : sh.sub === 'Ship date' ? 'Ship date TBD' : `Ships ${sh.sub} · ${sh.main}`}</span>
+                {m && <span className="is-r-acts"><button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button><button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} aria-label="Ignore" title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button></span>}
+              </div>
             </div>
           ); })}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match these filters.</div>}
         </div>
-        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span><b>{viewUnits.toLocaleString()}</b> units</span><span><b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b> SO value</span><span><b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b> PO value</span></div>
+        <div className="is-foot" data-testid="is-footer"><span><b>{rows.length}</b> shipment{rows.length === 1 ? '' : 's'}</span><span>Units <b>{viewUnits.toLocaleString()}</b></span><span>SO total <b>{money(rows.reduce((a, s) => a + soTotal(s), 0))}</b></span><span>PO total <b>{money(rows.reduce((a, s) => a + poTotal(s), 0))}</b></span></div>
       </section>
       )}
 
@@ -476,7 +481,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
       )}
 
       {dtab === 'activity' && (
-        <section className="is-card is-activity is-tl" data-testid="is-activity">
+        <section className="is-card is-tl" data-testid="is-activity">
           <div className="is-card-head"><div><h2>Activity</h2><p className="is-muted">Everything that has happened on this shipment.</p></div><small className="is-muted">{s.activity.length} event{s.activity.length === 1 ? '' : 's'}</small></div>
           <ol className="is-tl-list">
             {s.activity.map((a, i) => { const t = a.title.toLowerCase(); const Icon = t.includes('prepay') || t.includes('payment') ? CreditCard : t.includes('instruction') || t.includes('booking') ? Truck : t.includes('message') ? MessageSquare : t.includes('upload') || t.includes('document') ? FileText : t.includes('status') ? Check : Ship; return (
