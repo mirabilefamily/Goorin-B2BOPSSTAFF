@@ -1,0 +1,61 @@
+{
+  "summary": "Frontend regression for simplified Intl Shipments overview (4-tile filter buttons + shipments board + Open Orders tab + New Shipment). Empty-creds login -> Intl Shipments loads. Tiles render 3 / 1 / 2 / 2,670 as expected. All specified selectors and flows behave correctly. 0 DOM-nesting warnings from nested <em> inside <button> tiles, 0 page errors, 0 console errors, 0 horizontal overflow at 1920/1280/390 widths.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "tiles_strong": {"is-kpi-all": "3", "is-kpi-released": "1", "is-attn-group-message": "2", "is-tile-motion": "2,670"},
+    "focus_filters": {
+      "is-kpi-released_rows": 1,
+      "is-kpi-released_class": "is-tile on",
+      "is-kpi-released_toggle_back_rows": 3,
+      "is-attn-group-message_rows": 2,
+      "is-kpi-all_rows": 3,
+      "is-stage-shipped_rows": 1
+    },
+    "text_links_no_tile_filter": {
+      "is-next-IS-0011": "opens intl-shipment-detail",
+      "is-act-reply": "opens is-chat",
+      "is-act-remind": "toast (no filter side-effect)",
+      "is-act-mark-prepaid": "is-kpi-released strong -> 0, small: '$3,191 received · 2 released'",
+      "is-act-ignore-all": "is-attn-group-message strong -> 0, small: 'Inbox clear — every message answered'",
+      "is-tile-motion": "opens is-factories-drawer (no overdue)"
+    },
+    "table": {
+      "is-row-IS-0012": "opens detail",
+      "is-search_SASA_rows": 1,
+      "is-filter-customer_menu_visible": true,
+      "is-filter-customer_opts": 3,
+      "is-clear-filters": "resets to 3 rows",
+      "footer": "3 shipments · 2,670 units · $24,099 SO value · $9,822.75 PO value"
+    },
+    "tabs": {
+      "is-tab-orders_kpis_present": ["is-oo-kpi-open","is-oo-kpi-overdue","is-oo-kpi-due","is-oo-kpi-groups"],
+      "is-open-orders_present": true,
+      "is-tab-shipments_restores": true,
+      "is-new-shipment_flow": "IS-0013 created + detail opened, toast 'IS-0013 created'"
+    },
+    "responsive": {
+      "1920x800_overflow_px": 0,
+      "1280x800_overflow_px": 0,
+      "390x844_overflow_px": 0
+    },
+    "console_errors": 0,
+    "page_errors": 0,
+    "dom_nesting_warnings": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 463 lines and still mixes list, overview, detail (~180 lines) and modals. Consider extracting Detail into its own file.",
+    "is-attn-ignore-IS-0010 cannot be independently verified once is-act-ignore-all runs earlier in the same session. Run this assertion BEFORE is-act-ignore-all or add a dev reset.",
+    "Nested clickable <em class='is-tile-link'> with onClick inside <button class='is-tile'> is valid HTML (em is phrasing content) and produced 0 React DOM-nesting warnings, but it is semantically fragile — a nested interactive element inside a button is not fully accessible (keyboard-focus reaches only the outer button). Consider restructuring the tile as a non-button container (div) with an explicit inner <button> for the tile filter and separate inner <button>s for actions/links, so each interactive is independently focusable.",
+    "is-kpi-released testid label ('released') is semantically 'awaiting prepayment / focus prepay' — consider renaming to is-focus-prepay for testid clarity."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked, per /app/memory/test_credentials.md)",
+  "seed_data_creation": "IS-0013 created transiently via New Shipment (client-only state)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All review-request flows pass. Verified selectors: is-tab-shipments/orders, is-factories, is-new-shipment, is-kpi-all, is-kpi-released, is-attn-group-message, is-tile-motion, is-next-IS-0011, is-act-{remind,reply,mark-prepaid,ignore-all,chase,factories}, is-row-<id>, is-attn-{reply,ignore}-<id>, is-search, is-filter-customer-toggle/menu/opts, is-stage-*, is-clear-filters, is-footer, is-oo-kpi-{open,overdue,due,groups}, is-open-orders, is-factories-drawer, is-create-modal, is-form-{customer,factory,so,submit}, is-back, is-chat, intl-shipment-detail. Note: verify is-attn-ignore-IS-0010 BEFORE any is-act-ignore-all action. No DOM-nesting console warnings from em-in-button tiles."
+}
