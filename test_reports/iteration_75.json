@@ -1,0 +1,64 @@
+{
+  "summary": "Frontend regression for redesigned Intl Shipments combo (Action Center hero + shipments board + Open Orders tab + inline messages). Empty-creds login -> Intl Shipments loads. Hero renders 3 action cards (is-acard-prepay/msg/next), ship-schedule chart, and pipeline rail with 4 KPI rows. All focus/action/table/filter/tab flows behave as specified with 0 page errors and 0 horizontal overflow at 1920/1280/390 widths.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_details": {
+    "hero": {"acards": ["is-acard-prepay","is-acard-msg","is-acard-next"], "chart_svg": true, "rail_kpi_rows": 4, "rows_initial": 3},
+    "focus_filters": {
+      "is-kpi-released_rows": 1,
+      "is-kpi-released_shows_Focused": true,
+      "is-kpi-all_label_after_filter": "Clear focus",
+      "is-kpi-all_reset_rows": 3,
+      "is-attn-group-message_rows": 2,
+      "is-kpi-shipped_rail_rows": 1,
+      "is-stage-prepaid_rows": 1
+    },
+    "actions": {
+      "is-act-remind": "clicked (toast fired)",
+      "is-act-reply": "opens is-chat + is-back present",
+      "is-next-IS-0011": "opens intl-shipment-detail",
+      "is-act-mark-prepaid": "prepay card removed; IS-0011 row now shows Prepaid",
+      "is-act-ignore-all": "msg card removed"
+    },
+    "table": {
+      "row_IS-0012_click": "opens detail",
+      "is-attn-reply-IS-0012": "opens is-chat",
+      "search_SASA_rows": 1,
+      "filter_customer_menu_options": 3,
+      "filter_customer_apply_rows": 1,
+      "clear_filters_resets": true,
+      "footer": "3 shipments · 2,670 units · $24,099 SO · $9,822.75 PO"
+    },
+    "tabs": {
+      "is-tab-orders_hero": "Order Intake hero (is-oo-kpi-overdue/due/groups) rendered",
+      "shipment_search_hidden_in_orders": true,
+      "is-tab-shipments_restores_search": true,
+      "is-factories_drawer_factories": 3,
+      "is-new-shipment_create_flow": "Created IS-0013 and opened detail"
+    },
+    "responsive_horizontal_overflow_px": {"1920x1000": 0, "1280x800": 0, "390x844": 0},
+    "page_errors": 0,
+    "console_errors": 0,
+    "console_warnings": "Recharts ResponsiveContainer emits benign width/height(-1) warnings during initial mount / tab-switch renders. Non-blocking."
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 529 lines and mixes list, hero, detail and modals - Detail (~180 lines) should be extracted to its own module.",
+    "useMemo for rows disables react-hooks/exhaustive-deps and misses 'ignored' explicitly - stale closure risk if ignored is later used inside filter beyond unanswered().",
+    "Recharts ResponsiveContainer inside .is-hero-chart logs width(-1)/height(-1) warnings on mount and viewport changes. Consider setting minWidth/minHeight or a fixed height to silence and avoid flicker.",
+    "is-attn-ignore-IS-0010 could not be re-verified after is-act-ignore-all (already ignored globally). Suggest separate re-render test or reset control.",
+    "Card view testid 'is-kpi-released' actually toggles fStatus 'prepayment' (label 'Focus'/'Focused' on the Collect prepayment card). Consider aligning testid semantics (e.g. is-focus-prepay) to avoid confusion with the rail's is-kpi-prepaid."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked)",
+  "seed_data_creation": "IS-0013 created transiently through New Shipment flow (client-only state)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All review-request flows pass. Selectors verified: is-tab-shipments/is-tab-orders, is-factories, is-new-shipment, is-kpi-all (Clear focus toggle), is-acard-{prepay,msg,next}, is-kpi-released (card focus toggle), is-attn-group-message, is-queue-soon, is-next-IS-<id>, is-act-{remind,reply,mark-prepaid,ignore-all,next-msg}, is-kpi-<stage> rail rows, is-stage-<status> chips, is-row-<id>, is-attn-<id>, is-attn-reply-<id>, is-attn-ignore-<id>, is-search, is-filter-customer-toggle + is-filter-customer-opt-*, is-filter-factory-toggle, is-clear-filters, is-footer, is-factories-drawer, is-create-modal + is-form-{customer,factory,so,submit}, is-back."
+}
