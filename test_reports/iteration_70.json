@@ -1,0 +1,59 @@
+{
+  "summary": "Frontend regression for Dashboard-style Intl Shipments hero (units figure + declared chip + Recharts area chart + stats + Pipeline rail). All review-request flows pass at 1920x900, 1280x800 and 390x844 with 0 overflow, 0 console errors and 0 page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "empty email/password -> ryan@mirabile.com; nav via sidebar 'Intl Shipments' item",
+    "hero": {
+      "units_figure_strong": "2,670",
+      "declared_chip": "$24,099 declared",
+      "recharts_svg_count": 1,
+      "eyebrow_tabs_seg": "is-tab-shipments/is-tab-orders visible with counts"
+    },
+    "kpi_filters": {
+      "base_rows": 3,
+      "is-kpi-released": "3 -> 1 row, class 'on' applied",
+      "is-kpi-all_reset": "restored to 3 rows",
+      "is-attn-group-message": "toggle 3 -> 2 rows and back",
+      "is-kpi-prepaid (rail row)": "1 row, class 'is-rail-row on'",
+      "is-kpi-shipped (rail row)": "1 row, class 'is-rail-row on'",
+      "is-attn-ignore-IS-0010": "Awaiting reply 2 -> 1; rail status '2 messages need a reply' -> '1 message need a reply'"
+    },
+    "tabs": {
+      "is-tab-orders": "hero (is-priority-strip) stays visible; is-open-orders visible",
+      "is-tab-shipments": "restores board (.is-board visible)"
+    },
+    "factories_and_create": {
+      "is-factories": "opens is-factories-drawer",
+      "is-new-shipment -> is-create-modal -> is-form-customer/is-form-factory -> is-form-submit": "creates and opens intl-shipment-detail",
+      "is-back": "returns to list"
+    },
+    "regression": {
+      "is-stage-shipped": "rows 3 -> 1",
+      "is-filter-customer-toggle menu": "visible bbox x=1549 y=517 w=300 h=254 (fully inside 1920x900)",
+      "is-search 'IS-0012'": "1 row",
+      "row click -> intl-shipment-detail -> is-back": "works"
+    },
+    "responsive": {
+      "1920x900 overflow_px": 0,
+      "1280x800 overflow_px": 0,
+      "1280 positions": "hero-left y=61 h=376.75, hero-rail y=437.75 (rail stacks below at 1280 too)",
+      "390x844 overflow_px": 0,
+      "390 positions": "hero-left y=41 h=466.25, hero-rail y=507.25 (stacked below, no clipping)"
+    },
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 453 lines and still contains list + detail + drawer + create modal in a single file; consider splitting for maintainability (carry-over)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Hero now has a Recharts area chart with defs gradient 'gIs'; strong figure = 2,670 units; declared chip = $24,099. is-kpi-all/is-kpi-released/is-attn-group-message are the three primary filter buttons in .is-hero-stats. Rail rows use data-testid=is-kpi-<stage> (prepaid, shipped, prepayment, etc.). Note: at 1280x800 the hero rail also stacks below the left (not side-by-side); no overflow observed — treat as intended per CSS grid breakpoint."
+}
