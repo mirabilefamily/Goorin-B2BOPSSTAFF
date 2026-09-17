@@ -1,0 +1,60 @@
+{
+  "summary": "Frontend regression for the new tactical Action Center hero on Intl Shipments (queues + rail + Recharts bar schedule + board). All review-request flows pass at 1920x900, 1280x800 and 390x844 with 0 horizontal overflow, 0 console errors and 0 page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "empty email/password -> ryan@mirabile.com; sidebar 'Intl Shipments'",
+    "hero_header": "is-tab-shipments/is-tab-orders (with counts) + is-factories + is-new-shipment present",
+    "figure": "'2 items need action today' with $3,182.50 prepayment outstanding",
+    "queues_visible_only_when_positive": {
+      "is-kpi-released": "present (n=1)",
+      "is-attn-group-message": "present (n=2)",
+      "is-queue-overdue": "absent (0) — correct",
+      "is-queue-nopack": "absent (0) — correct (seed IS-0010 shipped so not flagged)",
+      "is-queue-soon": "absent (0) — correct"
+    },
+    "filter_flow": {
+      "is-kpi-released": "3 -> 1 row (IS-0011); button text switches to 'Showing'; toggle resets to 3",
+      "is-attn-group-message": "3 -> 2 rows (IS-0012, IS-0010)",
+      "is-kpi-all": "resets to 3 rows",
+      "is-kpi-prepaid (rail)": "1 row, class 'on' applied",
+      "is-kpi-shipped (rail)": "1 row, class 'on' applied"
+    },
+    "ignore_flow": {
+      "is-attn-ignore-IS-0010": "Reply-to-customers 2 -> 1; rail status '1 message need a reply'",
+      "ignore_both": "is-attn-group-message queue removed; figure 2 -> 1"
+    },
+    "tabs": {
+      "is-tab-orders": "shows is-open-orders while hero (is-priority-strip) remains visible",
+      "is-tab-shipments": "restores .is-board"
+    },
+    "factories_and_create": {
+      "is-factories": "opens is-factories-drawer",
+      "is-new-shipment -> is-create-modal -> is-form-submit": "creates IS-0013 and opens intl-shipment-detail",
+      "is-back": "returns to list"
+    },
+    "regression": {
+      "is-stage-shipped": "1 row",
+      "is-filter-customer-toggle": "menu opens",
+      "is-search": "works (0 rows for IS-0011 while shipped stage filter active — expected)",
+      "is-clear-filters": "resets to 4 rows (3 seed + 1 created)"
+    },
+    "chart": "1 Recharts SVG rendered (BarChart)",
+    "responsive_overflow_px": {"1920x900": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is ~484 lines and still bundles list + detail + drawer + create modal + hero in one file; consider splitting into `IntlShipmentDetail.tsx`, `IntlShipmentsHero.tsx`, and modal/drawer components for maintainability.",
+    "`rows` useMemo omits `ignored` from the eslint-disable dep list; correct today because `unanswered` is captured via closure but is fragile — prefer listing dependencies explicitly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "1 test shipment IS-0013 (client-side only, cleared on reload)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "New hero layout: figure `.is-figure strong` shows items-needing-action count; queues only render when n>0 (testids: is-kpi-released, is-attn-group-message, is-queue-overdue, is-queue-nopack, is-queue-soon). Rail rows use is-kpi-<stage>. Seed produces 2 items-need-action; ignoring IS-0010 then IS-0012 removes the entire attn-group-message queue and decrements the figure. Recharts uses `BarChart` (not area)."
+}
