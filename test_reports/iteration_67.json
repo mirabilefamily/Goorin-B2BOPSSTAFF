@@ -1,0 +1,48 @@
+{
+  "summary": "Frontend-only regression for INTL Shipments page with new searchable MultiSelect Customer/Factory filters. All review-request flows pass at 1920x1080 and 390x844 with zero console/page errors and no horizontal overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "empty email/password logs in as ryan@mirabile.com",
+    "testids_present": ["intl-shipments-page","is-kpi-all","is-kpi-released","is-attn-group-message","is-tab-shipments","is-tab-orders","is-new-shipment","is-factories","is-search","is-stage-all","is-footer","is-filter-customer","is-filter-factory"],
+    "multiselect_customer": {
+      "toggle_opens_menu": true,
+      "menu_bbox_desktop": "x=1549 w=300 (not clipped, viewport 1920)",
+      "search_input_present_is-filter-customer-search": true,
+      "options_count": 3,
+      "single_select_rows": "3 -> 1",
+      "union_two_selects_rows": "-> 2 (union works)"
+    },
+    "multiselect_factory": {
+      "menu_bbox_desktop": "x=1475 right-aligned near button (x=1625, w=150), fully visible within 1920 viewport",
+      "mobile_menu_bbox_390": "x=61 w=300 not clipped"
+    },
+    "is-clear-filters": "resets both MultiSelects, is-kpi and is-search; button disappears when no filters active",
+    "kpi_filters": {"all_rows": 3, "is-kpi-released": 1, "is-attn-group-message_rows": 2, "toggle_back": true},
+    "attn_flow": {
+      "is-attn-reply-IS-0012": "opens intl-shipment-detail with is-chat visible",
+      "is-back": "returns to list",
+      "is-attn-ignore-IS-0010": "decrements Awaiting reply tile 2 -> 1"
+    },
+    "row_detail": "clicking is-row-IS-0012 opens intl-shipment-detail; is-back returns",
+    "tabs": {"is-tab-orders": "opens is-open-orders", "is-tab-shipments": "restores"},
+    "create_modal": "is-new-shipment opens is-create-modal",
+    "factories_drawer": "is-factories opens is-factories-drawer, backdrop closes",
+    "responsive": {"desktop_1920_overflow_px": 0, "mobile_390_overflow_px": 0, "mobile_dropdown_visible": true},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx remains large (list + detail + drawer + create modal in one file); consider splitting into modules for maintainability (carried over).",
+    "Escape closes MultiSelect popovers (via MultiSelect useEffect) but does NOT close the create modal or factories drawer — only backdrop click closes them (minor UX inconsistency, carried over)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "none (create modal opened but not submitted)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Customer/Factory filters are now MultiSelect (same as Linesheet). Testids: is-filter-{customer|factory} on wrapper, plus -toggle/-menu/-search/-opt-<value>/-clear/-all/-done children. Menus render below the button with right-align on factory; verified not clipped on 1920x1080 nor 390x844. is-clear-filters clears both sets + kpi + msg + search."
+}
