@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Check, Download, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
 import { MultiSelect } from './MultiSelect';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
 import './intlshipments.css';
@@ -123,37 +124,64 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
-      <section className="is-card is-overview">
-      <div className="is-modebar" data-testid="is-modebar">
-        <div className="ops-seg is-mode-seg" role="tablist">
-          <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
-          <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
+      {(() => {
+        const months = Array.from({ length: 8 }, (_, i) => { const d = new Date(2026, 5 + i, 1); return { key: `${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`, m: d.toLocaleString('en-US', { month: 'short' }), units: 0 }; });
+        list.forEach((s) => { const [mm, , yy] = s.ship.split('-'); const hit = months.find((x) => x.key === `${mm}-${yy}`); if (hit) hit.units += units(s); });
+        const totalUnits = list.reduce((a, s) => a + units(s), 0);
+        const relPct = active.length ? Math.round((released.length / active.length) * 100) : 0;
+        const stageColor: Record<string, string> = { draft: '#c9c0a5', ready: '#8fd1b6', instructions: '#9db1ec', prepayment: '#e0a629', prepaid: '#0f8a66', shipped: '#2952c8', invoiced: '#b7c1bb' };
+        return (
+      <section className="is-card is-hero" data-testid="is-priority-strip">
+        <div className="is-hero-left">
+          <div className="is-hero-top">
+            <p className="is-eyebrow"><i /> Units in motion · {tab === 'shipments' ? 'Shipments' : 'Open orders'}</p>
+            <div className="is-hero-tools" data-testid="is-modebar">
+              <div className="is-seg" role="tablist">
+                <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
+                <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')} data-testid="is-tab-orders">Open Orders <b>{OPEN_ORDERS.length}</b></button>
+              </div>
+              <button className="is-btn is-icon" onClick={() => setFactoriesOpen(true)} data-testid="is-factories" title="Factories"><Folder size={15} /></button>
+              <button className="is-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
+            </div>
+          </div>
+          <div className="is-figure">
+            <strong>{totalUnits.toLocaleString()}</strong>
+            <span className="is-delta">{money(list.reduce((a, s) => a + soTotal(s), 0))} declared</span>
+          </div>
+          <div className="is-hero-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={months} margin={{ top: 10, right: 12, left: 12, bottom: 0 }}>
+                <defs><linearGradient id="gIs" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16a37a" stopOpacity={0.28} /><stop offset="100%" stopColor="#16a37a" stopOpacity={0} /></linearGradient></defs>
+                <XAxis dataKey="m" tickLine={false} axisLine={false} interval={0} tick={{ fill: '#7d8f86', fontSize: 11 }} dy={6} />
+                <Tooltip cursor={{ stroke: '#16a37a', strokeWidth: 1, strokeDasharray: '3 3' }} content={({ active: on, payload, label }: any) => on && payload?.length ? <div className="is-tip"><p>{label}</p><b>{payload[0].value.toLocaleString()} units</b></div> : null} />
+                <Area type="monotone" dataKey="units" stroke="#0f8a66" strokeWidth={2.5} fill="url(#gIs)" dot={false} activeDot={{ r: 5, fill: '#0f8a66', stroke: '#fff', strokeWidth: 2 }} isAnimationActive={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="is-hero-stats">
+            <button className={fStatus === 'all' && !fMsg ? 'on' : ''} onClick={() => { setFStatus('all'); setFMsg(false); }} data-testid="is-kpi-all"><span>Active</span><b>{active.length}</b></button>
+            <button className={fStatus === 'prepaid' ? 'on' : ''} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released"><span>Released</span><b>{released.length}</b></button>
+            <button className={fMsg ? 'on' : ''} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message"><span>Awaiting reply</span><b>{attention.length}</b></button>
+            <div><span>Shipments</span><b>{list.length}</b></div>
+          </div>
         </div>
-        <div className="is-modebar-r">
-          <button className="ops-btn" onClick={() => setFactoriesOpen(true)} data-testid="is-factories"><Folder size={15} /> Factories</button>
-          <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
-        </div>
-      </div>
+        <aside className="is-hero-rail">
+          <div className="is-rail-head"><p className="is-eyebrow">Pipeline</p><span className="is-pct">{relPct}% released</span></div>
+          <div className="is-rail-nums"><strong>{active.length}</strong><span>active shipment{active.length === 1 ? '' : 's'} · {list.length - active.length} invoiced</span></div>
+          <div className="is-rail-stack" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <i key={d.id} style={{ width: `${(d.n / (list.length || 1)) * 100}%`, background: stageColor[d.id] }} />)}</div>
+          <p className={`is-rail-status ${attention.length ? 'behind' : 'ok'}`}><i />{attention.length ? `${attention.length} message${attention.length === 1 ? '' : 's'} need a reply` : 'All customer messages answered'}</p>
+          <div className="is-rail-split">
+            {dist.filter((d) => d.n > 0).map((d) => (
+              <button className={`is-rail-row ${fStatus === d.id ? 'on' : ''}`} key={d.id} onClick={() => setFStatus(fStatus === d.id ? 'all' : d.id)} data-testid={`is-kpi-${d.id}`}>
+                <span><i style={{ background: stageColor[d.id] }} />{d.id === 'prepayment' ? 'Prepayment due' : STATUS_LABEL[d.id]}</span>
+                <b>{d.n}</b>
+                <em>{list.filter((s) => s.status === d.id).reduce((a, s) => a + units(s), 0).toLocaleString()}<small>units</small></em>
+              </button>
+            ))}
+          </div>
+        </aside>
       </section>
-
-      {tab === 'shipments' && <section className="is-card is-kpis" data-testid="is-priority-strip">
-        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-          <div className="is-kpi-head"><span className="is-chip"><Ship size={16} /></span><span className="is-kpi-k">In pipeline</span></div>
-          <div><strong className="is-kpi-v">{active.length}</strong><small className="is-kpi-cap">{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'no shipments yet'}</small></div>
-        </button>
-        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-          <div className="is-kpi-head"><span className="is-chip"><CheckCircle2 size={16} /></span><span className="is-kpi-k">Released to factory</span></div>
-          <div><strong className="is-kpi-v">{released.length}</strong><small className="is-kpi-cap">{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small></div>
-        </button>
-        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
-          <div className="is-kpi-head"><span className="is-chip"><MessageSquare size={16} /></span><span className="is-kpi-k">Awaiting reply</span></div>
-          <div><strong className="is-kpi-v">{attention.length}</strong><small className="is-kpi-cap">{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'inbox clear'}</small></div>
-        </button>
-        <div className="is-kpi">
-          <div className="is-kpi-head"><span className="is-chip"><Boxes size={16} /></span><span className="is-kpi-k">In motion</span></div>
-          <div><strong className="is-kpi-v">{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small className="is-kpi-cap">units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small></div>
-        </div>
-      </section>}
+        ); })()}
 
       {tab === 'orders' && (
         <IntlOpenOrders

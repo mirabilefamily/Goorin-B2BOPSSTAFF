@@ -1,0 +1,46 @@
+{
+  "summary": "Frontend regression for the rebuilt Intl Shipments overview band (KPI-strip style: 4 tiles - In pipeline, Released to factory, Awaiting reply, In motion). All review-request flows pass at 1920x900 and 390x844 with no console/page errors and no overflow.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login_empty_creds": "empty email/password -> ryan@mirabile.com, lands on #dashboard",
+    "tiles_present": ["is-kpi-all", "is-kpi-released", "is-attn-group-message", "is-priority-strip (In motion tile is non-button)"],
+    "kpi_filters": {
+      "initial_rows": "3 (IS-0012, IS-0011, IS-0010)",
+      "is-kpi-released": "3 -> 1 row, class becomes 'is-kpi on' (active bg + dark chip)",
+      "is-kpi-all_reset": "restored to 3 rows",
+      "is-attn-group-message": "3 -> 2 rows and toggles back",
+      "is-attn-ignore-IS-0010": "Awaiting reply value 2 -> 1"
+    },
+    "tabs": {"is-tab-orders": "hides is-priority-strip, is-open-orders shown", "is-tab-shipments": "restores is-priority-strip"},
+    "regression": {
+      "is-stage-shipped": "clickable filter, 3 -> 1",
+      "is-filter-customer-toggle": "opens is-filter-customer-menu (bbox 1549,425 300x216) fully within 1920x900 viewport",
+      "is-search 'IS-0012'": "1 row",
+      "row -> detail -> is-back": "works",
+      "is-new-shipment": "opens is-create-modal"
+    },
+    "responsive": {
+      "desktop_1920x900_overflow_px": 0,
+      "mobile_390x844_overflow_px": 0,
+      "mobile_strip_bbox": "x=14 y=183 w=362 h=259.5 (within 390 viewport)",
+      "mobile_tiles_2x2": "positions [(15,184),(195,184),(15,316),(195,316)] each ~180x130 -> confirmed 2x2 grid, no clipping"
+    },
+    "console_errors": 0,
+    "page_errors": 0,
+    "console_warnings_noted": "Pre-existing recharts width(-1)/height(-1) warnings from Dashboard chart container on initial load; unrelated to Intl Shipments overview band."
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx still large (list + detail + drawer + create modal); carry-over from prior iterations.",
+    "Recharts 'width(-1) height(-1)' warnings originate from Dashboard chart container (unrelated) - main agent may set explicit min dimensions to silence."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (per /app/memory/test_credentials.md)",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Intl Shipments overview band is now a KPI-strip card with 4 tiles: is-kpi-all (In pipeline), is-kpi-released (Released to factory), is-attn-group-message (Awaiting reply), and a non-button In motion tile. First three tiles are filter buttons with .is-kpi and .on classes when active. Mobile shows tiles in a 2x2 grid. All prior testids intact."
+}

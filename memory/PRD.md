@@ -177,3 +177,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Removed page title/subtitle; Shipments/Open Orders seg + Factories + New Shipment now in a card-style mode bar above the KPI band.
 - Overview card elevated: KPI tiles as inset panels with icon chips, hover lift, stage bar; mode bar merged into same card. Regression iteration_66.
 - Overview band rebuilt to mirror Dashboard KPI strip exactly (icon chip + label, 32px figure, caption, hairline dividers); active tile = tinted bg + dark chip. Filters use MultiSelect (searchable) like Linesheet.
+- Shipments top rebuilt as Dashboard-style hero: units-in-motion figure + monthly area chart + stat row (Active/Released/Awaiting reply filters), pipeline rail w/ stage stack + per-stage rows; tabs + actions in hero header. Mode bar & KPI card removed.
