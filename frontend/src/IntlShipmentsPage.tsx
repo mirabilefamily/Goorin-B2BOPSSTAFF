@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowLeft, Boxes, Check, CheckCircle2, Download, Ship, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
+import { Activity, ArrowLeft, Check, Download, Factory, LayoutGrid, Truck, FileText, Folder, MessageSquare, MoreHorizontal, Pencil, Plus, Search, Send, Upload, X } from 'lucide-react';
 import { useToast } from '@/lib/toast';
+import { MultiSelect } from './MultiSelect';
 import { IntlOpenOrders, OPEN_POS, poUnits, poValue, type PO } from './IntlOpenOrders';
 import './ops.css';
 import './intlshipments.css';
@@ -67,8 +68,8 @@ export default function IntlShipmentsPage() {
   const [openTab, setOpenTab] = useState<DTab>('overview');
   const [q, setQ] = useState('');
   const [fStatus, setFStatus] = useState('all');
-  const [fCustomer, setFCustomer] = useState('all');
-  const [fFactory, setFFactory] = useState('all');
+  const [fCustomer, setFCustomer] = useState<Set<string>>(new Set());
+  const [fFactory, setFFactory] = useState<Set<string>>(new Set());
   const [creating, setCreating] = useState(false);
   const [factoriesOpen, setFactoriesOpen] = useState(false);
   const startFromOrder = (o: typeof OPEN_ORDERS[number]) => { setForm({ customer: o.customer, factory: o.factory, so: o.so, po: o.po, ship: o.due }); setCreating(true); };
@@ -82,8 +83,8 @@ export default function IntlShipmentsPage() {
     if (t && ![s.id, s.customer, s.factory, ...s.lines.map((l) => l.so + l.po + l.sku)].join(' ').toLowerCase().includes(t)) return false;
     if (fStatus !== 'all' && s.status !== fStatus) return false;
     if (fMsg && !unanswered(s)) return false;
-    if (fCustomer !== 'all' && s.customer !== fCustomer) return false;
-    if (fFactory !== 'all' && s.factory !== fFactory) return false;
+    if (fCustomer.size && !fCustomer.has(s.customer)) return false;
+    if (fFactory.size && !fFactory.has(s.factory)) return false;
     return true;
   }), [list, q, fStatus, fCustomer, fFactory, fMsg, ignored]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -110,7 +111,7 @@ export default function IntlShipmentsPage() {
   const active = list.filter((s) => s.status !== 'invoiced');
   const released = list.filter((s) => s.status === 'prepaid');
   const viewUnits = rows.reduce((a, s) => a + units(s), 0);
-  const filtered = fStatus !== 'all' || fCustomer !== 'all' || fFactory !== 'all' || fMsg || q;
+  const filtered = fStatus !== 'all' || fCustomer.size > 0 || fFactory.size > 0 || fMsg || q;
   const dist = STEPS.map((st) => ({ ...st, n: list.filter((s) => s.status === st.id).length }));
   const shipText = (s: Shipment) => {
     if (s.status === 'shipped' || s.status === 'invoiced') return { main: s.ship, sub: 'Shipped', tone: 'ok' };
@@ -134,26 +135,22 @@ export default function IntlShipmentsPage() {
         </div>
       </div>
       {tab === 'shipments' && <div className="is-kpis" data-testid="is-priority-strip">
-        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-          <i className="is-kpi-ic"><Ship size={16} /></i>
-          <span>In pipeline</span><strong>{active.length}</strong>
+        <button className={`is-kpi-main ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+          <span className="is-kicker"><i className="is-dot" /> Pipeline</span>
+          <div className="is-kpi-fig"><strong>{active.length}</strong><em>active shipment{active.length === 1 ? '' : 's'}</em></div>
           <i className="is-dist">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</i>
           <small>{dist.filter((d) => d.n > 0).map((d) => <em key={d.id} className={d.id}><i />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</em>)}</small>
         </button>
-        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-          <i className="is-kpi-ic g"><CheckCircle2 size={16} /></i>
-          <span>Released to factory</span><strong className="g">{released.length}</strong>
-          <small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
-        </button>
-        <button className={`is-kpi ${fMsg ? 'on' : ''} ${attention.length ? 'alert' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
-          <i className={`is-kpi-ic ${attention.length ? 'b' : ''}`}><MessageSquare size={16} /></i>
-          <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong>
-          <small>{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'Inbox clear'}</small>
-        </button>
-        <div className="is-kpi">
-          <i className="is-kpi-ic"><Boxes size={16} /></i>
-          <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
-          <small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small>
+        <div className="is-kpi-rail">
+          <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+            <span>Released to factory</span><strong className="g">{released.length}</strong><small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
+          </button>
+          <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+            <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong><small>{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'Inbox clear'}</small>
+          </button>
+          <div className="is-kpi">
+            <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong><small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small>
+          </div>
         </div>
       </div>}
       </section>
@@ -168,12 +165,10 @@ export default function IntlShipmentsPage() {
       {tab === 'shipments' && <>
       <section className="is-card is-board">
         <div className="is-board-head">
-          <label className="is-search"><Search size={16} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipments, customers, SO or PO" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
-          <div className="is-tools">
-            <select value={fCustomer} onChange={(e) => setFCustomer(e.target.value)} data-testid="is-filter-customer"><option value="all">Customer</option>{customers.map((c) => <option key={c}>{c}</option>)}</select>
-            <select value={fFactory} onChange={(e) => setFFactory(e.target.value)} data-testid="is-filter-factory"><option value="all">Factory</option>{factories.map((c) => <option key={c}>{c}</option>)}</select>
-            {filtered && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer('all'); setFFactory('all'); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
-          </div>
+          <label className="is-search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipment, customer, SO or PO…" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
+          <MultiSelect label="Customers" testId="is-filter-customer" value={fCustomer} onChange={setFCustomer} options={customers.map((c) => ({ value: c, label: c, count: list.filter((s) => s.customer === c).length }))} />
+          <MultiSelect label="Factories" testId="is-filter-factory" value={fFactory} onChange={setFFactory} options={factories.map((c) => ({ value: c, label: c, count: list.filter((s) => s.factory === c).length }))} />
+          {filtered && <button className="is-clear" onClick={() => { setFStatus('all'); setFCustomer(new Set()); setFFactory(new Set()); setFMsg(false); setQ(''); }} data-testid="is-clear-filters"><X size={13} /> Clear</button>}
         </div>
         <div className="is-stages" role="tablist" data-testid="is-stages">
           <button className={`is-stage ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-stage-all">All <b>{list.length}</b></button>
