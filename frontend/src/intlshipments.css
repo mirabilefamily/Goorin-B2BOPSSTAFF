@@ -626,3 +626,22 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-v10 .is-act.primary { background: var(--ink); border-color: var(--ink); color: #fff; } .is-v10 .is-act.primary:hover { background: var(--green); border-color: var(--green); }
 .is-v10 .is-foot { background: transparent; justify-content: flex-end; gap: 28px; }
 .is-v10 .is-attn { color: var(--ink-3); } .is-v10 .is-attn svg { color: var(--navy); }
+
+/* v12 inset panels */
+.is-v12 .is-ov { background: #fff; }
+.is-v12 .is-ov-head { padding: 14px 16px 10px; }
+.is-v12 .is-tiles { padding: 4px 16px 16px; gap: 10px; }
+.is-v12 .is-tile { background: var(--sub-2); border-radius: 16px !important; padding: 20px 20px 18px; box-shadow: inset 0 0 0 1px #edf1ee; }
+.is-v12 .is-tile:hover:not(:disabled) { background: #fff; box-shadow: 0 1px 2px rgba(15,31,24,.04), 0 14px 30px -24px rgba(15,31,24,.4), inset 0 0 0 1px var(--line); transform: translateY(-1px); }
+.is-v12 .is-tile.on { background: #fff; box-shadow: inset 0 0 0 1px #c9d3ce, 0 10px 24px -20px rgba(15,31,24,.4); }
+.is-v12 .is-tile.alert { background: #fff7f7; }
+.is-v12 .is-tile header { width: 100%; } .is-v12 .is-tile header i { background: #fff; box-shadow: 0 0 0 1px var(--line); }
+.is-v12 .is-tile header i.ink { background: var(--ink); color: #fff; box-shadow: none; } .is-v12 .is-tile header i.amber { background: var(--amber-l); color: #9a6208; box-shadow: none; } .is-v12 .is-tile header i.blue { background: #e8edfb; color: var(--navy); box-shadow: none; } .is-v12 .is-tile header i.violet { background: #ece9fb; color: #5b4bc4; box-shadow: none; } .is-v12 .is-tile header i.red { background: var(--red-l); color: var(--red); box-shadow: none; }
+.is-v12 .is-tile strong { font-size: 36px; margin-top: 10px; }
+.is-v12 .is-tile-bar { height: 6px; border-radius: 4px; margin-top: 6px; } .is-v12 .is-tile-bar b { border-radius: 4px; }
+.is-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; white-space: normal !important; overflow: visible !important; }
+.is-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.is-tile-dot { width: 6px; height: 6px; border-radius: 50%; background: #d3dbd6; display: inline-block; }
+.is-tile-dot.draft { background: #c9c0a5; } .is-tile-dot.ready { background: #8fd1b6; } .is-tile-dot.instructions { background: #9db1ec; } .is-tile-dot.prepayment { background: var(--amber); } .is-tile-dot.prepaid { background: var(--green); } .is-tile-dot.shipped { background: var(--navy); } .is-tile-dot.invoiced { background: #b7c1bb; }
+.is-v12 .is-tile-link, .is-v12 .is-tile-acts { padding-top: 16px; }
+.is-v12 .is-board { margin-top: 0; }

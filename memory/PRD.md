@@ -188,3 +188,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - v11 simple tiles: whole tile = filter button (is-kpi-all / is-kpi-released / is-attn-group-message / is-tile-motion), 30px icon chips, 40px light figures, text-link actions (Mark prepaid, Send reminder, Reply, Ignore all, Next ship, N factories, Chase factory). No pills, no dividers.
 - v11.1: table restyled to match tiles (dot statuses w/o pills, transparent header, right-aligned footer totals, pill actions), staggered tile entrance, soft ring on selected tile.
 - Verified clean/modern pass on desktop, Open Orders tab and 390px mobile (screenshots). CSS-only since iteration_77 PASS.
+- Tiles reordered per user: In pipeline | Messages (Reply/Ignore all) | Needing payment (Mark prepaid/Send reminder) | Needing shipping instructions (ready+draft; Send instructions advances to instructions, Open). v12 inset-panel styling.
