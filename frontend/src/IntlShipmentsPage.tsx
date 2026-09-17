@@ -439,17 +439,38 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
       )}
 
       {dtab === 'chat' && (
-        <section className="is-card is-chat" data-testid="is-chat">
-          <div className="is-chat-head"><span className="is-chip"><MessageSquare size={16} /></span><div><strong>Shipment conversation</strong><small>Visible to the customer · notifications follow the admin setting.</small></div></div>
-          <div className="is-msgs">
+        <section className="is-card is-chat is-chat2" data-testid="is-chat">
+          <div className="is-chat-head">
+            <span className="is-chip"><MessageSquare size={16} /></span>
+            <div><strong>Conversation with {s.customer}</strong><small>{s.buyer} · visible in the customer portal</small></div>
+            <div className="is-chat-meta">{s.msgs.length > 0 && !s.msgs[s.msgs.length - 1].me ? <em className="is-chat-badge">Awaiting your reply</em> : <em className="is-chat-badge ok"><Check size={12} /> Up to date</em>}<span className="is-muted">{s.msgs.length} message{s.msgs.length === 1 ? '' : 's'}</span></div>
+          </div>
+          <div className="is-msgs" ref={(el) => { if (el) el.scrollTop = el.scrollHeight; }}>
             {s.msgs.length === 0 && <div className="is-chat-empty"><MessageSquare size={22} /><strong>No messages yet</strong><small>Start the conversation with {s.customer}. They'll see it in their portal.</small></div>}
-            {s.msgs.map((m) => <div key={m.id} className={`is-msg ${m.me ? 'me' : ''}`} data-testid="is-msg"><small>{m.who} · {m.at}</small><p>{m.text}</p></div>)}
+            {s.msgs.map((m, i) => { const day = m.at.split(',')[0]; const prevDay = i > 0 ? s.msgs[i - 1].at.split(',')[0] : null; const sameAsPrev = i > 0 && s.msgs[i - 1].who === m.who && prevDay === day; return (
+              <div key={m.id} className="is-msg-wrap">
+                {day !== prevDay && <div className="is-day"><span>{fmtAt(day)}</span></div>}
+                <div className={`is-msg ${m.me ? 'me' : ''} ${sameAsPrev ? 'cont' : ''}`} data-testid="is-msg">
+                  {!m.me && <i className="is-mono-av xs">{mono(m.who)}</i>}
+                  <div>
+                    {!sameAsPrev && <small>{m.me ? 'You' : m.who}<time>{m.at.split(', ')[1] ?? ''}</time></small>}
+                    <p>{m.text}</p>
+                  </div>
+                </div>
+              </div>
+            ); })}
           </div>
-          <div className="is-compose">
-            <textarea value={msg} onChange={(e) => setMsg(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder="Write a message…" data-testid="is-msg-input" />
-            <button className="is-btn dark" onClick={send} disabled={!msg.trim()} data-testid="is-msg-send"><Send size={15} /> Send</button>
+          <div className="is-compose-wrap">
+            <div className="is-quick">
+              {['Thanks — confirming receipt.', 'Prepayment received, releasing to factory.', 'Shipping instructions sent to the factory today.', 'Tracking will follow once the container departs.'].map((t) => <button key={t} className="is-quick-chip" onClick={() => setMsg(t)} data-testid="is-quick-reply">{t}</button>)}
+            </div>
+            <div className="is-compose">
+              <i className="is-mono-av xs me">RM</i>
+              <textarea value={msg} onChange={(e) => setMsg(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder={`Message ${s.customer}…`} data-testid="is-msg-input" />
+              <button className="is-btn dark" onClick={send} disabled={!msg.trim()} data-testid="is-msg-send"><Send size={15} /> Send</button>
+            </div>
+            <small className="is-muted">Enter to send · Shift + Enter for a new line</small>
           </div>
-          <small className="is-muted">Enter to send · Shift + Enter for a new line</small>
         </section>
       )}
 
