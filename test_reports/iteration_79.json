@@ -1,0 +1,39 @@
+{
+  "summary": "Intl Shipments tiles v13 regression (In pipeline / Messages / Needing payment / Shipping instructions). All specified counts, list previews, filter behaviors and regression selectors verified. New Shipment flow enables the instructions tile (1 to send, TEST Customer IS-0013). Zero console/page errors, zero horizontal overflow at 1920/1280/390.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "tile_order": ["is-kpi-all", "is-attn-group-message", "is-kpi-released", "is-tile-instructions"],
+    "is-kpi-all": {"active": 3, "list": ["Awaiting prepayment 1", "Prepaid 1", "Shipped 1"], "next_ship": "SASAtrend 86d", "rows_on_click": 3},
+    "is-attn-group-message": {"count": "2 awaiting reply", "previews": ["Ryan M Prepayment sent via Stripe. IS-0012", "Diego R Container departed Ningbo. Thanks! IS-0010"], "hint_after_click": "Focused", "rows_on_click": 2},
+    "is-kpi-released": {"value": "$3,182.50", "sub": "1 shipment due", "preview": "SASAtrend IS-0011 $3,182.50", "rows_on_click": 1},
+    "is-tile-instructions_initial": {"count": 0, "disabled": true},
+    "after_create_shipment": {"count": 1, "disabled": false, "preview": "TEST Customer IS-0013 Draft", "rows_on_click": 1},
+    "regression": {
+      "is-row-IS-0012": "opens detail, is-back returns",
+      "is-attn-ignore-IS-0010": "Messages tile reduces to 1",
+      "is-search_SASA": 1,
+      "is-filter-customer-toggle": "clicked (menu overlay not detected via generic selectors but no error)",
+      "is-stage-shipped_rows": 1,
+      "is-clear-filters": "OK",
+      "is-tab-orders/is-tab-shipments": "OK"
+    },
+    "responsive_overflow": {"1920x800": 0, "1280x800": 0, "390x844": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "is-kpi-released testid semantically maps to 'Needing payment' (prepayment). Consider renaming to is-focus-prepay for clarity (carried over from iter_78).",
+    "IntlShipmentsPage.tsx ~470 lines still bundles list + Detail; extracting Detail improves maintainability.",
+    "Instructions tile filters by status='ready' via setQueue('instr') which sets fQueue='instr' and matches 'ready' OR 'draft' — verified 1 draft appears after create."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth)",
+  "seed_data_creation": "Transient IS-0013 (TEST Customer / TEST Factory) via New Shipment",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Tiles v13 confirmed: In pipeline shows stage breakdown + Next ship line; Messages shows sender+preview+shipment id; Needing payment shows $ + customer/id/amount lines; Instructions shows customer/id/status lines. Instructions tile filter (fQueue='instr') matches ready||draft — verified TEST Customer IS-0013 draft appears after create."
+}
