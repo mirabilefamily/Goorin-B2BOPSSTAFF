@@ -306,3 +306,10 @@
   .ls-share { padding: 16px 12px 40px; }
 }
 @media (max-width: 480px) { .ls-grid { grid-template-columns: 1fr 1fr; } .ls-actions .ops-btn span { display: none; } }
+/* fixes: dropdown clipping + nested search input */
+.ls-catalog { overflow: visible; }
+.ls-catalog .ls-grid, .ls-catalog .ls-pager { border-radius: 0 0 22px 22px; }
+.ls-toolbar { position: relative; z-index: 5; } .ls-ms.open { z-index: 50; }
+.ls-field .ls-search input, .ls-search input { border: none !important; background: transparent !important; padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; outline: none !important; }
+.ls-search input:focus-visible, .ls-ms-search input:focus-visible, .dash-search input:focus-visible { outline: none !important; }
+.ls-search.block { padding: 10px 12px; }
