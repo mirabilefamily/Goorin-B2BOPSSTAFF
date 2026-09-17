@@ -463,7 +463,6 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-bar-row > span { grid-area: label; display: flex; align-items: baseline; gap: 8px; min-width: 0; } .is-bar-row strong { font-size: 13.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .is-bar-row small { font-size: 11.5px; color: var(--ink-4); }
 .is-bar-row > em { grid-area: val; font-style: normal; font-family: var(--ui); font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .is-bar-row > i { grid-area: bar; display: block; height: 6px; border-radius: 999px; background: #e3e9e5; overflow: hidden; } .is-bar-row > i b { display: block; height: 100%; border-radius: 999px; background: var(--green); transform-origin: left; animation: is-grow .8s cubic-bezier(.16,1,.3,1) both .2s; }
-.is-sched { display: none; }
 @media (max-width: 1280px) { .is-body { grid-template-columns: 1fr; } .is-next { padding-left: 0; border-left: none; padding-top: 14px; border-top: 1px dashed #d7e6de; } }
 
 /* action cards */
@@ -537,3 +536,10 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-v8 .is-foot { justify-content: flex-start; border-radius: 0 0 0 20px; margin-top: auto; }
 @media (max-width: 1280px) { .is-ws { grid-template-columns: 1fr; } .is-ws-side { border-left: none; border-top: 1px solid var(--line); border-radius: 0 0 20px 20px; } .is-r.on::after { display: none; } .is-v8 .is-foot { border-radius: 0; } }
 @media (max-width: 768px) { .is-v8 .is-bar .is-seg { flex: 1 1 100%; display: grid; grid-template-columns: 1fr 1fr; } .is-v8 .is-bar .is-seg button { justify-content: center; } .is-v8 .is-bar .ls-ms { flex: 1 1 45%; } .is-v8 .is-bar .ls-ms-btn { width: 100%; justify-content: space-between; } .is-v8 .is-bar-r { width: 100%; } .is-v8 .is-bar-r .is-btn.dark { flex: 1; justify-content: center; } .is-r { grid-template-columns: 1fr; padding: 14px 16px 14px 18px; } .is-r-right { flex-direction: row; align-items: center; justify-content: space-between; } .is-insp-actions .is-btn { flex: 1; justify-content: center; } }
+
+/* v9 */
+.is-v9 .is-sched { display: flex; margin-top: 18px; padding-top: 14px; border-top: 1px dashed #d7e6de; }
+.is-v9 .is-hero-chart { height: 96px; }
+.is-bars-list { display: flex; flex-direction: column; gap: 2px; }
+.is-v9 .is-acard p { min-height: 0; }
+.is-v9 .is-figure .is-all { margin-left: auto; }
