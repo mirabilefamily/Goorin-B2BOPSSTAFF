@@ -306,18 +306,21 @@ export default function PreBookPage({ onNavigate }: Props) {
                 </div>
                 <div className="pbx-report" data-testid="pb-stat-combined">
                   {[
-                    { key: 'all', name: 'Total Combined', dot: '#fff', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', testId: 'pb-stat-total' },
-                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', testId: 'pb-stat-usw' },
-                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', testId: 'pb-stat-dist' },
-                  ].map((c) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; return (
-                    <div key={c.key} className="pbx-rep" data-testid={c.testId}>
-                      <div className="pbx-rep-head"><i style={{ background: c.dot }} /><strong>{c.name}</strong><small>{c.accounts} accounts</small></div>
+                    { key: 'all', name: 'Total Combined', dot: '#fff', accounts: combined.accounts, units: combined.units, wholesale: combined.wholesale, hit: atOrAbove, of: skus.length, bar: '#6ee7b7', share: 100, delta: '+12% vs Drop 2', testId: 'pb-stat-total' },
+                    { key: 'usw', name: 'US Wholesale', dot: '#16a37a', accounts: 2, units: chan.usw.units, wholesale: chan.usw.wholesale, hit: Math.round(atOrAbove * 0.5), of: skus.length, bar: '#16a37a', share: Math.round((chan.usw.units / combined.units) * 100), delta: '−4% vs Drop 2', testId: 'pb-stat-usw' },
+                    { key: 'dist', name: 'Distributor', dot: '#3b82f6', accounts: 2, units: chan.dist.units, wholesale: chan.dist.wholesale, hit: atOrAbove, of: skus.length, bar: '#3b82f6', share: Math.round((chan.dist.units / combined.units) * 100), delta: '+18% vs Drop 2', testId: 'pb-stat-dist' },
+                  ].map((c, i) => { const rate = c.of ? Math.round((c.hit / c.of) * 100) : 0; const R = 17, C = 2 * Math.PI * R; return (
+                    <div key={c.key} className={`pbx-rep ${i === 0 ? 'primary' : ''}`} data-testid={c.testId}>
+                      <div className="pbx-rep-head"><i style={{ background: c.dot }} /><strong>{c.name}</strong>{i > 0 && <em className="pbx-rep-share">{c.share}% of units</em>}<small>{c.accounts} accounts</small></div>
                       <div className="pbx-rep-nums">
-                        <div><small>Units</small><b>{c.units.toLocaleString()}</b></div>
+                        <div className="pbx-rep-main"><small>Units</small><b>{c.units.toLocaleString()}</b><em className={c.delta.startsWith('+') ? 'up' : 'down'}>{c.delta}</em></div>
                         <div><small>Wholesale</small><b className="g">{c.wholesale}</b></div>
-                        <div><small>MOQ rate</small><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b></div>
+                        <div className="pbx-rep-ring">
+                          <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r={R} fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="4" /><circle cx="20" cy="20" r={R} fill="none" stroke={rate >= 90 ? '#34d399' : '#fbbf24'} strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(rate / 100) * C} ${C}`} transform="rotate(-90 20 20)" /></svg>
+                          <div><small>MOQ rate</small><b className={rate >= 90 ? 'g' : 'a'}>{rate}%</b><span>{c.hit}/{c.of} SKUs</span></div>
+                        </div>
                       </div>
-                      <div className="pbx-rep-bar"><small>MOQ hit</small><span><i style={{ width: `${rate}%`, background: c.bar }} /></span><small className="pbx-rep-of">{c.hit}/{c.of}</small></div>
+                      <div className="pbx-rep-bar"><span><i style={{ width: `${rate}%`, background: c.bar }} /></span></div>
                     </div>
                   ); })}
                 </div>
