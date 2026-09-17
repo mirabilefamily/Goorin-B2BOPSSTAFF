@@ -1,0 +1,53 @@
+{
+  "summary": "Frontend regression for Intl Shipments/Open Orders v14. Verified new stage chips (is-stage-instr/is-stage-msg/is-stage-all), restyled shipment detail page (title, 6+ fact panels, stepper, is-dtab-* tabs, is-advance CTA), removal of is-next-card/is-advance-card, and Open Orders MultiSelect customer/factory filters + tiles with lists. Zero console/page errors, no horizontal overflow at 1920x900 or 390x844.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verification_details": {
+    "login": "Empty creds -> ryan@mirabile.com dashboard, navigated to #intl-shipments",
+    "stage_chips": {
+      "is-stage-all_initial": "All 3",
+      "is-stage-instr_initial": "Missing shipping instructions 0 (zero class, empty state shown when clicked)",
+      "is-stage-msg_click": "2 rows (IS-0012 Mirabile, IS-0010 Mercury)",
+      "is-stage-instr_click": "0 rows + is-empty visible",
+      "is-stage-all_reset": "3 rows"
+    },
+    "detail_IS-0010": {
+      "title": "Industrias Mercury, S.A.",
+      "fact_panels": 10,
+      "is-stepper": "present (6 steps)",
+      "tabs_switched": ["is-dtab-chat", "is-dtab-docs", "is-dtab-activity"],
+      "is-next-card": 0,
+      "is-advance-card": 0,
+      "is-advance_before": "Mark invoiced",
+      "is-advance_after_click": "not present (final status reached / advanced)",
+      "is-back": "returns to #intl-shipments"
+    },
+    "open_orders": {
+      "is-oo-kpi-open": "8 POs 9,608 units + 3 factory rows (ASI 4, Hangzhou 3, Tan Son 1)",
+      "is-oo-kpi-overdue": "0 overdue message shown",
+      "is-oo-kpi-due": "6 units-to-book with due list (Grupo, Manhattan, Owear)",
+      "is-oo-kpi-groups": "2 consolidation rows (Owear ASI 2POs; SASAtrend Hangzhou 2POs)",
+      "is-oo-customer-toggle": "menu visible, 6 options; SASAtrend filter -> 2 rows",
+      "is-oo-factory-toggle": "menu visible, 3 options; first factory -> 4 rows",
+      "is-oo-search": "'Owear' -> 2 rows",
+      "is-oo-groups-toggle": "expands to 2 groups"
+    },
+    "responsive": {"1920x900_overflow_px": 0, "390x844_overflow_px": 0},
+    "console_errors": 0,
+    "page_errors": 0
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx still bundles list + Detail (>350 lines) — extraction into IntlShipmentDetail.tsx would improve maintainability.",
+    "OPEN_POS/OPEN_ORDERS mock data lives inside IntlOpenOrders.tsx — move to a shared /mocks module for reuse.",
+    "New Shipment modal inputs lack explicit data-testid on customer/factory fields, making test-automation of the create flow brittle (fallback via generic input indices)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "Empty email/password -> ryan@mirabile.com (mocked auth)",
+  "seed_data_creation": "None persisted (new-shipment modal opened but not submitted in this iteration; previous iteration_79 verified draft creation)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "v14 verified: stage chips include is-stage-instr and is-stage-msg before status chips. Detail page has no is-next-card/is-advance-card (removed) — only hero is-advance CTA. Open Orders uses MultiSelect with testids is-oo-customer-toggle/-menu/-opt-*/-clear/-done and is-oo-factory-*. Tiles is-oo-kpi-open/overdue/due/groups render list previews (3 factory rows, due list, 2 consolidation rows). Zero overflow at 1920x900 & 390x844."
+}

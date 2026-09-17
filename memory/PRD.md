@@ -194,3 +194,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Added filter chips: Missing shipping instructions (is-stage-instr, draft+ready) and Needs reply (is-stage-msg) before the stage chips; instructions tile always clickable.
 - v13.1: compact tiles (no min-height), pipeline legend inline + Next ship/overdue rows; lists bottom-aligned.
 - Detail page v2: customer as title, id/factory meta, inset fact panels, seg-style tabs; Next action card removed per user. Open Orders: MultiSelect filters (is-oo-customer/-factory sets), content-rich intake tiles (by factory, overdue, due-14 list, consolidation groups), quieter board styling.
+- Activity tab: timeline (round icon nodes, title/detail/date·by, latest dark). Open Orders tiles simplified (legend instead of factory list, lists capped at 2). Instructions tile relabeled "Needs shipping instructions". Back button = pill w/ Esc hint.

@@ -728,3 +728,22 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-oo .is-ship { background: transparent; padding: 0; font-weight: 600; } .is-oo .is-ship.soon { color: #9a6208; }
 .is-oo .is-po-cta { border-radius: 999px; height: 32px; }
 .is-oo .is-c1 small u { color: var(--ink-3); } .is-oo .is-po-id .is-id { color: var(--ink); font-family: var(--ui); }
+
+/* timeline */
+.is-tl .is-card-head { align-items: flex-start; } .is-tl .is-card-head p { margin-top: 2px; font-size: 13px; }
+.is-tl-list { list-style: none; display: flex; flex-direction: column; margin-top: 18px; }
+.is-tl-list li { position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding-bottom: 28px; }
+.is-tl-list li::before { content: ''; position: absolute; left: 27px; top: 56px; bottom: 0; width: 2px; background: #e6ebe8; }
+.is-tl-list li:last-child::before { display: none; } .is-tl-list li:last-child { padding-bottom: 4px; }
+.is-tl-list li > i { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--sub); color: var(--ink-2); box-shadow: 0 0 0 1px var(--line); }
+.is-tl-list li.latest > i { background: var(--ink); color: #fff; box-shadow: none; }
+.is-tl-list li > div { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; min-width: 0; }
+.is-tl-list strong { font-family: var(--ui); font-size: 17px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.is-tl-list span { font-size: 14px; color: var(--ink-2); }
+.is-tl-list small { font-size: 13px; color: var(--ink-4); margin-top: 2px; }
+.is-tile.static .is-tile-list { margin-top: auto; }
+.is-detail .is-crumbs { display: flex; align-items: center; gap: 10px; }
+.is-detail .is-back { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-family: var(--ui); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 2px rgba(15,31,24,.04); transition: border-color .16s, transform .16s, background .16s; }
+.is-detail .is-back:hover { border-color: #c9d3ce; transform: translateX(-2px); }
+.is-detail .is-back svg { color: var(--ink-3); }
+.is-detail .is-back::after { content: 'Esc'; margin-left: 4px; font-size: 10.5px; font-weight: 700; color: var(--ink-4); background: var(--sub); border-radius: 5px; padding: 1px 5px; letter-spacing: .04em; }

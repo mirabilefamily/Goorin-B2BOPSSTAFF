@@ -180,11 +180,11 @@ export default function IntlShipmentsPage() {
             </ul>
           </button>
           <button className={`is-tile ${fQueue === 'instr' ? 'on' : ''}`} onClick={() => setQueue('instr')} data-testid="is-tile-instructions">
-            <header><i className="violet"><Send size={15} /></i><span>Shipping instructions</span><em className="is-tile-hint">{fQueue === 'instr' ? 'Focused' : 'Focus'}</em></header>
-            <strong>{needInstr.length}<small>to send</small></strong>
+            <header><i className="violet"><Send size={15} /></i><span>Needs shipping instructions</span><em className="is-tile-hint">{fQueue === 'instr' ? 'Focused' : 'Focus'}</em></header>
+            <strong>{needInstr.length}<small>shipment{needInstr.length === 1 ? '' : 's'} waiting</small></strong>
             <ul className="is-tile-list">
               {needInstr.slice(0, 3).map((s) => <li key={s.id}><i className="is-mono-av xs">{mono(s.customer)}</i><span><b>{s.customer}</b> {s.id}</span><small>{STATUS_LABEL[s.status]}</small></li>)}
-              {needInstr.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>All sent · {list.filter((s) => s.status === 'instructions').length} awaiting factory confirmation</span></li>}
+              {needInstr.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>All instructions sent</span></li>}
             </ul>
           </button>
         </div>
@@ -197,24 +197,23 @@ export default function IntlShipmentsPage() {
         <div className="is-tiles">
           <div className="is-tile static" data-testid="is-oo-kpi-open">
             <header><i className="ink"><FileText size={15} /></i><span>Open purchase orders</span></header>
-            <strong>{OPEN_POS.length}<small>{oUnits.toLocaleString()} units</small></strong>
-            <small>{money(oValue)} not yet on a shipment</small>
-            <ul className="is-tile-list">{Array.from(new Set(OPEN_POS.map((p) => p.factory))).map((f) => <li key={f}><i className="is-mono-av xs">{mono(f)}</i><span>{f.replace(/\s*\(.*\)$/, '')}</span><b>{OPEN_POS.filter((p) => p.factory === f).length}</b></li>)}</ul>
+            <strong>{OPEN_POS.length}<small>{oUnits.toLocaleString()} units · {money(oValue)}</small></strong>
+                        <small className="is-legend">{Array.from(new Set(OPEN_POS.map((p) => p.factory))).map((f) => <span key={f}><i className="is-tile-dot prepaid" />{OPEN_POS.filter((p) => p.factory === f).length} {f.replace(/\s*\(.*\)$/, '')}</span>)}</small>
           </div>
           <div className={`is-tile static ${lateOs.length ? 'alert' : ''}`} data-testid="is-oo-kpi-overdue">
             <header><i className={lateOs.length ? 'red' : 'violet'}><AlertTriangle size={15} /></i><span>Past ship date</span></header>
             <strong>{lateOs.length}<small>overdue</small></strong>
-            <ul className="is-tile-list">{lateOs.slice(0, 3).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>{Math.abs(daysOut(p.shipDate))}d late</small></li>)}{lateOs.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing overdue — all POs on schedule</span></li>}</ul>
+            <ul className="is-tile-list">{lateOs.slice(0, 2).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>{Math.abs(daysOut(p.shipDate))}d late</small></li>)}{lateOs.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing overdue — all POs on schedule</span></li>}</ul>
           </div>
           <div className="is-tile static" data-testid="is-oo-kpi-due">
             <header><i className="amber"><CalendarClock size={15} /></i><span>Due within 14 days</span></header>
             <strong>{due14.length}<small>{due14.reduce((a, p) => a + poUnits(p), 0).toLocaleString()} units to book</small></strong>
-            <ul className="is-tile-list">{due14.slice(0, 3).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>in {daysOut(p.shipDate)}d</small></li>)}{due14.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing due in the next two weeks</span></li>}</ul>
+            <ul className="is-tile-list">{due14.slice(0, 2).map((p) => <li key={p.po}><i className="is-mono-av xs">{mono(p.customer)}</i><span><b>{p.customer}</b> {p.po}</span><small>in {daysOut(p.shipDate)}d</small></li>)}{due14.length === 0 && <li className="is-tile-ok"><Check size={12} /><span>Nothing due in the next two weeks</span></li>}</ul>
           </div>
           <div className="is-tile static" data-testid="is-oo-kpi-groups">
             <header><i className="blue"><Truck size={15} /></i><span>Consolidation</span></header>
             <strong>{groups}<small>group{groups === 1 ? '' : 's'} suggested</small></strong>
-            <ul className="is-tile-list">{Array.from(gm.entries()).filter(([, n]) => n > 1).slice(0, 3).map(([k, n]) => { const [c, f] = k.split('|'); return <li key={k}><i className="is-mono-av xs">{mono(c)}</i><span><b>{c}</b> {f.replace(/\s*\(.*\)$/, '')}</span><small>{n} POs</small></li>; })}{groups === 0 && <li className="is-tile-ok"><Check size={12} /><span>No consolidation opportunities right now</span></li>}</ul>
+            <ul className="is-tile-list">{Array.from(gm.entries()).filter(([, n]) => n > 1).slice(0, 2).map(([k, n]) => { const [c, f] = k.split('|'); return <li key={k}><i className="is-mono-av xs">{mono(c)}</i><span><b>{c}</b> {f.replace(/\s*\(.*\)$/, '')}</span><small>{n} POs</small></li>; })}{groups === 0 && <li className="is-tile-ok"><Check size={12} /><span>No consolidation opportunities right now</span></li>}</ul>
           </div>
         </div>
             ); })()}
@@ -468,9 +467,16 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
       )}
 
       {dtab === 'activity' && (
-        <section className="is-card is-activity" data-testid="is-activity">
-          <div className="is-card-head"><h2>Activity</h2><small className="is-muted">{s.activity.length} events · newest first</small></div>
-          <ul>{s.activity.map((a, i) => <li key={i}><i className={a.title.startsWith('Status') ? 'st' : a.title.includes('message') || a.title.includes('Message') ? 'msg' : a.title.includes('upload') ? 'doc' : ''} /><div><div className="is-act-row"><strong>{a.title}</strong><small>{a.at}</small></div>{a.detail && <span>{a.detail}</span>}<small className="is-act-by"><b className="is-mono-av xs">{mono(a.by)}</b>{a.by}</small></div></li>)}</ul>
+        <section className="is-card is-activity is-tl" data-testid="is-activity">
+          <div className="is-card-head"><div><h2>Activity</h2><p className="is-muted">Everything that has happened on this shipment.</p></div><small className="is-muted">{s.activity.length} event{s.activity.length === 1 ? '' : 's'}</small></div>
+          <ol className="is-tl-list">
+            {s.activity.map((a, i) => { const t = a.title.toLowerCase(); const Icon = t.includes('prepay') || t.includes('payment') ? CreditCard : t.includes('instruction') || t.includes('booking') ? Truck : t.includes('message') ? MessageSquare : t.includes('upload') || t.includes('document') ? FileText : t.includes('status') ? Check : Ship; return (
+              <li key={i} className={i === 0 ? 'latest' : ''}>
+                <i><Icon size={18} strokeWidth={1.8} /></i>
+                <div><strong>{a.title}</strong>{a.detail && <span>{a.detail}</span>}<small>{a.at} · {a.by}</small></div>
+              </li>
+            ); })}
+          </ol>
         </section>
       )}
     </div>
