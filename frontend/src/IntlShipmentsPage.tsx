@@ -458,7 +458,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
               <div key={m.id} className="is-msg-wrap">
                 {day !== prevDay && <div className="is-day"><span>{fmtAt(day)}</span></div>}
                 <div className={`is-msg ${m.me ? 'me' : ''} ${sameAsPrev ? 'cont' : ''}`} data-testid="is-msg">
-                  {!m.me && <i className="is-mono-av xs">{mono(m.who)}</i>}
+                  <i className="is-mono-av xs">{m.me ? 'RM' : mono(m.who)}</i>
                   <div>
                     {!sameAsPrev && <small>{m.me ? 'You' : m.who}<time>{m.at.split(', ')[1] ?? ''}</time></small>}
                     <p>{m.text}</p>
@@ -476,7 +476,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
               <textarea value={msg} onChange={(e) => setMsg(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder={`Message ${s.customer}…`} data-testid="is-msg-input" />
               <button className="is-btn dark" onClick={send} disabled={!msg.trim()} data-testid="is-msg-send"><Send size={15} /> Send</button>
             </div>
-            <small className="is-muted">Enter to send · Shift + Enter for a new line</small>
+            <small className="is-muted">Enter to send · Shift + Enter for a new line · Customer typically replies within one business day</small>
           </div>
         </section>
       )}

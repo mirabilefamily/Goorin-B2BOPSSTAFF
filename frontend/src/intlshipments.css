@@ -978,3 +978,28 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-chat2 .is-msg { flex-direction: row !important; align-items: flex-start !important; } .is-chat2 .is-msg.me { flex-direction: row-reverse !important; }
 .is-chat2 .is-msg .is-mono-av.xs { margin-top: 22px; } .is-chat2 .is-msg.cont .is-mono-av.xs { margin-top: 0; }
 .is-chat2 .is-msgs { gap: 2px; }
+
+/* chat v3 — reference scale */
+.is-chat2 { max-height: none; }
+.is-chat2 .is-chat-head { padding: 26px 32px; gap: 16px; }
+.is-chat2 .is-chat-head .is-chip { width: 64px; height: 64px; border-radius: 16px; background: #e8edfb; color: var(--navy); } .is-chat2 .is-chat-head .is-chip svg { width: 26px; height: 26px; }
+.is-chat2 .is-chat-head strong { font-size: 22px; font-weight: 600; letter-spacing: -.02em; } .is-chat2 .is-chat-head small { font-size: 16px; color: var(--ink-4); display: block; margin-top: 4px; }
+.is-chat-badge { font-size: 16px; font-weight: 600; padding: 12px 20px; border-radius: 999px; } .is-chat-meta .is-muted { font-size: 16px; }
+.is-chat2 .is-msgs { padding: 30px 32px 20px; gap: 6px; }
+.is-day { margin: 8px 0 24px; } .is-day span { font-size: 13px; }
+.is-chat2 .is-msg { max-width: 78%; gap: 20px; margin-bottom: 20px; align-items: flex-start !important; }
+.is-chat2 .is-msg .is-mono-av.xs { width: 56px !important; height: 56px !important; border-radius: 16px !important; font-size: 13px !important; margin-top: 30px !important; background: #fff !important; box-shadow: 0 0 0 1px var(--line) !important; color: var(--ink) !important; font-weight: 700; }
+.is-chat2 .is-msg.cont .is-mono-av.xs { margin-top: 0 !important; visibility: hidden; }
+.is-chat2 .is-msg small { font-size: 17px; font-weight: 600; color: var(--ink-2); gap: 12px; padding: 0 6px; } .is-chat2 .is-msg small time { font-size: 16px; font-weight: 500; }
+.is-chat2 .is-msg p { font-size: 19px; line-height: 1.5; padding: 20px 26px; border-radius: 22px 22px 22px 6px; }
+.is-chat2 .is-msg.me p { border-radius: 22px 22px 6px 22px; }
+.is-chat2 .is-msg.me .is-mono-av.xs { display: inline-grid; background: var(--ink) !important; color: #fff !important; box-shadow: none !important; }
+.is-compose-wrap { padding: 32px 32px 30px; gap: 26px; }
+.is-quick { gap: 16px; flex-wrap: wrap; overflow: visible; } .is-quick-chip { height: 58px; padding: 0 26px; font-size: 18px; font-weight: 600; color: var(--ink); border-color: var(--line); }
+.is-chat2 .is-compose { gap: 20px; }
+.is-chat2 .is-compose .is-mono-av.me { width: 66px; height: 66px; border-radius: 16px; font-size: 16px; margin-bottom: 26px; }
+.is-chat2 .is-compose textarea { min-height: 120px; font-size: 19px; padding: 26px 28px; border-radius: 22px; }
+.is-chat2 .is-compose .is-btn { height: 82px; padding: 0 32px; font-size: 20px; border-radius: 22px; margin-bottom: 20px; } .is-chat2 .is-compose .is-btn svg { width: 22px; height: 22px; }
+.is-chat2 .is-compose .is-btn.dark:disabled { background: #b3bab6; border-color: #b3bab6; opacity: 1; }
+.is-compose-wrap > .is-muted { font-size: 16px; }
+@media (max-width: 768px) { .is-chat2 .is-chat-head { padding: 16px; } .is-chat2 .is-chat-head .is-chip { width: 44px; height: 44px; } .is-chat2 .is-chat-head strong { font-size: 16px; } .is-chat2 .is-chat-head small { font-size: 13px; } .is-chat-badge { font-size: 12.5px; padding: 6px 12px; } .is-chat2 .is-msgs { padding: 16px 14px; } .is-chat2 .is-msg { max-width: 92%; gap: 10px; } .is-chat2 .is-msg .is-mono-av.xs { width: 34px !important; height: 34px !important; border-radius: 10px !important; font-size: 10.5px !important; margin-top: 24px !important; } .is-chat2 .is-msg small { font-size: 13px; } .is-chat2 .is-msg p { font-size: 15px; padding: 12px 16px; border-radius: 16px 16px 16px 4px; } .is-compose-wrap { padding: 14px; gap: 12px; } .is-quick-chip { height: 38px; padding: 0 14px; font-size: 13px; } .is-chat2 .is-compose { grid-template-columns: 1fr auto; } .is-chat2 .is-compose .is-mono-av.me { display: none; } .is-chat2 .is-compose textarea { min-height: 60px; font-size: 15px; padding: 14px 16px; border-radius: 14px; } .is-chat2 .is-compose .is-btn { height: 48px; padding: 0 16px; font-size: 14px; margin-bottom: 0; } .is-compose-wrap > .is-muted { font-size: 12px; } }

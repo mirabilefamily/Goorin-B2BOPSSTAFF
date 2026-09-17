@@ -206,3 +206,4 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Pipeline table cleanup: 6-col grid with dedicated actions column (Reply/Ignore or chevron), compact SO/PO blocks, units+lines on one line, tighter rows. Regression iteration_84 PASS (testing agent fixed a TS typo in re-upload handler).
 - Conversation tab v2: messenger layout (date separators, left/right bubbles w/ avatars+names+time, grouped consecutive msgs, Awaiting reply/Up to date badge, quick-reply chips, pinned composer, auto-scroll to latest).
 - Pipeline rows: unanswered message is a full-width tinted sub-row under the row with Reply/Ignore inline (is-attn-<id>, is-attn-reply-<id>, is-attn-ignore-<id>); actions column = chevron. Chat bubbles: avatar inline with name row.
+- Chat v3: scaled to user reference (56px avatars both sides, 19px bubbles, big quick chips, 120px composer, grey disabled Send).
