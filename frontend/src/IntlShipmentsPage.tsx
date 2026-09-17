@@ -152,43 +152,31 @@ export default function IntlShipmentsPage() {
         </div>
         {tab === 'shipments' ? (
         <div className="is-tiles">
-          <div className={`is-tile ${!filtered ? 'on' : ''}`} data-testid="is-tile-pipeline">
-            <header><i className="ink"><Ship size={16} /></i><span>In pipeline</span></header>
+          <button className={`is-tile ${!filtered ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); setQ(''); setFCustomer(new Set()); setFFactory(new Set()); }} data-testid="is-kpi-all">
+            <header><i className="ink"><Ship size={15} /></i><span>In pipeline</span></header>
             <strong>{active.length}</strong>
             <small>{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'No shipments yet'}</small>
             <div className="is-tile-bar" aria-hidden="true">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</div>
-            <footer>
-              <button className={`is-tile-act ${!filtered ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus('all'); setQ(''); setFCustomer(new Set()); setFFactory(new Set()); }} data-testid="is-kpi-all">{filtered ? 'Show all' : 'Showing all'}</button>
-              {nextUp && <button className="is-tile-act" onClick={() => setOpenId(nextUp.id)} data-testid={`is-next-${nextUp.id}`}>Next ship · {daysTo(nextUp.ship)}d <ChevronRight size={12} /></button>}
-            </footer>
-          </div>
-          <div className={`is-tile ${fStatus === 'prepayment' ? 'on' : ''}`} data-testid="is-tile-prepay">
-            <header><i className="amber"><CreditCard size={16} /></i><span>Awaiting prepayment</span></header>
+            {nextUp && <em className="is-tile-link" onClick={(e) => { e.stopPropagation(); setOpenId(nextUp.id); }} data-testid={`is-next-${nextUp.id}`}>Next ship in {daysTo(nextUp.ship)}d · {nextUp.customer} <ChevronRight size={13} /></em>}
+          </button>
+          <button className={`is-tile ${fStatus === 'prepayment' ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); }} disabled={prepayDue.length === 0} data-testid="is-kpi-released">
+            <header><i className="amber"><CreditCard size={15} /></i><span>Awaiting prepayment</span></header>
             <strong>{prepayDue.length}</strong>
             <small>{prepayDue.length ? `${money(prepayDue.reduce((a, s) => a + s.prepay, 0))} due · ${prepayDue.map((s) => s.customer.split(' ')[0]).join(', ')}` : `${money(released.reduce((a, s) => a + s.prepay, 0))} received · ${released.length} released`}</small>
-            <footer>
-              <button className={`is-tile-act ${fStatus === 'prepayment' ? 'on' : ''}`} onClick={() => { setFQueue(''); setFMsg(false); setFStatus(fStatus === 'prepayment' ? 'all' : 'prepayment'); }} disabled={prepayDue.length === 0} data-testid="is-kpi-released">{fStatus === 'prepayment' ? 'Focused' : 'Focus'}</button>
-              {prepayDue.length > 0 && <><button className="is-tile-act" onClick={() => toast(`Payment reminder sent to ${prepayDue.map((s) => s.buyer).join(', ')}`)} data-testid="is-act-remind">Send reminder</button><button className="is-tile-act go" onClick={markAllPrepaid} data-testid="is-act-mark-prepaid"><Check size={12} /> Mark prepaid</button></>}
-            </footer>
-          </div>
-          <div className={`is-tile ${fMsg ? 'on' : ''}`} data-testid="is-tile-msg">
-            <header><i className="blue"><MessageSquare size={16} /></i><span>Awaiting reply</span></header>
+            {prepayDue.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); markAllPrepaid(); }} data-testid="is-act-mark-prepaid"><Check size={13} /> Mark prepaid</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); toast(`Payment reminder sent to ${prepayDue.map((s) => s.buyer).join(', ')}`); }} data-testid="is-act-remind">Send reminder</em></span>}
+          </button>
+          <button className={`is-tile ${fMsg ? 'on' : ''}`} onClick={() => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); }} disabled={attention.length === 0} data-testid="is-attn-group-message">
+            <header><i className="blue"><MessageSquare size={15} /></i><span>Awaiting reply</span></header>
             <strong>{attention.length}</strong>
             <small>{attention.length ? `${attention[0].msgs[attention[0].msgs.length - 1].who}: “${attention[0].msgs[attention[0].msgs.length - 1].text}”` : 'Inbox clear — every message answered'}</small>
-            <footer>
-              <button className={`is-tile-act ${fMsg ? 'on' : ''}`} onClick={() => { setFQueue(''); setFStatus('all'); setFMsg((v) => !v); }} disabled={attention.length === 0} data-testid="is-attn-group-message">{fMsg ? 'Focused' : 'Focus'}</button>
-              {attention.length > 0 && <><button className="is-tile-act go" onClick={() => { setOpenTab('chat'); setOpenId(attention[0].id); }} data-testid="is-act-reply">Reply · {attention[0].id}</button><button className="is-tile-act" onClick={() => attention.forEach(ignoreMsg)} data-testid="is-act-ignore-all">Ignore all</button></>}
-            </footer>
-          </div>
-          <div className={`is-tile ${late.length ? 'alert' : ''} ${fQueue === 'overdue' ? 'on' : ''}`} data-testid="is-tile-motion">
-            <header><i className={late.length ? 'red' : 'violet'}>{late.length ? <AlertTriangle size={16} /> : <Boxes size={16} />}</i><span>{late.length ? 'Overdue' : 'In motion'}</span></header>
+            {attention.length > 0 && <span className="is-tile-acts"><em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(attention[0].id); }} data-testid="is-act-reply"><MessageSquare size={13} /> Reply · {attention[0].id}</em><em className="is-tile-link" onClick={(e) => { e.stopPropagation(); attention.forEach(ignoreMsg); }} data-testid="is-act-ignore-all">Ignore all</em></span>}
+          </button>
+          <button className={`is-tile ${late.length ? 'alert' : ''} ${fQueue === 'overdue' ? 'on' : ''}`} onClick={() => late.length ? setQueue('overdue') : setFactoriesOpen(true)} data-testid="is-tile-motion">
+            <header><i className={late.length ? 'red' : 'violet'}>{late.length ? <AlertTriangle size={15} /> : <Boxes size={15} />}</i><span>{late.length ? 'Overdue' : 'In motion'}</span></header>
             <strong>{late.length ? late.length : list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
             <small>{late.length ? `${late.map((s) => s.id).join(', ')} past planned ship date` : `units · ${money(list.reduce((a, s) => a + soTotal(s), 0))} declared value`}</small>
-            <footer>
-              {late.length ? <><button className={`is-tile-act ${fQueue === 'overdue' ? 'on' : ''}`} onClick={() => setQueue('overdue')} data-testid="is-queue-overdue">{fQueue === 'overdue' ? 'Focused' : 'Focus'}</button><button className="is-tile-act go" onClick={() => toast('Follow-up sent to factories')} data-testid="is-act-chase">Chase factory</button></>
-              : <>{list.some(dueSoon) && <button className={`is-tile-act ${fQueue === 'soon' ? 'on' : ''}`} onClick={() => setQueue('soon')} data-testid="is-queue-soon">Shipping in 30d · {list.filter(dueSoon).length}</button>}<button className="is-tile-act" onClick={() => setFactoriesOpen(true)} data-testid="is-act-factories">{factories.length} factories <ChevronRight size={12} /></button></>}
-            </footer>
-          </div>
+            {late.length ? <em className="is-tile-link go" onClick={(e) => { e.stopPropagation(); toast('Follow-up sent to factories'); }} data-testid="is-act-chase">Chase factory</em> : <em className="is-tile-link" data-testid="is-act-factories">{factories.length} factories <ChevronRight size={13} /></em>}
+          </button>
         </div>
         ) : (() => {
             const oUnits = OPEN_POS.reduce((a, p) => a + poUnits(p), 0); const oValue = OPEN_POS.reduce((a, p) => a + poValue(p), 0);
