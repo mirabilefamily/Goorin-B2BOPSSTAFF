@@ -244,8 +244,9 @@ export default function IntlShipmentsPage() {
             <span />
           </div>
           {rows.map((s) => { const m = unanswered(s) ? s.msgs[s.msgs.length - 1] : null; const sh = shipText(s); const idx = stepIdx(s.status); return (
-            <div key={s.id} className={`is-ptr is-prow ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
-              <div className="is-pc-ship"><i className="is-mono-av">{mono(s.customer)}</i><div><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b> · Created {s.created}</small>{m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><MessageSquare size={11} /> {m.who}: “{m.text}”</span>}</div></div>
+            <div key={s.id} className={`is-prow ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
+              <div className="is-ptr is-prow-main">
+              <div className="is-pc-ship"><i className="is-mono-av">{mono(s.customer)}</i><div><strong>{s.customer}</strong><small><b className="is-id">{s.id}</b> · Created {s.created}</small></div></div>
               <div className="is-pc-stage"><em className={`is-status pill ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><i className="is-prog">{STEPS.map((st, i) => <b key={st.id} className={i < idx ? 'd' : i === idx ? 'n' : ''} />)}</i></div>
               <div className="is-pc-fac"><strong>{s.factory}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></div>
               <div className="is-pc-orders">
@@ -257,8 +258,14 @@ export default function IntlShipmentsPage() {
                 <span className={`is-ship ${sh.tone}`}>{sh.sub === 'Shipped' ? `Shipped · ${sh.main}` : sh.sub === 'Ship date' ? 'Ship date TBD' : `Ships ${sh.sub} · ${sh.main}`}</span>
               </div>
               <div className="is-pc-acts">
-                {m ? <><button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button><button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} aria-label="Ignore" title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button></> : <i className="is-chev" />}
+                <i className="is-chev" />
               </div>
+            </div>
+              {m && <div className="is-msgrow" data-testid={`is-attn-${s.id}`}>
+                <i className="is-mono-av xs">{mono(m.who)}</i>
+                <span className="is-msgrow-txt"><b>{m.who}</b> {m.text}<time>{m.at}</time></span>
+                <span className="is-msgrow-acts"><button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}><MessageSquare size={13} /> Reply</button><button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} aria-label="Ignore" title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button></span>
+              </div>}
             </div>
           ); })}
           {rows.length === 0 && <div className="is-empty" data-testid="is-empty">No shipments match these filters.</div>}

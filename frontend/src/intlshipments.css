@@ -964,3 +964,17 @@ div.is-queue { cursor: default; } div.is-queue:hover { transform: none; box-shad
 .is-chat2 .is-msg { align-self: flex-start; margin-left: 0; margin-right: 0; width: auto; } .is-chat2 .is-msg.me { align-self: flex-end; }
 .is-chat2 .is-msg-wrap { width: 100%; }
 .is-chat2 .is-msg { align-items: flex-start; } .is-chat2 .is-msg .is-mono-av.xs { margin-top: 20px; } .is-chat2 .is-msg.cont .is-mono-av.xs { margin-top: 0; }
+
+/* message sub-row */
+.is-prow { display: block; padding: 0; }
+.is-prow-main { border-bottom: none; }
+.is-msgrow { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin: -4px 26px 14px 82px; padding: 10px 12px 10px 12px; background: var(--navy-l); border-radius: 12px; }
+.is-msgrow .is-mono-av.xs { width: 28px; height: 28px; border-radius: 9px; font-size: 10px; display: inline-grid; place-items: center; background: #fff; color: var(--navy); }
+.is-msgrow-txt { font-size: 13.5px; color: var(--ink); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .is-msgrow-txt b { font-weight: 700; color: var(--navy); margin-right: 4px; } .is-msgrow-txt time { margin-left: 10px; font-size: 12px; color: #5a6fb3; }
+.is-msgrow-acts { display: flex; gap: 6px; } .is-msgrow-acts .is-act.primary { background: var(--navy); border-color: var(--navy); } .is-msgrow-acts .is-act.primary:hover { background: #1e3f9e; border-color: #1e3f9e; }
+.is-msgrow-acts .is-act:not(.primary) { background: #fff; border-color: #c9d3ee; }
+@media (max-width: 768px) { .is-msgrow { margin: 0 12px 12px; grid-template-columns: auto 1fr; } .is-msgrow-acts { grid-column: 1 / -1; justify-content: flex-end; } .is-msgrow-txt { white-space: normal; } .is-msgrow-txt time { display: block; margin: 2px 0 0; } }
+/* chat alignment fix */
+.is-chat2 .is-msg { flex-direction: row !important; align-items: flex-start !important; } .is-chat2 .is-msg.me { flex-direction: row-reverse !important; }
+.is-chat2 .is-msg .is-mono-av.xs { margin-top: 22px; } .is-chat2 .is-msg.cont .is-mono-av.xs { margin-top: 0; }
+.is-chat2 .is-msgs { gap: 2px; }

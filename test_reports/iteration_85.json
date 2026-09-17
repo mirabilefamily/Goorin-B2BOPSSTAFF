@@ -1,0 +1,18 @@
+{
+  "summary": "Frontend-only regression for Intl Shipments Conversation messenger layout. Login empty creds -> Intl Shipments. is-attn-reply-IS-0012 opens detail with is-chat, badge 'Awaiting your reply', 3 is-msg bubbles, 2 date separators present. First is-quick-reply fills textarea; is-msg-send appends 4th right-aligned 'me' bubble; badge switches to 'Up to date'; Conversation tab count = 4; last bubble visible (auto-scrolled). Enter sends (5th bubble); Shift+Enter inserts newline and does not send. Regression: is-dtab-docs shows is-packing-reupload; is-dtab-activity works; is-back returns; is-attn-ignore-IS-0010 dismisses; is-tab-orders / is-tab-shipments toggle. Mobile 390x844: composer visible, no overflow. No console errors (only benign Recharts width warnings on dashboard load).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntlShipmentsPage.tsx is 509 lines - within limits, but composer/chat section could be extracted to a dedicated component for clarity",
+    "Auto-scroll uses ref callback (el.scrollTop = el.scrollHeight) on every render; fine but a useEffect on messages length would be cleaner"
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "empty email/password -> ryan@mirabile.com",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All Conversation messenger requirements verified end-to-end at 1920x900 and 390x844. Recharts container warnings on dashboard are pre-existing and not related to shipments."
+}
