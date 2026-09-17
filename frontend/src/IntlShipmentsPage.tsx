@@ -122,6 +122,7 @@ export default function IntlShipmentsPage() {
 
   return (
     <div className="is" data-testid="intl-shipments-page">
+      <section className="is-card is-overview">
       <div className="is-modebar" data-testid="is-modebar">
         <div className="ops-seg is-mode-seg" role="tablist">
           <button className={tab === 'shipments' ? 'active' : ''} onClick={() => setTab('shipments')} data-testid="is-tab-shipments">Shipments <b>{active.length}</b></button>
@@ -132,6 +133,26 @@ export default function IntlShipmentsPage() {
           <button className="ops-btn dark" onClick={() => setCreating(true)} data-testid="is-new-shipment"><Plus size={15} /> New Shipment</button>
         </div>
       </div>
+      {tab === 'shipments' && <div className="is-kpis" data-testid="is-priority-strip">
+        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
+          <span>In pipeline</span><strong>{active.length}</strong>
+          <i className="is-dist">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</i>
+          <small>{dist.filter((d) => d.n > 0).map((d) => <em key={d.id} className={d.id}><i />{d.n} {STATUS_LABEL[d.id].toLowerCase()}</em>)}</small>
+        </button>
+        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
+          <span>Released to factory</span><strong className="g">{released.length}</strong>
+          <small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
+        </button>
+        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
+          <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong>
+          <small>{attention.length ? attention.map((s) => s.customer.split(' ')[0]).join(', ') : 'Inbox clear'}</small>
+        </button>
+        <div className="is-kpi">
+          <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
+          <small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared</small>
+        </div>
+      </div>}
+      </section>
 
       {tab === 'orders' && (
         <IntlOpenOrders
@@ -141,26 +162,6 @@ export default function IntlShipmentsPage() {
       )}
 
       {tab === 'shipments' && <>
-      <section className="is-card is-kpis" data-testid="is-priority-strip">
-        <button className={`is-kpi ${fStatus === 'all' ? 'on' : ''}`} onClick={() => setFStatus('all')} data-testid="is-kpi-all">
-          <span>In pipeline</span><strong>{active.length}</strong>
-          <i className="is-dist">{dist.filter((d) => d.n > 0).map((d) => <b key={d.id} className={d.id} style={{ flex: d.n }} />)}</i>
-          <small>{dist.filter((d) => d.n > 0).map((d) => `${d.n} ${STATUS_LABEL[d.id].toLowerCase()}`).join(' · ') || 'No shipments'}</small>
-        </button>
-        <button className={`is-kpi ${fStatus === 'prepaid' ? 'on' : ''}`} onClick={() => setFStatus(fStatus === 'prepaid' ? 'all' : 'prepaid')} data-testid="is-kpi-released">
-          <span>Released to factory</span><strong className="g">{released.length}</strong>
-          <small>{money(released.reduce((a, s) => a + s.prepay, 0))} prepayment received</small>
-        </button>
-        <button className={`is-kpi ${fMsg ? 'on' : ''}`} onClick={() => setFMsg((v) => !v)} disabled={attention.length === 0} data-testid="is-attn-group-message">
-          <span>Awaiting reply</span><strong className={attention.length ? 'b' : ''}>{attention.length}</strong>
-          <small>{attention.length ? `${list.filter((s) => { const d = daysTo(s.ship); return d !== null && d < 0 && s.status !== 'shipped' && s.status !== 'invoiced'; }).length} overdue · ${attention.map((s) => s.customer.split(' ')[0]).join(', ')}` : 'Inbox clear'}</small>
-        </button>
-        <div className="is-kpi">
-          <span>In motion</span><strong>{list.reduce((a, s) => a + units(s), 0).toLocaleString()}</strong>
-          <small>units · {money(list.reduce((a, s) => a + soTotal(s), 0))} declared value</small>
-        </div>
-      </section>
-
       <section className="is-card is-board">
         <div className="is-board-head">
           <label className="is-search"><Search size={16} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search shipments, customers, SO or PO" data-testid="is-search" />{q && <button className="is-search-x" onClick={() => setQ('')} aria-label="Clear search"><X size={13} /></button>}</label>
@@ -181,18 +182,17 @@ export default function IntlShipmentsPage() {
             <div key={s.id} className={`is-tr is-row ${m ? 'has-msg' : ''}`} role="button" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)} data-testid={`is-row-${s.id}`}>
               <span className="is-c1">
                 <strong>{s.customer}</strong>
-                <small><b className="is-id">{s.id}</b> · {Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}</small>
-                {m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><i /><em>{m.who}:</em> {m.text}</span>}
+                <small><b className="is-id">{s.id}</b><i className="is-sep" />{Array.from(new Set(s.lines.map((l) => l.so))).join(', ') || 'No SO'}{m && <span className="is-attn" data-testid={`is-attn-${s.id}`}><MessageSquare size={11} /> {m.who}: “{m.text}”</span>}</small>
               </span>
-              <span className="is-c2"><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><small>Step {stepIdx(s.status) + 1} of {STEPS.length}</small></span>
+              <span className="is-c2"><em className={`is-status ${s.status}`}><i />{STATUS_LABEL[s.status]}</em><small>Created {s.created}</small></span>
               <span className="is-c2"><strong>{s.factory.replace(/\s*\(.*\)$/, '')}</strong><small>{s.incoterms} · {s.currency}{s.booking.mode !== '—' ? ` · ${s.booking.mode}` : ''}</small></span>
               <span className={`is-c2 is-date ${sh.tone}`}><strong>{sh.main}</strong><small>{sh.sub}</small></span>
               <span className="is-c4 r"><strong>{units(s).toLocaleString()}</strong><small>{s.lines.length} line{s.lines.length === 1 ? '' : 's'}</small></span>
               <span className="is-c4 r"><strong>{money(soTotal(s))}</strong><small>PO {money(poTotal(s))}</small></span>
               <span className="is-c5">
                 {m ? <>
-                  <button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}><MessageSquare size={13} /> Reply</button>
-                  <button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" data-testid={`is-attn-ignore-${s.id}`}><Check size={13} /></button>
+                  <button className="is-act primary" onClick={(e) => { e.stopPropagation(); setOpenTab('chat'); setOpenId(s.id); }} data-testid={`is-attn-reply-${s.id}`}>Reply</button>
+                  <button className="is-act" onClick={(e) => { e.stopPropagation(); ignoreMsg(s); }} title="Dismiss — no reply needed" aria-label="Ignore" data-testid={`is-attn-ignore-${s.id}`}><Check size={14} /></button>
                 </> : <i className="is-chev" />}
               </span>
             </div>
