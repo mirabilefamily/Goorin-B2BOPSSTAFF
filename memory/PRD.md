@@ -207,3 +207,8 @@ Original request: port attached Vite/TS Bolt project into CRA env as a pixel-per
 - Conversation tab v2: messenger layout (date separators, left/right bubbles w/ avatars+names+time, grouped consecutive msgs, Awaiting reply/Up to date badge, quick-reply chips, pinned composer, auto-scroll to latest).
 - Pipeline rows: unanswered message is a full-width tinted sub-row under the row with Reply/Ignore inline (is-attn-<id>, is-attn-reply-<id>, is-attn-ignore-<id>); actions column = chevron. Chat bubbles: avatar inline with name row.
 - Chat v3: scaled to user reference (56px avatars both sides, 19px bubbles, big quick chips, 120px composer, grey disabled Send).
+
+
+## 2026-06 (fork) — Runtime overlay fix
+- Suppressed opaque cross-origin `Script error.` events (from platform preview script) in `public/index.html` so the CRA red overlay no longer appears.
+- Fixed day-divider formatting for newly sent chat messages (`stamp()` now emits MM-DD-YYYY, matching `fmtAt`).

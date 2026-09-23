@@ -320,7 +320,7 @@ function Detail({ s, onBack, update, initialTab = 'overview' }: { s: Shipment; o
   const [dtab, setDtab] = useState<DTab>(initialTab);
   const idx = stepIdx(s.status);
   const total = soTotal(s);
-  const stamp = () => new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const stamp = () => new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(/\//g, '-');
   const advance = () => {
     const next = STEPS[Math.min(idx + 1, STEPS.length - 1)].id;
     update((x) => ({ ...x, status: next, activity: [{ title: 'Status changed', detail: `${STATUS_LABEL[x.status].toLowerCase()} → ${STATUS_LABEL[next].toLowerCase()}`, at: stamp(), by: 'Ryan Mirabile' }, ...x.activity] }));
